@@ -42,7 +42,7 @@ class HomeFixer extends Component {
         <MapView style={{height: '50%'}} />
         <View style={styles.containerInfor}>
           <Text style={styles.nameRepair}>
-            Tiệm sửa xe {stationInformation.nameStore}
+            Tiệm sửa xe {stationInformation.name}
           </Text>
           <View style={styles.information}>
             <View style={{padding: 5}}>

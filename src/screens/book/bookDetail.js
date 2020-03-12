@@ -69,11 +69,6 @@ class BookDetail extends Component {
 
   handleService = () => {
     const {serviceSelected} = this.state;
-
-    console.log('total price', serviceSelected);
-
-
-
     this.props.addServiceToBook(serviceSelected, this.props.value.id);
     this.setModalVisible(!this.state.modalVisible);
   };
@@ -178,8 +173,8 @@ class BookDetail extends Component {
             <Text style={styles.idOrder}> {book.id}</Text>
           </View>
           <View style={styles.between}>
-            <Text>Tên khách hàng: Đặng Phuong Nam</Text>
-            <Text>SDT: 0325468972</Text>
+            <Text>Tên khách hàng: {book.user.fullName}</Text>
+            <Text>SDT: {book.user.phone}</Text>
           </View>
           <Text style={{marginHorizontal: 15}}>Thời gian: {book.time}</Text>
 

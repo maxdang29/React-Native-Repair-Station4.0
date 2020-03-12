@@ -18,11 +18,11 @@ class Register extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      userName: 'nam nam',
-      address: 'Đội 4, Minh Tiến, Thái Thủy',
+      userName: 'Phương Nam',
+      address: 'Đội 4, Minh Tiến, TX Quảng Trị',
       password: '123123123',
       confirmPassword: '123123123',
-      phone: '123123123',
+      phone: '0368947444',
       addressError: null,
       passwordError: null,
       userNameError: null,
@@ -81,7 +81,7 @@ class Register extends Component {
       const user = {
         address: address,
         password: password,
-        nameStore: userName,
+        name: userName,
         phoneNumber: phone,
         available: true,
         hasAmbulatory: false,

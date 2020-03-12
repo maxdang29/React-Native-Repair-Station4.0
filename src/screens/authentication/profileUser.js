@@ -13,7 +13,7 @@ class ProfileUser extends Component {
     const {stationInformation} = this.props;
     return (
       <View style={styles.container}>
-        <Text>Ten cua hang: {stationInformation.nameStore}</Text>
+        <Text>Ten cua hang: {stationInformation.name}</Text>
         <TouchableOpacity
           style={styles.buttonLogOut}
           onPress={() => this.props.logOut(stationInformation.id)}>

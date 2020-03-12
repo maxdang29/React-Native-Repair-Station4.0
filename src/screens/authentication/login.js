@@ -18,7 +18,7 @@ class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      phone: '123123123',
+      phone: '0368947444',
       password: '123123123',
       phoneError: null,
       passwordError: null,
@@ -69,6 +69,7 @@ class Login extends Component {
         phoneNumber: phone,
         password: password,
       };
+
       let station = allStation.find(element => {
         return (
           element.phoneNumber === user.phoneNumber &&
