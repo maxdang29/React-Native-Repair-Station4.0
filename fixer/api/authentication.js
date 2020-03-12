@@ -1,18 +1,18 @@
 import firebase from 'react-native-firebase';
 
-export async function loginRequest(user) {
-  let result;
-  await firebase
-    .auth()
-    .signInWithEmailAndPassword(user.email, user.password)
-    .then(response => {
-      result = true;
-    })
-    .catch(error => {
-      throw error;
-    });
-  return result;
-}
+// export async function loginRequest(user) {
+//   let result;
+//   await firebase
+//     .auth()
+//     .signInWithEmailAndPassword(user.email, user.password)
+//     .then(response => {
+//       result = true;
+//     })
+//     .catch(error => {
+//       throw error;
+//     });
+//   return result;
+// }
 
 export async function logOutRequest() {
   await firebase

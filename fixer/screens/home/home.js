@@ -1,5 +1,10 @@
 import React, {Component} from 'react';
-import {Text, View, StyleSheet, TouchableOpacity} from 'react-native';
+import {
+  Text,
+  View,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import MapView, {Marker} from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
@@ -11,7 +16,7 @@ class HomeFixer extends Component {
   constructor(props) {
     super(props);
   }
-  componentDidMount() {
+  async componentDidMount() {
     this.props.getStationInformation();
   }
   changeToggleSwitch = isOn => {
@@ -19,7 +24,6 @@ class HomeFixer extends Component {
   };
   render() {
     const {stationInformation} = this.props;
-
     return (
       <View style={styles.container}>
         <View style={styles.getRepair}>
@@ -28,7 +32,7 @@ class HomeFixer extends Component {
           </Text>
 
           <ToggleSwitch
-            isOn={stationInformation.status}
+            isOn={stationInformation.hasAmbulatory}
             onColor="#44db5e"
             offColor="red"
             size="medium"
@@ -38,7 +42,7 @@ class HomeFixer extends Component {
         <MapView style={{height: '50%'}} />
         <View style={styles.containerInfor}>
           <Text style={styles.nameRepair}>
-            Tiệm sửa xe {stationInformation.userName}
+            Tiệm sửa xe {stationInformation.nameStore}
           </Text>
           <View style={styles.information}>
             <View style={{padding: 5}}>
@@ -71,7 +75,9 @@ class HomeFixer extends Component {
 
               <View style={{padding: 10}}>
                 <Icon style={styles.icon} name="ios-star-outline" size={35} />
-                <Text style={styles.textAlign}>5.00</Text>
+                <Text style={styles.textAlign}>
+                  {stationInformation.totalRating}
+                </Text>
               </View>
             </View>
           </View>
@@ -140,7 +146,7 @@ const mapStateToProps = store => {
 const mapDispatchToProps = dispatch => {
   return {
     getStationInformation: service => {
-      dispatch(authenticationAction.getStation());
+      dispatch(authenticationAction.getStationById());
     },
     changePower: (stationKey, status) => {
       dispatch(authenticationAction.changePower(stationKey, status));

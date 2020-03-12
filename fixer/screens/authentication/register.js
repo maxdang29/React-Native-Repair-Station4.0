@@ -11,6 +11,7 @@ import {connect} from 'react-redux';
 import * as authenticationAction from '../../redux/authentication/actions/actions';
 import firebase from 'react-native-firebase';
 import {Navigation} from 'react-native-navigation';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 import startApp from '../../navigation/bottomTab';
 class Register extends Component {
@@ -18,16 +19,16 @@ class Register extends Component {
     super(props);
     this.state = {
       userName: 'nam nam',
-      email: 'abc3312@gmail.com',
+      address: 'Đội 4, Minh Tiến, Thái Thủy',
       password: '123123123',
       confirmPassword: '123123123',
       phone: '123123123',
-      emailError: null,
+      addressError: null,
       passwordError: null,
       userNameError: null,
       confirmPasswordError: null,
       phoneError: null,
-      tokenDevice: null,
+      message: null,
     };
   }
 
@@ -39,13 +40,14 @@ class Register extends Component {
   }
 
   componentDidMount() {
+    this.props.getAllStation();
+
     firebase
       .messaging()
       .getToken()
       .then(fcmToken => {
         if (fcmToken) {
           // user has a device token
-          console.log('token   ', fcmToken);
           this.onchangeText('tokenDevice', fcmToken);
         } else {
           // user doesn't have a device token yet
@@ -62,31 +64,42 @@ class Register extends Component {
   }
   register = () => {
     const {
-      email,
+      address,
       password,
       userName,
       phone,
       confirmPassword,
-      emailError,
+      addressError,
       passwordError,
       userNameError,
       confirmPasswordError,
       phoneError,
-      tokenDevice,
     } = this.state;
+    const {allStation} = this.props;
 
-    if (email && password && userName && phone && confirmPassword) {
+    if (address && password && userName && phone && confirmPassword) {
       const user = {
-        email: email,
+        address: address,
         password: password,
-        userName: userName,
+        nameStore: userName,
         phoneNumber: phone,
-        token: tokenDevice,
+        available: true,
+        hasAmbulatory: false,
+        starRating: 0,
+        totalRating: 0,
       };
-      this.props.register(user);
+      const found = allStation.filter(element => {
+        return element.phoneNumber === user.phoneNumber;
+      });
+      if (found.length > 0) {
+        this.setState({message: 'Số điện thoại này đã tồn tại!'});
+      } else {
+        this.props.register(user, this.props.componentId);
+        this.setState({message: null});
+      }
     } else {
-      if (!email) this.onchangeText('emailError', 'Nhập Email');
-      else this.onchangeText('emailError', null);
+      if (!address) this.onchangeText('addressError', 'Nhập địa chỉ');
+      else this.onchangeText('addressError', null);
       if (!password) this.onchangeText('passwordError', 'Nhập mật khẩu');
       else this.onchangeText('passwordError', null);
       if (!userName) this.onchangeText('userNameError', 'Nhập tên đăng nhập');
@@ -103,12 +116,14 @@ class Register extends Component {
   };
   render() {
     const {
-      emailError,
+      addressError,
       passwordError,
       userNameError,
       phoneError,
       confirmPasswordError,
+      message,
     } = this.state;
+
     return (
       <ScrollView>
         <View style={styles.container}>
@@ -117,22 +132,22 @@ class Register extends Component {
             <InputText
               ref={ref => (this.userName = ref)}
               onSubmitEditing={() => {
-                this.focusNextField('Email');
+                this.focusNextField('address');
               }}
               onchangeText={value => this.onchangeText('userName', value)}
-              title="Tên đăng nhập *"
+              title="Tên cửa hàng *"
               error={userNameError}
-              icon="https://img.icons8.com/windows/2x/name.png"
+              icon="https://img.icons8.com/dotty/2x/online-store.png"
             />
             <InputText
-              ref={ref => (this.email = ref)}
+              ref={ref => (this.address = ref)}
               onSubmitEditing={() => {
                 this.focusNextField('phone');
               }}
-              onchangeText={value => this.onchangeText('email', value)}
-              title="Email *"
-              error={emailError}
-              icon="https://img.icons8.com/ios/2x/send-mass-email.png"
+              onchangeText={value => this.onchangeText('address', value)}
+              title="Địa chỉ *"
+              error={addressError}
+              icon="https://img.icons8.com/ios/2x/address.png"
             />
             <InputText
               ref={ref => (this.phone = ref)}
@@ -154,6 +169,7 @@ class Register extends Component {
               title="Mật khẩu *"
               error={passwordError}
               icon="https://img.icons8.com/ios/2x/password.png"
+              isSecureTextEntry={true}
             />
             <InputText
               ref={ref => (this.confirmPassword = ref)}
@@ -163,9 +179,15 @@ class Register extends Component {
               title="Xác nhận mật khẩu *"
               error={confirmPasswordError}
               icon="https://img.icons8.com/ios/2x/reviewer-female.png"
+              isSecureTextEntry={true}
             />
           </View>
-
+          {message ? (
+            <View style={styles.containerError}>
+              <Icon name="ios-alert" style={styles.error} />
+              <Text style={[styles.error, styles.textError]}>{message}</Text>
+            </View>
+          ) : null}
           <View style={styles.row}>
             <TouchableOpacity
               style={styles.button}
@@ -210,17 +232,32 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginVertical: 30,
   },
+  containerError: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  error: {
+    color: 'red',
+    fontSize: 14,
+  },
+  textError: {
+    marginLeft: 14,
+  },
 });
 const mapStateToProps = store => {
   return {
     onLogin: store.AuthenticationReducers.onLogin,
+    allStation: store.AuthenticationReducers.allStation,
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    register: data => {
-      dispatch(authenticationAction.register(data));
+    register: (data, componentId) => {
+      dispatch(authenticationAction.register(data, componentId));
+    },
+    getAllStation: () => {
+      dispatch(authenticationAction.getAllStation());
     },
   };
 };

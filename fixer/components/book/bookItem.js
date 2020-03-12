@@ -1,7 +1,18 @@
 import React, {Component} from 'react';
 import {Text, View, StyleSheet, Image, TouchableOpacity} from 'react-native';
 import {showModalNavigation} from '../../navigation/function';
-export default class ItemOrder extends Component {
+export default class ItemBook extends Component {
+  totalPrice = book => {
+    let totalPrice = 0;
+
+    if (book.services) {
+      book.services.forEach(element => {
+        totalPrice += parseInt(element.price);
+      });
+    }
+
+    return totalPrice;
+  };
   render() {
     const {item} = this.props;
     return (
@@ -17,7 +28,13 @@ export default class ItemOrder extends Component {
           </View>
           <View style={styles.row}>
             <View style={[styles.item, styles.idOrder, styles.button]}>
-              <Text style={[styles.text, {color: 'white'}]}>#{item.id} </Text>
+              <Text
+                style={[
+                  styles.text,
+                  {color: 'white', fontSize: 12, margin: 2},
+                ]}>
+                #{item.id}
+              </Text>
             </View>
             <View style={[styles.item, styles.button, styles.status]}>
               <Text style={[styles.text, {color: 'white'}]}>{item.status}</Text>
@@ -32,7 +49,7 @@ export default class ItemOrder extends Component {
 
             <View style={styles.row}>
               <Text style={{marginLeft: 20}}>Tiền thu được:</Text>
-              <Text style={styles.price}>{item.totalPrice} vnd</Text>
+              <Text style={styles.price}>{this.totalPrice(item)} vnd</Text>
             </View>
           </View>
 
@@ -56,7 +73,7 @@ export default class ItemOrder extends Component {
                     : styles.buttonRed,
                 ]}
                 onPress={() =>
-                  showModalNavigation('orderDetail', item, 'Chi tiết', true)
+                  showModalNavigation('bookDetail', item, 'Chi tiết', true)
                 }>
                 <Text style={styles.textButton}>Chi tiết</Text>
               </TouchableOpacity>

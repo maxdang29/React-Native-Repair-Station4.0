@@ -7,20 +7,20 @@ import {
   FlatList,
   ActivityIndicator,
 } from 'react-native';
-import ItemOrder from '../../components/order/orderItem';
+import BookItem from '../../components/book/bookItem';
 import firebase from 'react-native-firebase';
 import {connect} from 'react-redux';
-import * as orderAction from '../../redux/order/actions/actions';
+import * as bookAction from '../../redux/book/actions/actions';
 
-class Order extends Component {
+class Book extends Component {
   constructor(props) {
     super(props);
   }
   componentDidMount() {
-    this.props.getAllOrder();
+    this.props.getAllBook();
   }
   render() {
-    const {dataOrders, loading} = this.props;
+    const {dataBooks, loading} = this.props;
     if (loading) {
       return (
         <View style={styles.loading}>
@@ -32,8 +32,8 @@ class Order extends Component {
         <ScrollView>
           <View style={styles.container}>
             <FlatList
-              data={dataOrders}
-              renderItem={({item}) => <ItemOrder item={item} />}
+              data={dataBooks}
+              renderItem={({item}) => <BookItem item={item} />}
               keyExtractor={item => item.id}
             />
           </View>
@@ -51,15 +51,15 @@ const styles = StyleSheet.create({
 });
 const mapStateToProps = store => {
   return {
-    dataOrders: store.OrderReducers.dataOrder,
-    loading: store.OrderReducers.loading,
+    dataBooks: store.BookReducers.dataBook,
+    loading: store.BookReducers.loading,
   };
 };
 const mapDispatchToProps = dispatch => {
   return {
-    getAllOrder: () => {
-      dispatch(orderAction.getAllOrder());
+    getAllBook: () => {
+      dispatch(bookAction.getAllBook());
     },
   };
 };
-export default connect(mapStateToProps, mapDispatchToProps)(Order);
+export default connect(mapStateToProps, mapDispatchToProps)(Book);

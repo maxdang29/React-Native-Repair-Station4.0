@@ -1,19 +1,19 @@
 import * as typesAction from './actions/typesAction';
 
 const init = {
-  data: [],
+  allStation: [],
   onLogin: false,
   stationInformation: {},
 };
 
 const AuthenticationReducers = (state = init, action) => {
   switch (action.type) {
-    case typesAction.LOGIN:
-      return {...state};
+    case typesAction.GET_ALL_STATION_SUCCESS:
+      return {...state, allStation: action.data};
     case typesAction.LOGIN_SUCCESS:
-      return {...state};
-    case typesAction.LOGIN_FAILED:
-      return {...state};
+      return {...state, onLogin: true};
+    case typesAction.LOGOUT_SUCCESS:
+      return {...state, onLogin: false};
     case typesAction.REGISTER_SUCCESS:
       return {...state};
     case typesAction.REGISTER_FAILED:

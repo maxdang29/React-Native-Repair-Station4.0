@@ -35,7 +35,7 @@ export default function startApp() {
               children: [
                 {
                   component: {
-                    name: 'order',
+                    name: 'bookMain',
                   },
                 },
               ],

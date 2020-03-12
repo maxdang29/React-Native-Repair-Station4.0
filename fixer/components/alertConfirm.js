@@ -12,7 +12,6 @@ import {Navigation} from 'react-native-navigation';
 const deviceWidth = Dimensions.get('window').width;
 export default class AlertConfirm extends Component {
   render() {
-    console.log('object', this.props.event.onPress);
     return (
       <View style={styles.container}>
         <View style={styles.modalContainer}>

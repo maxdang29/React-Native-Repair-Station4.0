@@ -3,27 +3,20 @@ import {Text, View, StyleSheet, TouchableOpacity} from 'react-native';
 import firebase from 'react-native-firebase';
 import {connect} from 'react-redux';
 import * as authenticationAction from '../../redux/authentication/actions/actions';
+
 class ProfileUser extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      user: {},
-    };
   }
-  componentDidMount() {
-    const {currentUser} = firebase.auth();
-    this.setState({
-      user: currentUser,
-    });
-  }
+
   render() {
-    const {user} = this.state;
+    const {stationInformation} = this.props;
     return (
       <View style={styles.container}>
-        <Text>Email: {user.email}</Text>
+        <Text>Ten cua hang: {stationInformation.nameStore}</Text>
         <TouchableOpacity
           style={styles.buttonLogOut}
-          onPress={() => this.props.logOut()}>
+          onPress={() => this.props.logOut(stationInformation.id)}>
           <Text>Đăng xuất</Text>
         </TouchableOpacity>
       </View>
@@ -44,13 +37,16 @@ const styles = StyleSheet.create({
   },
 });
 const mapStateToProps = store => {
-  return {};
+  return {
+    stationInformation: store.AuthenticationReducers.stationInformation,
+    onLogin: store.AuthenticationReducers.onLogin,
+  };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    logOut: () => {
-      dispatch(authenticationAction.logOut());
+    logOut: stationId => {
+      dispatch(authenticationAction.logOut(stationId));
     },
   };
 };

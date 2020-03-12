@@ -1,20 +1,44 @@
 import React, {Component} from 'react';
-import {Text, View, StyleSheet, TouchableOpacity} from 'react-native';
+import {
+  Text,
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  AsyncStorage,
+} from 'react-native';
 import InputText from '../../components/textInput';
 import {connect} from 'react-redux';
+import Icon from 'react-native-vector-icons/Ionicons';
 import * as authenticationAction from '../../redux/authentication/actions/actions';
 import firebase from 'react-native-firebase';
 import {showModalNavigation} from '../../navigation/function';
 import startApp from '../../navigation/bottomTab';
+
 class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      email: 'oke@gmail.com',
-      password: '12345678',
-      emailError: null,
+      phone: '123123123',
+      password: '123123123',
+      phoneError: null,
       passwordError: null,
+      message: null,
+      tokenDevice: null,
     };
+  }
+  componentDidMount() {
+    this.props.getAllStation();
+    firebase
+      .messaging()
+      .getToken()
+      .then(fcmToken => {
+        if (fcmToken) {
+          // user has a device token
+          this.onchangeText('tokenDevice', fcmToken);
+        } else {
+          // user doesn't have a device token yet
+        }
+      });
   }
 
   componentDidUpdate() {
@@ -31,43 +55,73 @@ class Login extends Component {
   focusNextField(nextField) {
     this[nextField].focus();
   }
-  login = () => {
-    const {email, password, emailError, passwordError} = this.state;
-
-    if (email && password) {
+  login = async () => {
+    const {
+      phone,
+      password,
+      phoneError,
+      passwordError,
+      tokenDevice,
+    } = this.state;
+    const {allStation} = this.props;
+    if (phone && password) {
       const user = {
-        email: email,
+        phoneNumber: phone,
         password: password,
       };
-      this.props.login(user);
+      let station = allStation.find(element => {
+        return (
+          element.phoneNumber === user.phoneNumber &&
+          element.password === user.password
+        );
+      });
+
+      if (station) {
+        this.props.login(station.id, tokenDevice);
+        await AsyncStorage.setItem('stationData', JSON.stringify(station));
+      } else {
+        this.setState({
+          message: 'Số điện thoại hoăc mật khẩu không chính xác!',
+        });
+      }
     } else {
-      if (!email) this.onchangeText('emailError', 'Nhập Email');
+      if (!phone) this.onchangeText('phoneError', 'Nhập số điện thoại');
+      else this.onchangeText('phoneError', '');
       if (!password) this.onchangeText('passwordError', 'Nhập mật khẩu');
+      else this.onchangeText('passwordError', '');
     }
   };
   render() {
-    const {emailError, passwordError} = this.state;
+    const {phoneError, passwordError, message} = this.state;
     return (
       <View style={styles.container}>
         <Text style={styles.title}>Đăng nhập</Text>
         <View>
           <InputText
-            ref={ref => (this.email = ref)}
+            ref={ref => (this.phone = ref)}
             onSubmitEditing={() => {
               this.focusNextField('password');
             }}
-            onchangeText={value => this.onchangeText('email', value)}
-            title="Email *"
-            error={emailError}
-            icon="https://img.icons8.com/ios/2x/send-mass-email.png"
+            onchangeText={value => this.onchangeText('phone', value)}
+            title="Số điện thoại *"
+            error={phoneError}
+            icon="https://img.icons8.com/ios/2x/phone.png"
+            type="numeric"
           />
           <InputText
             ref={ref => (this.password = ref)}
             onchangeText={value => this.onchangeText('password', value)}
             title="Mật khẩu *"
             error={passwordError}
+            isSecureTextEntry={true}
             icon="https://img.icons8.com/ios/2x/password.png"
           />
+          {message ? (
+            <View style={styles.containerError}>
+              <Icon name="ios-alert" style={styles.error} />
+              <Text style={[styles.error, styles.textError]}>{message}</Text>
+            </View>
+          ) : null}
         </View>
 
         <View style={styles.row}>
@@ -114,17 +168,34 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginVertical: 30,
   },
+  containerError: {
+    flexDirection: 'row',
+    marginLeft: 50,
+    marginTop: -5,
+    alignContent: 'center',
+  },
+  error: {
+    color: 'red',
+    fontSize: 12,
+  },
+  textError: {
+    marginLeft: 10,
+  },
 });
 const mapStateToProps = store => {
   return {
     onLogin: store.AuthenticationReducers.onLogin,
+    allStation: store.AuthenticationReducers.allStation,
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    login: data => {
-      dispatch(authenticationAction.login(data));
+    getAllStation: () => {
+      dispatch(authenticationAction.getAllStation());
+    },
+    login: (stationId, tokenDevice) => {
+      dispatch(authenticationAction.login(stationId, tokenDevice));
     },
   };
 };

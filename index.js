@@ -6,10 +6,19 @@ import {setRoot} from './fixer/navigation/function';
 Navigation.registerComponent('SplashScreen', () => SplashScreen);
 import firebase from 'react-native-firebase';
 import {registerScreens} from './fixer/navigation/registerScreens';
+import {AsyncStorage} from 'react-native';
 registerScreens();
+// firebase.auth().onAuthStateChanged(user => {
+//   if (user) {
+//     startApp();
+//   } else {
+//     setRoot('login');
+//   }
+// });
 
-firebase.auth().onAuthStateChanged(user => {
-  if (user) {
+Navigation.events().registerAppLaunchedListener(async () => {
+  const stationData = await AsyncStorage.getItem('tokenDevice');
+  if (stationData) {
     startApp();
   } else {
     setRoot('login');

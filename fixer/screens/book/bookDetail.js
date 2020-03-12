@@ -12,18 +12,19 @@ import {
 } from 'react-native';
 import {Navigation} from 'react-native-navigation';
 
-import CheckBoxItem from '../../components/order/checkBoxService';
+import CheckBoxItem from '../../components/book/checkBoxService';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {connect} from 'react-redux';
-import * as orderAction from '../../redux/order/actions/actions';
+import * as bookAction from '../../redux/book/actions/actions';
 const deviceWidth = Dimensions.get('window').width;
 
-class OrderDetail extends Component {
+class BookDetail extends Component {
   constructor(props) {
     super(props);
     this.state = {
       modalVisible: false,
       serviceSelected: [],
+      totalPrice: null,
     };
     this.navigationEventListener = Navigation.events().bindComponent(this);
   }
@@ -37,6 +38,7 @@ class OrderDetail extends Component {
   setModalVisible(visible) {
     this.setState({modalVisible: visible});
   }
+
   onValueChange = valueCheckBox => {
     let {serviceSelected} = this.state;
 
@@ -57,25 +59,33 @@ class OrderDetail extends Component {
 
     this.setState({serviceSelected: serviceSelected});
   };
+
   setDefaultValueServices = async value => {
     await this.setState({serviceSelected: []});
     let {serviceSelected} = this.state;
     serviceSelected = [...serviceSelected, value];
     this.setState({serviceSelected: serviceSelected});
   };
+
   handleService = () => {
     const {serviceSelected} = this.state;
-    this.props.addServiceToOrder(serviceSelected, this.props.value.id);
+
+    console.log('total price', serviceSelected);
+
+
+
+    this.props.addServiceToBook(serviceSelected, this.props.value.id);
     this.setModalVisible(!this.state.modalVisible);
   };
 
   filterData = () => {
-    const {dataOrders, value} = this.props;
-    const order = dataOrders.filter(item => {
+    const {dataBooks, value} = this.props;
+    const book = dataBooks.filter(item => {
       return item.id === value.id;
     });
-    return order[0];
+    return book[0];
   };
+
   countStars = (starsRating, styleChecked, styleUnChecked) => {
     let star = [];
     for (var i = 0; i < 5; i++) {
@@ -87,20 +97,22 @@ class OrderDetail extends Component {
     }
     return star;
   };
-  totalPrice = order => {
+
+  totalPrice = book => {
     let totalPrice = 0;
 
-    if (order.services) {
-      order.services.forEach(element => {
+    if (book.services) {
+      book.services.forEach(element => {
         totalPrice += parseInt(element.price);
       });
     }
 
     return totalPrice;
   };
+
   render() {
     const {listService} = this.props;
-    const order = this.filterData();
+    const book = this.filterData();
 
     return (
       <ScrollView>
@@ -131,7 +143,7 @@ class OrderDetail extends Component {
                               this.setDefaultValueServices(value);
                             }}
                             item={item}
-                            serviceSelected={order.services}
+                            serviceSelected={book.services}
                           />
                         )}
                         keyExtractor={item => item.id}
@@ -163,13 +175,13 @@ class OrderDetail extends Component {
 
           <View style={styles.row}>
             <Text style={styles.title}>Mã đặt chuyến: </Text>
-            <Text style={styles.idOrder}> {order.id}</Text>
+            <Text style={styles.idOrder}> {book.id}</Text>
           </View>
           <View style={styles.between}>
             <Text>Tên khách hàng: Đặng Phuong Nam</Text>
             <Text>SDT: 0325468972</Text>
           </View>
-          <Text style={{marginHorizontal: 15}}>Thời gian: {order.time}</Text>
+          <Text style={{marginHorizontal: 15}}>Thời gian: {book.time}</Text>
 
           <View style={styles.line} />
           <View>
@@ -178,7 +190,7 @@ class OrderDetail extends Component {
             </Text>
 
             <FlatList
-              data={order.services}
+              data={book.services}
               renderItem={({item}) => (
                 <View style={styles.between}>
                   <Text style={styles.text}>{item.name}</Text>
@@ -193,7 +205,7 @@ class OrderDetail extends Component {
               <Text style={styles.text}>- 0 Vnd</Text>
             </View>
             <View style={styles.center}>
-              {order.status === 'Đang sửa' ? (
+              {book.status === 'Đang sửa' ? (
                 <TouchableOpacity
                   onPress={() => {
                     this.setModalVisible(!this.state.modalVisible);
@@ -223,21 +235,21 @@ class OrderDetail extends Component {
               <Text style={styles.title}>Thanh toán tiền mặt</Text>
             </View>
             <Text style={[styles.title, {marginVertical: 8}]}>
-              {this.totalPrice(order)} Vnd
+              {this.totalPrice(book)} Vnd
             </Text>
           </View>
 
           <View style={styles.review}>
-            {order.status === 'Hoàn thành' ? (
+            {book.status === 'Hoàn thành' ? (
               <Text style={{textAlign: 'center', margin: 10}}>
                 Đánh giá của khách hàng
               </Text>
             ) : null}
 
             <View style={[styles.row, {justifyContent: 'center'}]}>
-              {order.status === 'Hoàn thành' ? (
+              {book.status === 'Hoàn thành' ? (
                 this.countStars(
-                  order.star,
+                  book.star,
                   styles.iconRankChecked,
                   styles.iconRankUnchecked,
                 )
@@ -345,14 +357,14 @@ const styles = StyleSheet.create({
 const mapStateToProps = store => {
   return {
     listService: store.ServiceReducers.services,
-    dataOrders: store.OrderReducers.dataOrder,
+    dataBooks: store.BookReducers.dataBook,
   };
 };
 const mapDispatchToProps = dispatch => {
   return {
-    addServiceToOrder: (data, orderId) => {
-      dispatch(orderAction.addServiceToOrder(data, orderId));
+    addServiceToBook: (data, bookId) => {
+      dispatch(bookAction.addServiceToBook(data, bookId));
     },
   };
 };
-export default connect(mapStateToProps, mapDispatchToProps)(OrderDetail);
+export default connect(mapStateToProps, mapDispatchToProps)(BookDetail);

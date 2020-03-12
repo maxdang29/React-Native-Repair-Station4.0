@@ -10,15 +10,18 @@ import firebase from 'react-native-firebase';
 import {eventChannel} from 'redux-saga';
 
 import {
-  getDataRequest,
+  getDataByIdRequest,
   addDataRequest,
   deleteRequest,
   updateRequest,
 } from '../../api/database';
- 
+
 function* getAllService(actions) {
   const channel = new eventChannel(data => {
-    let listener = getDataRequest('services/', data);
+    let listener = getDataByIdRequest(
+      {collection: 'services/', child: 'stationId/'},
+      data,
+    );
     // #2: Return the shutdown method;
     return () => {
       listener.off();
@@ -28,7 +31,6 @@ function* getAllService(actions) {
     const {data} = yield take(channel);
     let keys = Object.keys(data);
     let listService = keys.map(function(k) {
-      data[k].id = k;
       return data[k];
     });
     // #4: Pause the task until the channel emits a signal and dispatch an action in the store;

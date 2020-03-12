@@ -22,11 +22,11 @@ class FormService extends Component {
     this.state = {
       image: '',
       name: '',
-      type: '',
+      vehicle: '',
       price: null,
       note: '',
       nameError: null,
-      typeError: null,
+      vehicleError: null,
       priceError: null,
     };
   }
@@ -43,19 +43,18 @@ class FormService extends Component {
   };
 
   handleButton = () => {
-    const {image, name, price, note, type} = this.state;
-    const {value, componentId} = this.props;
-    const {currentUser} = firebase.auth();
+    const {image, name, price, note, vehicle} = this.state;
+    const {value, componentId, currentStation} = this.props;
 
     let service = {
       image: image,
       name: name,
       price: price,
-      type: type,
+      vehicle: vehicle,
       note: note,
-      stationId: currentUser.uid,
+      stationId: currentStation.id,
     };
-    if (name && type && price) {
+    if (name && vehicle && price) {
       if (value.item) {
         service.id = value.item.id;
         this.props.updateService(service, componentId);
@@ -65,7 +64,7 @@ class FormService extends Component {
     } else {
       if (!name) this.onchangeText('nameError', 'Nhập tên dịch vụ');
       if (!price) this.onchangeText('priceError', 'Nhập giá');
-      if (!type) this.onchangeText('typeError', 'Nhập loại dịch vụ');
+      if (!vehicle) this.onchangeText('vehicleError', 'Nhập loại phương tiện');
     }
   };
   focusNextField(nextField) {
@@ -108,7 +107,7 @@ class FormService extends Component {
         image: value.item.image,
         name: value.item.name,
         price: value.item.price,
-        type: value.item.type,
+        vehicle: value.item.vehicle,
         note: value.item.note,
       });
     }
@@ -116,7 +115,7 @@ class FormService extends Component {
 
   render() {
     const {value} = this.props;
-    const {image, nameError, typeError, priceError} = this.state;
+    const {image, nameError, vehicleError, priceError} = this.state;
     return (
       <ScrollView>
         <View style={styles.container}>
@@ -130,7 +129,7 @@ class FormService extends Component {
           <InputText
             ref={ref => (this.name = ref)}
             onSubmitEditing={() => {
-              this.focusNextField('type');
+              this.focusNextField('vehicle');
             }}
             onchangeText={value => this.onchangeText('name', value)}
             title="Tên dịch vụ *"
@@ -139,14 +138,14 @@ class FormService extends Component {
             icon="https://img.icons8.com/windows/344/multiline-text.png"
           />
           <InputText
-            ref={ref => (this.type = ref)}
+            ref={ref => (this.vehicle = ref)}
             onSubmitEditing={() => {
               this.focusNextField('price');
             }}
-            error={typeError}
-            onchangeText={value => this.onchangeText('type', value)}
-            title="Loại dịch vụ *"
-            value={value.item ? value.item.type : null}
+            error={vehicleError}
+            onchangeText={value => this.onchangeText('vehicle', value)}
+            title="Loại phương tiện *"
+            value={value.item ? value.item.vehicle : null}
             icon="https://img.icons8.com/ios/2x/category.png"
           />
           <InputText
@@ -232,7 +231,9 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = store => {
-  return {};
+  return {
+    currentStation: store.AuthenticationReducers.stationInformation,
+  };
 };
 const mapDispatchToProps = dispatch => {
   return {

@@ -27,7 +27,7 @@ export default class InputText extends Component {
     this.props.onchangeText(text);
   };
   render() {
-    const {title, icon, type, error} = this.props;
+    const {title, icon, type, error, isSecureTextEntry} = this.props;
     return (
       <>
         <View style={styles.container}>
@@ -40,6 +40,7 @@ export default class InputText extends Component {
             onChangeText={text => this.onChangeText(text)}
             value={this.state.value}
             keyboardType={type ? type : 'default'}
+            secureTextEntry={isSecureTextEntry}
           />
         </View>
         {error ? (
