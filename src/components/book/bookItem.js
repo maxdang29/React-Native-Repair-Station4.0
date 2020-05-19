@@ -86,7 +86,6 @@ export default class ItemBook extends Component {
 }
 const styles = StyleSheet.create({
   container: {
-    //  flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -101,10 +100,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   idOrder: {
-    backgroundColor: 'black',
+    backgroundColor: '#4dc2ff',
   },
   status: {
-    backgroundColor: 'gray',
+    backgroundColor: '#ff7fe5',
   },
   button: {
     padding: 10,

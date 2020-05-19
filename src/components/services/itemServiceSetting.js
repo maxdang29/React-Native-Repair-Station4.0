@@ -60,11 +60,9 @@ class ItemServiceSetting extends Component {
                   'alertConfirm',
                   'Bạn chắc chắn muốn tiếp tục xóa',
                   null,
-                  null,
-                  // this.props.deleteService(item),
+                  'Xóa',
                   {onPress: () => this.props.deleteService(item)},
                 );
-                //this.props.deleteService(item);
               }}>
               <Icon name="ios-trash" color="gray" size={25} />
             </TouchableOpacity>

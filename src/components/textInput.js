@@ -52,7 +52,7 @@ export default class InputText extends Component {
       </>
     );
   }
-}
+} 
 const styles = StyleSheet.create({
   container: {
     marginHorizontal: 30,

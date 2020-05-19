@@ -11,6 +11,7 @@ import BookItem from '../../components/book/bookItem';
 import firebase from 'react-native-firebase';
 import {connect} from 'react-redux';
 import * as bookAction from '../../redux/book/actions/actions';
+import {showNotification} from '../../navigation/function';
 
 class Book extends Component {
   constructor(props) {
@@ -18,6 +19,20 @@ class Book extends Component {
   }
   componentDidMount() {
     this.props.getAllBook();
+  }
+  componentDidUpdate() {
+    const {dataBooks} = this.props;
+    const newOrder = dataBooks.filter(element => {
+      return element.status === 'Đợi xác nhận';
+    });
+    if (newOrder.length > 0) {
+      showNotification(
+        'notificationNewOrder',
+        'Bạn có cuốc mới',
+        null,
+        newOrder,
+      );
+    }
   }
   render() {
     const {dataBooks, loading} = this.props;

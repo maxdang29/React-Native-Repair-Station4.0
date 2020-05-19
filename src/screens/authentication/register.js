@@ -149,6 +149,7 @@ class Register extends Component {
               error={addressError}
               icon="https://img.icons8.com/ios/2x/address.png"
             />
+
             <InputText
               ref={ref => (this.phone = ref)}
               onSubmitEditing={() => {

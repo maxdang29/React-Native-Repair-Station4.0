@@ -5,6 +5,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   AsyncStorage,
+  Image,
+  ScrollView,
 } from 'react-native';
 import InputText from '../../components/textInput';
 import {connect} from 'react-redux';
@@ -95,50 +97,52 @@ class Login extends Component {
   render() {
     const {phoneError, passwordError, message} = this.state;
     return (
-      <View style={styles.container}>
-        <Text style={styles.title}>Đăng nhập</Text>
-        <View>
-          <InputText
-            ref={ref => (this.phone = ref)}
-            onSubmitEditing={() => {
-              this.focusNextField('password');
-            }}
-            onchangeText={value => this.onchangeText('phone', value)}
-            title="Số điện thoại *"
-            error={phoneError}
-            icon="https://img.icons8.com/ios/2x/phone.png"
-            type="numeric"
-          />
-          <InputText
-            ref={ref => (this.password = ref)}
-            onchangeText={value => this.onchangeText('password', value)}
-            title="Mật khẩu *"
-            error={passwordError}
-            isSecureTextEntry={true}
-            icon="https://img.icons8.com/ios/2x/password.png"
-          />
-          {message ? (
-            <View style={styles.containerError}>
-              <Icon name="ios-alert" style={styles.error} />
-              <Text style={[styles.error, styles.textError]}>{message}</Text>
-            </View>
-          ) : null}
-        </View>
+      <ScrollView>
+        <View style={styles.container}>
+          <Text style={styles.title}>Đăng nhập</Text>
+          <View>
+            <InputText
+              ref={ref => (this.phone = ref)}
+              onSubmitEditing={() => {
+                this.focusNextField('password');
+              }}
+              onchangeText={value => this.onchangeText('phone', value)}
+              title="Số điện thoại *"
+              error={phoneError}
+              icon="https://img.icons8.com/ios/2x/phone.png"
+              type="numeric"
+            />
+            <InputText
+              ref={ref => (this.password = ref)}
+              onchangeText={value => this.onchangeText('password', value)}
+              title="Mật khẩu *"
+              error={passwordError}
+              isSecureTextEntry={true}
+              icon="https://img.icons8.com/ios/2x/password.png"
+            />
+            {message ? (
+              <View style={styles.containerError}>
+                <Icon name="ios-alert" style={styles.error} />
+                <Text style={[styles.error, styles.textError]}>{message}</Text>
+              </View>
+            ) : null}
+          </View> 
 
-        <View style={styles.row}>
-          <TouchableOpacity
-            style={[styles.button, {backgroundColor: '#00a7e7'}]}
-            onPress={() => this.login()}>
-            <Text style={{color: 'white'}}>Đăng nhập</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => showModalNavigation('register')}>
-            <Text style={styles.text}>Đăng Kí</Text>
-          </TouchableOpacity>
+          <View style={styles.row}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => showModalNavigation('register')}>
+              <Text style={styles.text}>Đăng Kí</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.button, {backgroundColor: '#00a7e7'}]}
+              onPress={() => this.login()}>
+              <Text style={{color: 'white'}}>Đăng nhập</Text>
+            </TouchableOpacity>
+          </View>
+          <Text style={styles.text}>Quên mật khẩu?</Text>
         </View>
-        <Text style={styles.text}>Quên mật khẩu?</Text>
-      </View>
+      </ScrollView>
     );
   }
 }

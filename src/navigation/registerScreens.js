@@ -13,6 +13,8 @@ import profileUser from '../screens/authentication/profileUser';
 import bookMain from '../screens/book/bookMain';
 import bookDetail from '../screens/book/bookDetail';
 import alertConfirm from '../components/alertConfirm';
+import notificationNewOrder from '../screens/book/notificationNewOrder';
+import sideBar from './sideBar';
 console.disableYellowBox = true;
 
 function ReduxProvider(Component) {
@@ -84,5 +86,16 @@ export function registerScreens() {
     'alertConfirm',
     () => ReduxProvider(alertConfirm),
     () => alertConfirm,
+  );
+  Navigation.registerComponent(
+    'notificationNewOrder',
+    () => ReduxProvider(notificationNewOrder),
+    () => notificationNewOrder,
+  );
+
+  Navigation.registerComponent(
+    'sideBar',
+    () => ReduxProvider(sideBar),
+    () => sideBar,
   );
 }

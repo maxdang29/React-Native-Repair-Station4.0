@@ -25,11 +25,11 @@ export default class AlertConfirm extends Component {
           <View style={styles.row}>
             <Icon
               name="ios-notifications"
-              color="#ff6b6b"
+              color="#01cbfd"
               size={40}
               style={styles.icon}
             />
-            <Text>Bạn chắc chắn muốn tiếp tục xóa?</Text>
+            <Text>{this.props.title}</Text>
           </View>
           <View
             style={[styles.row, {justifyContent: 'flex-end', marginRight: 10}]}>
@@ -44,7 +44,7 @@ export default class AlertConfirm extends Component {
                 this.props.event.onPress();
                 Navigation.dismissOverlay(this.props.componentId);
               }}>
-              <Text>Tiếp tục</Text>
+              <Text>{this.props.data}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
     margin: 10,
   },
   header: {
-    backgroundColor: '#ff6b6b',
+    backgroundColor: '#01cbfd',
     padding: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',

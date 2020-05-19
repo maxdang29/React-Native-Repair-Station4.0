@@ -36,14 +36,14 @@ export const showModalNavigation = (
   });
 };
 
-showOverlay = (componentName, title, type, content, event) => {
+showOverlay = (componentName, title, type, data, event) => {
   Navigation.showOverlay({
     component: {
       name: componentName,
       passProps: {
         type,
         title,
-        content,
+        data,
         event,
       },
       options: {
@@ -55,11 +55,11 @@ showOverlay = (componentName, title, type, content, event) => {
   });
 };
 
-export const showNotification = (componentName, title, type, content) => {
-  showOverlay(componentName, title, type, content);
+export const showNotification = (componentName, title, type, data) => {
+  showOverlay(componentName, title, type, data);
 };
-export const alertConfirm = (componentName, title, type, content, event) => {
-  showOverlay(componentName, title, type, content, event);
+export const alertConfirm = (componentName, title, type, data, event) => {
+  showOverlay(componentName, title, type, data, event);
 };
 export const setRoot = componentName => {
   Navigation.setRoot({

@@ -16,7 +16,7 @@ export default class showNotification extends Component {
     this.animation = new Animated.Value(0);
   }
   componentDidMount() {
-    this.toggleNotificationAnim();
+    this.toggleNotificationAnim(); 
   }
   toggleNotificationAnim = () => {
     Animated.timing(this.animation, {

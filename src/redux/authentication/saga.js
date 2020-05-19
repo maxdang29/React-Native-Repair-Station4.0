@@ -108,7 +108,6 @@ function* getStationById(actions) {
     const {data} = yield take(channel);
     let keys = Object.keys(data);
     let stations = keys.map(function(k) {
-      //   data[k].id = k;
       return data[k];
     });
     yield put(authenticationAction.getStationByIdSuccess([...stations]));

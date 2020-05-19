@@ -5,6 +5,8 @@ import store from '../store';
 import firebase from 'react-native-firebase';
 import {eventChannel} from 'redux-saga';
 import {showNotification} from '../../navigation/function';
+import {Navigation} from 'react-native-navigation';
+
 import {
   getDataByIdRequest,
   setDataRequest,
@@ -16,7 +18,6 @@ function* getAllBook() {
       {collection: 'books/', child: 'stationId/'},
       data,
     );
-    // #2: Return the shutdown method;
     return () => {
       listener.off();
     };
@@ -27,7 +28,6 @@ function* getAllBook() {
     let listBook = keys.map(function(k) {
       return data[k];
     });
-    // #4: Pause the task until the channel emits a signal and dispatch an action in the store;
     yield put(bookAction.getAllBookSuccess([...listBook]));
   }
 }
@@ -51,9 +51,62 @@ function* addServiceToBook(actions) {
     yield put(bookAction.addServiceToBookFailed(error));
   }
 }
+function* confirmOrder(actions) {
+  try {
+    let response = yield call(
+      setDataRequest,
+      'books/' + actions.orderId + '/status',
+      'Đang sửa',
+    );
+    yield put(bookAction.confirmOrderSuccess());
+    yield Navigation.dismissOverlay(actions.componentId);
+    yield showNotification(
+      'showNotification',
+      'Nhận cuốc thành công',
+      'success',
+    );
+  } catch (error) {
+    console.log('error confirm order', error);
+    yield showNotification(
+      'showNotification',
+      'Nhận cuốc không thành công',
+      'error',
+    );
+
+    yield put(bookAction.confirmOrderFailed(error));
+  }
+}
+
+function* cancelConfirm(actions) {
+  try {
+    let response = yield call(
+      setDataRequest,
+      'books/' + actions.orderId + '/status',
+      'Đã hủy',
+    );
+    yield put(bookAction.cancelConfirmSuccess());
+    yield Navigation.dismissOverlay(actions.componentId);
+    yield showNotification(
+      'showNotification',
+      'Đã hũy cuốc',
+      'success',
+    );
+  } catch (error) {
+    console.log('error cancel confirm order', error);
+    yield showNotification(
+      'showNotification',
+      'Hủy cuốc không thành công',
+      'error',
+    );
+
+    yield put(bookAction.cancelConfirmFailed(error));
+  }
+}
 
 const rootSagaBook = () => [
   takeLatest(typesAction.GET_ALL_BOOK, getAllBook),
   takeLatest(typesAction.ADD_SERVICE_TO_BOOK, addServiceToBook),
+  takeLatest(typesAction.CONFIRM_ORDER, confirmOrder),
+  takeLatest(typesAction.CANCEL_CONFIRM, cancelConfirm),
 ];
 export default rootSagaBook();

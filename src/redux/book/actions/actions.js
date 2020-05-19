@@ -30,3 +30,40 @@ export const addServiceToBookFailed = () => {
     type: typesAction.ADD_SERVICE_TO_BOOK_FAILED,
   };
 };
+
+export const confirmOrder = (orderId, componentId) => {
+  return {
+    type: typesAction.CONFIRM_ORDER,
+    orderId,
+    componentId,
+  };
+};
+export const confirmOrderSuccess = () => {
+  return {
+    type: typesAction.CONFIRM_ORDER_SUCCESS,
+  };
+};
+export const confirmOrderFailed = orderId => {
+  return {
+    type: typesAction.CONFIRM_ORDER,
+  };
+};
+
+export const cancelConfirm = (orderId, componentId) => {
+  return {
+    type: typesAction.CANCEL_CONFIRM,
+    orderId,
+    componentId,
+  };
+};
+
+export const cancelConfirmSuccess = () => {
+  return {
+    type: typesAction.CANCEL_CONFIRM_SUCCESS,
+  };
+};
+export const cancelConfirmFailed = () => {
+  return {
+    type: typesAction.CANCEL_CONFIRM_FAILED,
+  };
+};
