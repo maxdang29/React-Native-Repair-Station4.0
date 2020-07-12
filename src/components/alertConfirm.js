@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {Navigation} from 'react-native-navigation';
+import {APP_COLOR} from '../utils/colors';
 
 const deviceWidth = Dimensions.get('window').width;
 export default class AlertConfirm extends Component {
@@ -25,7 +26,7 @@ export default class AlertConfirm extends Component {
           <View style={styles.row}>
             <Icon
               name="ios-notifications"
-              color="#01cbfd"
+              color= {APP_COLOR}
               size={40}
               style={styles.icon}
             />
@@ -78,7 +79,7 @@ const styles = StyleSheet.create({
     margin: 10,
   },
   header: {
-    backgroundColor: '#01cbfd',
+    backgroundColor: APP_COLOR,
     padding: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',

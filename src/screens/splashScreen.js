@@ -40,6 +40,7 @@ class SplashScreen extends Component {
       }, 700);
     }
   }
+
   // NOTIFICATION SETUP
   onRegister = token => {
     // this.props.onChangeDeviceToken(token);
@@ -66,7 +67,8 @@ class SplashScreen extends Component {
      // this.props.onFetchOrders();
       // this.props.onFetchNotifications();
       const stationId = await AsyncStorage.getItem('stationId');
-      orderAction.getAllOrder(stationId);
+      this.props.getAllOrder(stationId);
+
     }
   };
   // END NOTIFICATION SETUP
@@ -88,6 +90,7 @@ const styles = StyleSheet.create({
 const mapStateToProps = store => {
   return {
     allStation: store.StationReducers.allStation,
+    dataOrders: store.OrderReducers.dataOrder,
   };
 };
 const mapDispatchToProps = dispatch => {
@@ -100,6 +103,9 @@ const mapDispatchToProps = dispatch => {
     },
     getStationById: id => {
       dispatch(stationAction.getStationById(id));
+    },
+    getAllOrder: stationId => {
+      dispatch(orderAction.getAllOrder(stationId));
     },
   };
 };

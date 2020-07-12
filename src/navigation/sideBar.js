@@ -25,7 +25,7 @@ class SideBar extends Component {
   };
   render() {
     const {user} = this.props;
-    console.log('user', JSON.stringify(user, null, 4));
+    // console.log('user', JSON.stringify(user, null, 4));
 
     return (
       <View style={styles.container}>

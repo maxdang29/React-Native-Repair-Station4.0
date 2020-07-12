@@ -45,15 +45,13 @@ export default function startApp() {
                     {
                       component: {
                         name: 'orderMain',
+                        id: 'order'
                       },
                     },
                   ],
                   options: {
                     topBar: {
-                      visible: true,
-                      background: {
-                        translucent: false
-                      }
+                       visible: false,
                     },
                     bottomTab: {
                       text: 'Hoạt động',

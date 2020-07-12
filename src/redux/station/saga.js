@@ -51,7 +51,7 @@ function* getMyStation() {
     const response = yield call(getMyStationApi, token);
     yield put(stationAction.getMyStationSuccess(response.data));
   } catch (error) {
-    console.log('error', error.data);
+    console.log('error', error);
   }
 }
 

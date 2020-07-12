@@ -2,11 +2,11 @@ import {put, takeLatest, call, all, take} from 'redux-saga/effects';
 import * as typesAction from './actions/typesAction';
 import * as orderAction from './actions/actions';
 import store from '../store';
-import {eventChannel} from 'redux-saga';
-import {showNotification} from '../../navigation/function';
+import {showNotification, showModalNavigation} from '../../navigation/function';
 import {Navigation} from 'react-native-navigation';
 import {getAllOrderApi, updateStatusApi} from '../../api/order';
 import {AsyncStorage} from 'react-native';
+import {WAITING} from '../../constants/orderStatus';
 
 
 function* getAllOrder(actions) {
@@ -14,13 +14,21 @@ function* getAllOrder(actions) {
     const token = yield AsyncStorage.getItem('token');
     const response = yield call(getAllOrderApi, actions.stationId, token);
     yield put(orderAction.getAllOrderSuccess(response.data));
+
+    const newOrder = yield response.data.sources.filter(element => {
+      return element.status === WAITING;
+    });
+    // console.log('response111111111111',newOrder);
+
+    if (newOrder.length > 0) {
+      yield showModalNavigation('notificationNewOrder', newOrder, 'Bạn có cuốc mới');
+    }
   } catch (error) {
     console.log('get order error', error);
   }
 }
 
 function* updateStatus(actions) {
-  console.log(actions);
   try {
     const token = yield AsyncStorage.getItem('token');
     const response = yield call(
@@ -29,14 +37,13 @@ function* updateStatus(actions) {
       {status: actions.status},
       token,
     );
-    console.log('response', JSON.stringify(response.data, null, 4));
     var allOrder = yield store.getState().OrderReducers.dataOrder;
     let index = yield allOrder.findIndex(order => {
       return order.id === actions.orderId;
     });
     allOrder[index].status = response.data.status;
     yield put(orderAction.updateStatusSuccess([...allOrder]));
-    Navigation.dismissAllModals();
+    yield Navigation.dismissModal(actions.componentId);
   } catch (error) {
     console.log('get order error', error);
   }

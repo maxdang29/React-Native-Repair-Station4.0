@@ -71,11 +71,13 @@ export const cancelConfirmFailed = () => {
 
 //CHANGE STATUS
 
-export const updateStatus = (status, orderId) => {
+export const updateStatus = (status, orderId, componentId) => {
+  console.log('component id', componentId);
   return {
     type: typesAction.CHANGE_STATUS,
     orderId,
     status,
+    componentId
   };
 };
 export const updateStatusSuccess = (data) => {
