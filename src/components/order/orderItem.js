@@ -3,6 +3,8 @@ import {Text, View, StyleSheet, Image, TouchableOpacity} from 'react-native';
 import {showModalNavigation} from '../../navigation/function';
 import {MOTORBIKE, CAR} from '../../constants/vehicles';
 import {DONE} from '../../constants/orderStatus';
+import {format} from 'date-fns';
+
 export default class ItemOrder extends Component {
   totalPrice = order => {
     let totalPrice = 0;
@@ -27,12 +29,12 @@ export default class ItemOrder extends Component {
             <View style={styles.row}>
               <View style={styles.item}>
                 <Text style={[styles.text, {fontWeight: 'bold'}]}>
-                  Mã đặt chuyến{' '}
+                  Khách hàng: {item.customerName}
                 </Text>
               </View>
               <View style={styles.item}>
                 <Text style={[styles.text, {fontWeight: 'bold'}]}>
-                  Tình trạng
+                  {format(new Date(item.createdOn), 'dd-MM-yyyy H:mma')}
                 </Text>
               </View>
             </View>
@@ -71,7 +73,7 @@ export default class ItemOrder extends Component {
               )}
 
               <View style={styles.row}>
-                <Text style={{marginLeft: 20}}>Tiền thu được:</Text>
+                <Text style={{marginLeft: 20}}>Tổng tiền:</Text>
                 <Text style={styles.price}>{this.totalPrice(item)} vnd</Text>
               </View>
             </View>

@@ -4,6 +4,8 @@ import android.app.Application;
 import android.content.Context;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
+import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
+import com.swmansion.reanimated.ReanimatedPackage;
 import com.imagepicker.ImagePickerPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.facebook.react.ReactNativeHost;
@@ -25,7 +27,8 @@ import com.airbnb.android.react.maps.MapsPackage;
 
 import com.agontuk.RNFusedLocation.RNFusedLocationPackage;
 
-
+import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
+import com.swmansion.reanimated.ReanimatedPackage;
 
 public class MainApplication extends NavigationApplication {
 
@@ -54,8 +57,9 @@ public class MainApplication extends NavigationApplication {
             new ImagePickerPackage(),
             new ReactNativeFirebaseAppPackage(),
             new ReactNativeFirebaseMessagingPackage(),
-            new ReactNativePushNotificationPackage()
-
+            new ReactNativePushNotificationPackage(),
+            new ReanimatedPackage(),
+            new RNGestureHandlerPackage()
         );
     }
 

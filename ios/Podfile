@@ -44,6 +44,10 @@ target 'SuaXe4Dot0' do
 
 
 
+  pod 'RNReanimated', :path => '../node_modules/react-native-reanimated'
+
+  pod 'RNGestureHandler', :path => '../node_modules/react-native-gesture-handler'
+
   target 'SuaXe4Dot0Tests' do
     inherit! :search_paths
     # Pods for testing
