@@ -135,13 +135,13 @@ class Order extends Component {
 
   render() {
     const {dataOrders, loading} = this.props;
-    // if (loading) {
-    //   return (
-    //     <View style={styles.loading}>
-    //       <ActivityIndicator size="large" />
-    //     </View>
-    //   );
-    // } else
+    if (loading) {
+      return (
+        <View style={styles.loading}>
+          <ActivityIndicator size="large" />
+        </View>
+      );
+    } else
     return (
       <>
         <Text style={styles.title}>Danh sách đơn hàng</Text>

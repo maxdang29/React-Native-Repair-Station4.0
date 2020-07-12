@@ -20,66 +20,62 @@ export default class ItemOrder extends Component {
   render() {
     const {item} = this.props;
     return (
-      <TouchableOpacity
-        onPress={() =>
-          showModalNavigation('orderDetail', item, 'Chi tiết', true)
-        }>
-        <View style={([styles.bottom], {margin: 10})}>
-          <View style={styles.bottom}>
-            <View style={styles.row}>
-              <View style={styles.item}>
-                <Text style={[styles.text, {fontWeight: 'bold'}]}>
-                  Khách hàng: {item.customerName}
-                </Text>
-              </View>
-              <View style={styles.item}>
-                <Text style={[styles.text, {fontWeight: 'bold'}]}>
-                  {format(new Date(item.createdOn), 'dd-MM-yyyy H:mma')}
-                </Text>
-              </View>
+      <View style={([styles.bottom], {margin: 10})}>
+        <View style={styles.bottom}>
+          <View style={styles.row}>
+            <View style={[styles.item, styles.row]}>
+              <Text style={[styles.text, {color: '#5a5e68'}]}>
+                Khách hàng:{' '}
+              </Text>
+              <Text style={[styles.text, {fontWeight: 'bold'}]}>
+                {item.customerName}
+              </Text>
             </View>
-            <View style={styles.row}>
-              <View style={[styles.item, styles.idOrder, styles.button]}>
-                <Text style={[styles.text, {color: 'white'}]}>
-                  #
-                  {item.id.length > 15
-                    ? item.id.substring(0, 15) + '...'
-                    : item.id}
-                </Text>
-              </View>
-              <View style={[styles.item, styles.button, styles.status]}>
-                <Text style={[styles.text, {color: 'white'}]}>
-                  {item.status}
-                </Text>
-              </View>
+            <View>
+              <Text style={[styles.text, {color: '#5a5e68'}]}>
+                {format(new Date(item.createdOn), 'dd-MM-yyyy H:mma')}
+              </Text>
             </View>
-            <View
-              style={[
-                {marginLeft: 20, justifyContent: 'space-between'},
-                styles.row,
-              ]}>
-              {item.station.vehicle === MOTORBIKE ? (
-                <Image
-                  source={require('../../assets/image/icon-motor.png')}
-                  style={styles.imageIcon}
-                  resizeMode="stretch"
-                />
-              ) : (
-                <Image
-                  source={require('../../assets/image/icon-car.png')}
-                  style={styles.imageIcon}
-                  resizeMode="stretch"
-                />
-              )}
+          </View>
+          <View style={styles.row}>
+            <Text style={[styles.text, {color: '#5a5e68'}]}>Mã cuốc xe: </Text>
+            <Text style={[styles.text, {fontWeight: 'bold'}]}>{item.id}</Text>
+          </View>
+          <View style={styles.row}>
+            <View style={[styles.item, styles.row]}>
+              <Text style={[styles.text, {color: '#5a5e68'}]}>
+                Khoảng cách:{' '}
+              </Text>
+              <Text style={[styles.text, {fontWeight: 'bold'}]}>
+                {item.distance / 1000} km
+              </Text>
+            </View>
+            <View style={[styles.row]}>
+              <Text style={[styles.text, {color: '#5a5e68'}]}>Tổng tiền:</Text>
+              <Text style={[styles.text, {fontWeight: 'bold'}]}>
+                {item.totalPrice} vnd
+              </Text>
+            </View>
+          </View>
 
-              <View style={styles.row}>
-                <Text style={{marginLeft: 20}}>Tổng tiền:</Text>
-                <Text style={styles.price}>{this.totalPrice(item)} vnd</Text>
-              </View>
+          <View
+            style={[
+              {marginLeft: 20, justifyContent: 'space-between'},
+              styles.row,
+            ]}>
+            <TouchableOpacity
+              style={styles.buttonDetail}
+              onPress={() =>
+                showModalNavigation('orderDetail', item, 'Chi tiết', true)
+              }>
+              <Text>Chi tiết</Text>
+            </TouchableOpacity>
+            <View style={styles.row}>
+              <Text style={styles.status}>{item.status}</Text>
             </View>
           </View>
         </View>
-      </TouchableOpacity>
+      </View>
     );
   }
 }
@@ -91,6 +87,7 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginVertical: 5,
   },
   text: {
     textAlign: 'center',
@@ -98,29 +95,20 @@ const styles = StyleSheet.create({
   item: {
     flex: 1,
   },
-  idOrder: {
-    backgroundColor: '#4dc2ff',
+  buttonDetail: {
+    padding: 7,
+    borderColor: 'black',
+    borderWidth: 1,
+    borderRadius: 15,
+    width: '30%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
+
   status: {
-    backgroundColor: '#ff7fe5',
-  },
-  button: {
-    padding: 10,
-    marginVertical: 10,
-  },
-  imageIcon: {
-    width: 40,
-    height: 40,
-    marginHorizontal: 20,
-  },
-  price: {
-    color: 'red',
+    color: '#5d9d67',
     marginHorizontal: 15,
-  },
-  image: {
-    width: '100%',
-    height: 220,
-    marginVertical: 10,
+    fontWeight: 'bold',
   },
   textButton: {
     color: 'white',
