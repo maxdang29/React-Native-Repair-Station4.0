@@ -79,10 +79,22 @@ function* getMyAccount(actions) {
   }
 }
 
+function* updateMyAccount(actions) {
+  try {
+    const token = yield AsyncStorage.getItem('token');
+    let response = yield call(updateApi, actions.data, token);
+    yield put(authenticationAction.updateMyAccountSuccess(response.data));
+  } catch (error) {
+    console.log('error', error);
+    yield put(authenticationAction.updateMyAccountFailed(error));
+  }
+}
+
 const rootSagaAuthentication = () => [
   takeLatest(typesAction.LOGIN, login),
   takeLatest(typesAction.LOGOUT, logOut),
   takeLatest(typesAction.REGISTER, register),
   takeLatest(typesAction.GET_MY_ACCOUNT, getMyAccount),
+  takeLatest(typesAction.UPDATE_MY_ACCOUNT, updateMyAccount),
 ];
 export default rootSagaAuthentication();

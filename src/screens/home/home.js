@@ -203,12 +203,12 @@ const styles = StyleSheet.create({
     fontSize: 35,
   },
   nameRepair: {
+    flex: 1,
     fontSize: 25,
-    textAlign: 'center',
+    textAlign: 'left',
     padding: 20,
     color: 'white',
   },
-
   textAlign: {
     textAlign: 'center',
     color: 'white',
