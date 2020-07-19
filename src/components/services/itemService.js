@@ -9,31 +9,6 @@ export default class ItemService extends Component {
     return (
       <View style={styles.container}>
         <View style={styles.shadow}>
-          {/* <TouchableOpacity
-            style={styles.image}
-            onPress={() => {
-              showModalNavigation(
-                'FormService',
-                {item, handle: 'update'},
-                'Sữa dịch vụ',
-                true,
-              );
-            }}>
-            {item.image === '' ? (
-              <Image
-                source={require('../../assets/image/icons8-gas-pump-96.png')}
-                style={styles.image}
-                resizeMode="center"
-              />
-            ) : (
-              <Image
-                source={item.image}
-                style={styles.image}
-                resizeMode="center"
-              />
-            )}
-          </TouchableOpacity>
-          <Text>{item.name}</Text> */}
           <TouchableOpacity
             onPress={() => {
               showModalNavigation(

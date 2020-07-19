@@ -2,10 +2,14 @@ import {combineReducers} from 'redux';
 
 import ServiceReducers from './service/reducer';
 import AuthenticationReducers from './authentication/reducer';
-import BookReducers from './book/reducer';
+import OrderReducers from './order/reducer';
+import StationReducers from './station/reducer';
+import NotificationReducers from './notification/reducer';
 const rootReducer = combineReducers({
   ServiceReducers,
   AuthenticationReducers,
-  BookReducers,
+  OrderReducers,
+  StationReducers,
+  NotificationReducers,
 });
 export default rootReducer;

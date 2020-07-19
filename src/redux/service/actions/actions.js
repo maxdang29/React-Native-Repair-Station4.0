@@ -1,23 +1,5 @@
 import * as types from './typesAction';
 
-export const getAllService = () => {
-  return {
-    type: types.GET_ALL_SERVICE,
-  };
-};
-export const getAllServiceSuccess = data => {
-  return {
-    type: types.GET_ALL_SERVICE_SUCCESS,
-    data,
-  };
-};
-export const getAllServiceFailed = error => {
-  return {
-    type: types.GET_ALL_SERVICE_FAILED,
-    error,
-  };
-};
-
 //add service
 export const addService = (data, componentId) => {
   return {
@@ -27,9 +9,10 @@ export const addService = (data, componentId) => {
   };
 };
 
-export const addServiceSuccess = () => {
+export const addServiceSuccess = data => {
   return {
     type: types.ADD_SERVICE_SUCCESS,
+    data,
   };
 };
 export const addServiceFailed = error => {
@@ -40,15 +23,17 @@ export const addServiceFailed = error => {
 
 // delete service
 
-export const deleteService = data => {
+export const deleteService = (serviceId, componentId) => {
   return {
     type: types.DELETE_SERVICE,
-    data,
+    serviceId,
+    componentId,
   };
 };
-export const deleteServiceSuccess = () => {
+export const deleteServiceSuccess = data => {
   return {
     type: types.DELETE_SERVICE_SUCCESS,
+    data,
   };
 };
 export const deleteServiceFailed = error => {
@@ -60,17 +45,19 @@ export const deleteServiceFailed = error => {
 
 //update service
 
-export const updateService = (data, componentId) => {
+export const updateService = (data, serviceId, componentId) => {
   return {
     type: types.UPDATE_SERVICE,
     data,
+    serviceId,
     componentId,
   };
 };
 
-export const updateServiceSuccess = () => {
+export const updateServiceSuccess = data => {
   return {
     type: types.UPDATE_SERVICE_SUCCESS,
+    data,
   };
 };
 

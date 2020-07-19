@@ -16,9 +16,12 @@ import {Navigation} from 'react-native-navigation';
 import ToggleSwitch from 'toggle-switch-react-native';
 import {connect} from 'react-redux';
 import * as authenticationAction from '../../redux/authentication/actions/actions';
-
+import * as stationAction from '../../redux/station/actions/actions';
+import {AsyncStorage} from 'react-native';
+import {APP_COLOR} from '../../utils/colors';
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
-
+import messaging from '@react-native-firebase/messaging';
+import {Alert} from 'react-native';
 const DATA = [
   {
     id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
@@ -41,16 +44,21 @@ const DATA = [
     title: 'Third111 Item',
   },
 ];
+
 class HomeFixer extends Component {
   constructor(props) {
     super(props);
   }
-  async componentDidMount() {
-    this.props.getStationInformation();
-  }
-  changeToggleSwitch = isOn => {
-    this.props.changePower(this.props.stationInformation.id, isOn);
+  changeToggleSwitch = async isOn => {
+    await this.props.changePower(this.props.stationInformation.id, isOn);
   };
+  async componentDidUpdate() {
+    const {isAvailable} = this.props;
+    if (isAvailable) {
+      const stationId = await AsyncStorage.getItem('stationId');
+      this.props.getStationById(stationId);
+    }
+  }
 
   openSideBar = () => {
     Navigation.mergeOptions('sideBar', {
@@ -61,15 +69,17 @@ class HomeFixer extends Component {
       },
     });
   };
+
   render() {
     const {stationInformation} = this.props;
     return (
       <View style={styles.container}>
         <View
           style={{
-            backgroundColor: '#3748ca',
+            backgroundColor: APP_COLOR,
             paddingVertical: 15,
             paddingHorizontal: 15,
+            height: 250,
           }}>
           <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
             <TouchableOpacity
@@ -80,8 +90,8 @@ class HomeFixer extends Component {
             </TouchableOpacity>
 
             <ToggleSwitch
-              isOn={stationInformation.hasAmbulatory}
-              onColor="#44db5e"
+              isOn={stationInformation.isAvailable}
+              onColor="#4dc2ff"
               offColor="red"
               size="medium"
               onToggle={isOn => this.changeToggleSwitch(isOn)}
@@ -95,10 +105,7 @@ class HomeFixer extends Component {
               marginVertical: 35,
             }}>
             <Image
-              source={{
-                uri:
-                  'https://d1nhio0ox7pgb.cloudfront.net/_img/v_collection_png/512x512/shadow/store.png',
-              }}
+              source={require('../../assets/image/store.png')}
               style={styles.imageAvatar}
             />
             <Text style={styles.nameRepair}>
@@ -107,73 +114,77 @@ class HomeFixer extends Component {
           </View>
         </View>
 
-        <View style={{flexDirection: 'row'}}>
-          <View
-            style={[
-              {
-                backgroundColor: '#4dc2ff',
-              },
-              styles.containerRating,
-            ]}>
-            <Text style={[styles.rating, styles.textAlign]}>100%</Text>
-            <Text style={[styles.textAlign]}>Hoàn thành hằng ngày</Text>
-          </View>
-          <View
-            style={[
-              {
-                backgroundColor: '#ff7fe5',
-              },
-              styles.containerRating,
-            ]}>
-            <Text style={[styles.rating, styles.textAlign]}>100%</Text>
-            <Text style={[styles.textAlign]}>Hoàn thành hằng tháng</Text>
-          </View>
-          <View
-            style={{
-              backgroundColor: 'white',
-              width: 90,
-              height: 90,
-              position: 'absolute',
-              left: Dimensions.get('window').width / 2 - 45,
-              top: -45,
-              borderRadius: 50,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <Text style={{textAlign: 'center', fontSize: 18}}>
-              {stationInformation.totalRating}
-            </Text>
-            <Icon name="ios-star-outline" color="#00a7e7" size={30} />
-          </View>
-        </View>
         <View>
-          <Text style={{margin: 20, fontSize: 20, color: 'gray'}}>HÔM NAY</Text>
-          <View style={{height: 150}}>
-            <ScrollView>
-              <FlatList
-                data={DATA}
-                renderItem={({item}) => (
+          {/* <ScrollView> */}
+          <View style={{flexDirection: 'row'}}>
+            <View
+              style={[
+                {
+                  backgroundColor: '#4dc2ff',
+                },
+                styles.containerRating,
+              ]}>
+              <Text style={[styles.rating, styles.textAlign]}>100%</Text>
+              <Text style={[styles.textAlign]}>Hoàn thành hằng ngày</Text>
+            </View>
+            <View
+              style={[
+                {
+                  backgroundColor: '#ff7fe5',
+                },
+                styles.containerRating,
+              ]}>
+              <Text style={[styles.rating, styles.textAlign]}>100%</Text>
+              <Text style={[styles.textAlign]}>Hoàn thành hằng tháng</Text>
+            </View>
+            <View
+              style={{
+                backgroundColor: 'white',
+                width: 90,
+                height: 90,
+                position: 'absolute',
+                left: Dimensions.get('window').width / 2 - 45,
+                top: -45,
+                borderRadius: 50,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <Text style={{textAlign: 'center', fontSize: 18}}>
+                {stationInformation.totalRating
+                  ? stationInformation.totalRating
+                  : 5}
+              </Text>
+              <Icon name="ios-star-outline" color="#00a7e7" size={30} />
+            </View>
+          </View>
+          <Text style={{margin: 15, fontSize: 20, color: 'gray'}}>HÔM NAY</Text>
+          <View style={{height: SCREEN_HEIGHT - 550}}>
+            {/* <ScrollView> */}
+            <FlatList
+              data={DATA}
+              renderItem={({item}) => (
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    padding: 20,
+                  }}>
                   <View
                     style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      padding: 20,
-                    }}>
-                    <View
-                      style={{
-                        width: 15,
-                        height: 15,
-                        backgroundColor: 'red',
-                        borderRadius: 50,
-                      }}
-                    />
-                    <Text style={styles.notificationName}>{item.title}</Text>
-                  </View>
-                )}
-                keyExtractor={item => item.id}
-              />
-            </ScrollView>
+                      width: 15,
+                      height: 15,
+                      backgroundColor: 'red',
+                      borderRadius: 50,
+                    }}
+                  />
+                  <Text style={styles.notificationName}>{item.title}</Text>
+                </View>
+              )}
+              keyExtractor={item => item.id}
+            />
+            {/* </ScrollView> */}
           </View>
+          {/* </ScrollView> */}
         </View>
       </View>
     );
@@ -182,18 +193,18 @@ class HomeFixer extends Component {
 const styles = StyleSheet.create({
   containerRating: {
     width: '50%',
-    paddingVertical: 60,
+    paddingVertical: 40,
   },
   rating: {
     fontSize: 35,
   },
   nameRepair: {
+    flex: 1,
     fontSize: 25,
-    textAlign: 'center',
+    textAlign: 'left',
     padding: 20,
     color: 'white',
   },
-
   textAlign: {
     textAlign: 'center',
     color: 'white',
@@ -214,16 +225,24 @@ const styles = StyleSheet.create({
 });
 const mapStateToProps = store => {
   return {
-    stationInformation: store.AuthenticationReducers.stationInformation,
+    allStation: store.StationReducers.allStation,
+    stationInformation: store.StationReducers.station,
+    isAvailable: store.StationReducers.changePower,
   };
 };
 const mapDispatchToProps = dispatch => {
   return {
-    getStationInformation: service => {
-      dispatch(authenticationAction.getStationById());
+    getMyAccount: () => {
+      dispatch(authenticationAction.getMyAccount());
     },
-    changePower: (stationKey, status) => {
-      dispatch(authenticationAction.changePower(stationKey, status));
+    changePower: (stationId, isOn) => {
+      dispatch(stationAction.changePower(stationId, isOn));
+    },
+    getMyStation: () => {
+      dispatch(stationAction.getMyStation());
+    },
+    getStationById: id => {
+      dispatch(stationAction.getStationById(id));
     },
   };
 };

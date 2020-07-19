@@ -16,7 +16,7 @@ export default class showNotification extends Component {
     this.animation = new Animated.Value(0);
   }
   componentDidMount() {
-    this.toggleNotificationAnim(); 
+    this.toggleNotificationAnim();
   }
   toggleNotificationAnim = () => {
     Animated.timing(this.animation, {
@@ -33,9 +33,10 @@ export default class showNotification extends Component {
 
   render() {
     const {title, type} = this.props;
-    let color = '#ffa00a';
-    if (type === 'success') color = '#0bd534';
-    else color = '#ffa00a';
+    let color = type === 'success' ? (color = '#0bd534') : '#ffa00a';
+    if (!title) {
+      return null;
+    }
     return (
       <Animated.View
         style={[

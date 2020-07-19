@@ -48,10 +48,15 @@ export default class CheckBoxItem extends Component {
               borderBottomColor: 'gray',
               marginVertical: 10,
             }}>
-            <Text style={{marginTop: 5}}> {item.name}</Text>
+            <Text style={{marginTop: 5, width: '50%'}}>
+              {item.name}
+            </Text>
+            <Text style={{marginTop: 5, width: '30%'}}> {item.price} vnd</Text>
+
             <CheckBox
               value={this.state.checked}
               onValueChange={() => this.onValueChange(item)}
+              style={{ width: '10%'}}
             />
           </View>
         </TouchableOpacity>

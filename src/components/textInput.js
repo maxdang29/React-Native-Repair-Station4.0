@@ -27,18 +27,18 @@ export default class InputText extends Component {
     this.props.onchangeText(text);
   };
   render() {
-    const {title, icon, type, error, isSecureTextEntry} = this.props;
+    const {title, value, icon, type, error, isSecureTextEntry} = this.props;
     return (
       <>
         <View style={styles.container}>
-          <Image source={{uri: icon}} style={styles.image} />
+          <Image source={{uri: icon}} style={styles.image} /> 
           <TextInput
             style={styles.InputText}
             placeholder={title}
             ref={ref => (this.inputRef = ref)}
             onSubmitEditing={this.props.onSubmitEditing}
             onChangeText={text => this.onChangeText(text)}
-            value={this.state.value}
+            value={this.props.value || this.state.value}
             keyboardType={type ? type : 'default'}
             secureTextEntry={isSecureTextEntry}
           />

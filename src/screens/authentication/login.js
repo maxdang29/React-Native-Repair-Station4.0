@@ -7,20 +7,19 @@ import {
   AsyncStorage,
   Image,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import InputText from '../../components/textInput';
 import {connect} from 'react-redux';
 import Icon from 'react-native-vector-icons/Ionicons';
 import * as authenticationAction from '../../redux/authentication/actions/actions';
-import firebase from 'react-native-firebase';
-import {showModalNavigation} from '../../navigation/function';
-import startApp from '../../navigation/bottomTab';
-
+import {showModalNavigation, setRoot} from '../../navigation/function';
+import messaging from '@react-native-firebase/messaging';
 class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      phone: '0368947444',
+      phone: '0368947845',
       password: 'Abc123456#',
       phoneError: null,
       passwordError: null,
@@ -29,15 +28,11 @@ class Login extends Component {
     };
   }
   componentDidMount() {
-    firebase
-      .messaging()
+    messaging()
       .getToken()
       .then(fcmToken => {
         if (fcmToken) {
-          // user has a device token
           this.onchangeText('tokenDevice', fcmToken);
-        } else {
-          // user doesn't have a device token yet
         }
       });
   }
@@ -45,7 +40,7 @@ class Login extends Component {
   componentDidUpdate() {
     const {onLogin} = this.props;
     if (onLogin) {
-      startApp();
+      setRoot('splashScreen');
     }
   }
   onchangeText = (key, value) => {
@@ -80,6 +75,7 @@ class Login extends Component {
   };
   render() {
     const {phoneError, passwordError, message} = this.state;
+    const {error, loading} = this.props;
     return (
       <ScrollView>
         <View style={styles.container}>
@@ -121,11 +117,29 @@ class Login extends Component {
             <TouchableOpacity
               style={[styles.button, {backgroundColor: '#00a7e7'}]}
               onPress={() => this.login()}>
-              <Text style={{color: 'white'}}>Đăng nhập</Text>
+              {loading ? (
+                <ActivityIndicator size="small" />
+              ) : (
+                <Text style={{color: 'white'}}>Đăng nhập</Text>
+              )}
             </TouchableOpacity>
           </View>
           <Text style={styles.text}>Quên mật khẩu?</Text>
         </View>
+        {typeof error === 'string' ? (
+          <View>
+            <Text
+              style={{
+                marginVertical: 40,
+                fontSize: 16,
+                textAlign: 'center',
+                color: 'red',
+                marginHorizontal: 30,
+              }}>
+              {error}{' '}
+            </Text>
+          </View>
+        ) : null}
       </ScrollView>
     );
   }
@@ -175,6 +189,8 @@ const mapStateToProps = store => {
   return {
     onLogin: store.AuthenticationReducers.onLogin,
     allStation: store.AuthenticationReducers.allStation,
+    error: store.AuthenticationReducers.errorLogin,
+    loading: store.AuthenticationReducers.loading,
   };
 };
 

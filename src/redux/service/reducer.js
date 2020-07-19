@@ -1,5 +1,6 @@
 import * as typesAction from './actions/typesAction';
-import {act} from 'react-test-renderer';
+import * as stationTypeAction from '../station/actions/typesAction';
+import services from '../../screens/services/services';
 
 const init = {
   services: [],
@@ -8,21 +9,18 @@ const init = {
 
 const ServiceReducers = (state = init, action) => {
   switch (action.type) {
-    case typesAction.GET_ALL_SERVICE:
-      return {...state, services: [], loading: true};
-    case typesAction.GET_ALL_SERVICE_SUCCESS:
-      return {...state, services: action.data, loading: false};
+    case stationTypeAction.GET_STATION_BY_ID_SUCCESS:
+      return {...state, services: action.data.services};
     case typesAction.ADD_SERVICE:
       return {...state};
     case typesAction.ADD_SERVICE_SUCCESS:
-      return {...state};
+      return {...state, services: [...action.data]};
     case typesAction.ADD_SERVICE_FAILED:
       return {...state};
     case typesAction.DELETE_SERVICE_SUCCESS:
-      return {...state};
-
+      return {...state, services: [...action.data]};
     case typesAction.UPDATE_SERVICE_SUCCESS:
-      return {...state};
+      return {...state, services: [...action.data]};
     default:
       return {...state};
   }

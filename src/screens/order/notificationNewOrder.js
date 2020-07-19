@@ -7,28 +7,46 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
+  Vibration,
 } from 'react-native';
-import NewOrder from '../../components/book/newOrder';
+import NewOrder from '../../components/order/newOrder';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {connect} from 'react-redux';
-import * as orderAction from '../../redux/book/actions/actions';
+import * as orderAction from '../../redux/order/actions/actions';
 import {alertConfirm} from '../../navigation/function';
 import {Navigation} from 'react-native-navigation';
-
+import {format} from 'date-fns';
+import {ACCEPTED, REJECTED} from '../../constants/orderStatus';
+import {APP_COLOR, ERROR_COLOR} from '../../utils/colors';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 
 class NotificationNewOrder extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      componentId: null,
+    };
+  }
+  componentWillMount = () => {
+    Vibration.vibrate(2000);
+  };
   confirmOrder = orderId => {
+    const {componentId} = this.props;
     alertConfirm(
       'alertConfirm',
       'Bạn chắc chắn muốn nhận cuốc?',
       null,
       'Xác nhận',
-      {onPress: () => this.props.confirmOrder(orderId, this.props.componentId)},
+      {
+        onPress: () =>
+          this.props.updateStatusOrder(ACCEPTED, orderId, componentId),
+      },
     );
   };
+
   cancelOrder = orderId => {
+    const {componentId} = this.props;
     alertConfirm(
       'alertConfirm',
       'Bạn chắc chắn muốn hủy cuốc?',
@@ -36,18 +54,19 @@ class NotificationNewOrder extends Component {
       'Xác nhận hủy',
       {
         onPress: () =>
-          this.props.cancelConfirm(orderId, this.props.componentId),
+          this.props.updateStatusOrder(REJECTED, orderId, componentId),
       },
     );
   };
   render() {
-    const {data} = this.props;
+    const {value} = this.props;
 
+    //01cbfd
     return (
       <>
         <View style={styles.container}>
           <View style={styles.header}>
-            <Text style={styles.title}>{this.props.title}</Text>
+            <Text style={styles.title}>Bạn có cuốc mới</Text>
           </View>
           <View style={styles.content}>
             <View
@@ -60,10 +79,12 @@ class NotificationNewOrder extends Component {
                 source={require('../../assets/image/max.jpg')}
                 style={styles.imageUser}
               />
-              <Text style={{marginTop: 5}}>{data[0].user.fullName}</Text>
+              <Text style={{marginTop: 5, fontSize: 20}}>
+                {value[0].customerName}
+              </Text>
             </View>
 
-            <ScrollView>
+            <ScrollView showsVerticalScrollIndicator={false}>
               <View
                 style={[
                   {
@@ -77,24 +98,27 @@ class NotificationNewOrder extends Component {
                     <Icon
                       style={styles.icon}
                       name="ios-bicycle"
-                      color="#01cbfd"
+                      color={APP_COLOR}
                       size={23}
                     />
                     <Text style={styles.highlight}>Thông tin dịch vụ </Text>
                   </View>
-                  <Text style={{paddingLeft: 30}}>{data[0].vehicle}</Text>
+                  <Text style={{paddingLeft: 30}}>
+                    {value[0].station.vehicle}
+                  </Text>
                 </View>
                 <View style={{marginBottom: 12}}>
                   <View style={styles.row}>
                     <Icon
                       style={styles.icon}
-                      name="ios-bicycle"
-                      color="#01cbfd"
+                      name="ios-car"
+                      color={APP_COLOR}
                       size={23}
                     />
-                    <Text style={styles.highlight}>Loại xe </Text>
+                    <Text style={styles.highlight}>
+                      {value[0].distance / 1000} km
+                    </Text>
                   </View>
-                  <Text style={{paddingLeft: 30}}>{data[0].vehicleName}</Text>
                 </View>
               </View>
 
@@ -103,12 +127,12 @@ class NotificationNewOrder extends Component {
                   <Icon
                     style={styles.icon}
                     name="ios-navigate"
-                    color="#01cbfd"
+                    color={APP_COLOR}
                     size={23}
                   />
-                  <Text style={styles.highlight}>Điểm đón </Text>
+                  <Text style={styles.highlight}>Địa chỉ </Text>
                 </View>
-                <Text style={{paddingLeft: 30}}>101b lê hữu trác, sơn trà</Text>
+                <Text style={{paddingLeft: 30}}>{value[0].address}</Text>
               </View>
 
               <View style={[{paddingVertical: 12}, styles.border]}>
@@ -116,14 +140,15 @@ class NotificationNewOrder extends Component {
                   <Icon
                     style={styles.icon}
                     name="ios-time"
-                    color="#01cbfd"
+                    color={APP_COLOR}
                     size={23}
                   />
-                  <Text style={styles.highlight}>
-                    Thời gian tìm tiệm sửa xe
-                  </Text>
+                  <Text style={styles.highlight}>Thời gian</Text>
                 </View>
-                <Text style={{paddingLeft: 30}}>{data[0].time}</Text>
+                <Text style={{paddingLeft: 30}}>
+                  {' '}
+                  {format(new Date(value[0].createdOn), 'dd-MM-yyyy H:mma')}
+                </Text>
               </View>
 
               <View style={[{paddingVertical: 12}, styles.border]}>
@@ -131,18 +156,33 @@ class NotificationNewOrder extends Component {
                   <Icon
                     style={styles.icon}
                     name="ios-build"
-                    color="#01cbfd"
+                    color={APP_COLOR}
                     size={23}
                   />
                   <Text style={styles.highlight}>Dịch vụ </Text>
                 </View>
-                {this.props.data[0].services
-                  ? this.props.data[0].services.map(element => {
+                {value[0].services
+                  ? value[0].services.map(element => {
                       return (
-                        <Text style={{paddingLeft: 30}}>{element.name}</Text>
+                        <View
+                          style={[
+                            styles.row,
+                            {justifyContent: 'space-between'},
+                          ]}>
+                          <Text style={{paddingLeft: 30}}>{element.name}</Text>
+                          <Text>{element.price} vnd</Text>
+                        </View>
                       );
                     })
                   : null}
+                <Text
+                  style={{
+                    textAlign: 'right',
+                    marginVertical: 10,
+                    color: ERROR_COLOR,
+                  }}>
+                  {value[0].totalPrice} vnd
+                </Text>
               </View>
 
               <View style={[{paddingVertical: 12}, styles.border]}>
@@ -150,12 +190,12 @@ class NotificationNewOrder extends Component {
                   <Icon
                     style={styles.icon}
                     name="ios-create"
-                    color="#01cbfd"
+                    color={APP_COLOR}
                     size={23}
                   />
                   <Text style={styles.highlight}>Lưu ý </Text>
                 </View>
-                <Text style={{paddingLeft: 30}}>{data[0].note}</Text>
+                <Text style={{paddingLeft: 30}}>{value[0].note}</Text>
               </View>
             </ScrollView>
           </View>
@@ -169,8 +209,8 @@ class NotificationNewOrder extends Component {
               },
               styles.button,
             ]}
-            onPress={() => {
-              this.cancelOrder(data[0].id);
+            onPress={componentId => {
+              this.cancelOrder(value[0].id);
             }}>
             <Icon style={styles.icon} name="ios-close" color="red" size={35} />
           </TouchableOpacity>
@@ -179,12 +219,12 @@ class NotificationNewOrder extends Component {
               {
                 width: deviceWidth - 105,
                 marginHorizontal: 5,
-                backgroundColor: '#01cbfd',
+                backgroundColor: APP_COLOR,
               },
               styles.button,
             ]}
-            onPress={() => {
-              this.confirmOrder(data[0].id);
+            onPress={componentId => {
+              this.confirmOrder(value[0].id);
             }}>
             <Text style={{color: 'white'}}>Nhận sửa xe</Text>
           </TouchableOpacity>
@@ -206,7 +246,7 @@ const styles = StyleSheet.create({
   },
   header: {
     width: '100%',
-    backgroundColor: '#01cbfd',
+    backgroundColor: APP_COLOR,
     height: 200,
   },
   title: {
@@ -218,7 +258,7 @@ const styles = StyleSheet.create({
   },
   content: {
     backgroundColor: 'white',
-    height: deviceHeight - 240,
+    height: deviceHeight - 210,
     width: deviceWidth - 20,
     marginHorizontal: 20,
     borderRadius: 7,
@@ -241,7 +281,7 @@ const styles = StyleSheet.create({
   },
   highlight: {
     fontWeight: 'bold',
-    color: '#01cbfd',
+    color: APP_COLOR,
   },
   border: {
     borderBottomWidth: 0.2,
@@ -268,11 +308,8 @@ const mapStateToProps = store => {
 };
 const mapDispatchToProps = dispatch => {
   return {
-    confirmOrder: (idOrder, componentId) => {
-      dispatch(orderAction.confirmOrder(idOrder, componentId));
-    },
-    cancelConfirm: (idOrder, componentId) => {
-      dispatch(orderAction.cancelConfirm(idOrder, componentId));
+    updateStatusOrder: (status, orderId, componentId) => {
+      dispatch(orderAction.updateStatus(status, orderId, componentId));
     },
   };
 };

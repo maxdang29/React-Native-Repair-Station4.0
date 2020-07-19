@@ -5,35 +5,55 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  Image,
 } from 'react-native';
-import firebase from 'react-native-firebase';
-
 import {Navigation} from 'react-native-navigation';
 import InputText from '../../components/textInput';
 import Icon from 'react-native-vector-icons/Ionicons';
 import ImagePicker from 'react-native-image-picker';
 import {connect} from 'react-redux';
 import * as serviceAction from '../../redux/service/actions/actions';
+import {APP_COLOR, ERROR_COLOR} from '../../utils/colors';
 class FormService extends Component {
   constructor(props) {
     super(props);
     this.navigationEventListener = Navigation.events().bindComponent(this);
     this.state = {
-      image: '',
       name: '',
-      vehicle: '',
       price: null,
       note: '',
       nameError: null,
-      vehicleError: null,
       priceError: null,
     };
   }
+  componentDidUpdate() {
+    const {value} = this.props;
+    if (value.handle === 'update') {
+      this.updateRightButton();
+    }
+  }
+  updateRightButton() {
+    const options = {
+      topBar: {
+        rightButtons: [
+          {
+            id: 'deleteBtn',
+            icon: require('../../assets/image/icons-trash.png'),
+            color: ERROR_COLOR,
+          },
+        ],
+      },
+    };
+    Navigation.mergeOptions(this.props.componentId, options);
+  }
+
   navigationButtonPressed({buttonId}) {
     const {componentId} = this.props;
     if (buttonId === 'back') {
       Navigation.dismissModal(componentId);
+    }
+    if (buttonId === 'deleteBtn') {
+      const {value, componentId} = this.props;
+      this.props.deleteService(value.item.id, componentId);
     }
   }
   onchangeText = (key, value) => {
@@ -43,71 +63,35 @@ class FormService extends Component {
   };
 
   handleButton = () => {
-    const {image, name, price, note, vehicle} = this.state;
+    const {name, price, note} = this.state;
     const {value, componentId, currentStation} = this.props;
-
     let service = {
-      image: image,
       name: name,
       price: price,
-      vehicle: vehicle,
-      note: note,
+      description: note,
       stationId: currentStation.id,
     };
-    if (name && vehicle && price) {
-      if (value.item) {
-        service.id = value.item.id;
-        this.props.updateService(service, componentId);
+    if (name && price) {
+      if (value.handle === 'update') {
+        delete service.stationId;
+        this.props.updateService(service, value.item.id, componentId);
       } else {
         this.props.addService(service, componentId);
       }
     } else {
       if (!name) this.onchangeText('nameError', 'Nhập tên dịch vụ');
       if (!price) this.onchangeText('priceError', 'Nhập giá');
-      if (!vehicle) this.onchangeText('vehicleError', 'Nhập loại phương tiện');
     }
   };
   focusNextField(nextField) {
     this[nextField].focus();
   }
-  getImage = response => {
-    if (response.didCancel) {
-      console.log('User cancelled image picker');
-    } else if (response.error) {
-      console.log('ImagePicker Error: ', response.error);
-    } else if (response.customButton) {
-      console.log('User tapped custom button: ', response.customButton);
-    } else {
-      const source = {uri: response.uri};
-      this.setState({
-        image: source,
-      });
-    }
-  };
-  selectImage = () => {
-    const options = {
-      noData: true,
-    };
-    ImagePicker.launchImageLibrary(options, response => {
-      this.getImage(response);
-    });
-  };
-  launchCamera = () => {
-    const options = {
-      noData: true,
-    };
-    ImagePicker.launchCamera(options, response => {
-      this.getImage(response);
-    });
-  };
   componentDidMount() {
     const {value} = this.props;
     if (value.item) {
       this.setState({
-        image: value.item.image,
         name: value.item.name,
         price: value.item.price,
-        vehicle: value.item.vehicle,
         note: value.item.note,
       });
     }
@@ -115,21 +99,14 @@ class FormService extends Component {
 
   render() {
     const {value} = this.props;
-    const {image, nameError, vehicleError, priceError} = this.state;
+    const {nameError, priceError} = this.state;
     return (
       <ScrollView>
         <View style={styles.container}>
-          {image ? (
-            <Image
-              source={image}
-              style={{width: '100%', height: 300}}
-              resizeMode="center"
-            />
-          ) : null}
           <InputText
             ref={ref => (this.name = ref)}
             onSubmitEditing={() => {
-              this.focusNextField('vehicle');
+              this.focusNextField('price');
             }}
             onchangeText={value => this.onchangeText('name', value)}
             title="Tên dịch vụ *"
@@ -137,17 +114,7 @@ class FormService extends Component {
             error={nameError}
             icon="https://img.icons8.com/windows/344/multiline-text.png"
           />
-          <InputText
-            ref={ref => (this.vehicle = ref)}
-            onSubmitEditing={() => {
-              this.focusNextField('price');
-            }}
-            error={vehicleError}
-            onchangeText={value => this.onchangeText('vehicle', value)}
-            title="Loại phương tiện *"
-            value={value.item ? value.item.vehicle : null}
-            icon="https://img.icons8.com/ios/2x/category.png"
-          />
+
           <InputText
             ref={ref => (this.price = ref)}
             onSubmitEditing={() => {
@@ -156,7 +123,7 @@ class FormService extends Component {
             onchangeText={value => this.onchangeText('price', value)}
             title="Giá *"
             error={priceError}
-            value={value.item ? value.item.price : null}
+            value={value.item ? value.item.price.toString() : null}
             type="numeric"
             icon="https://img.icons8.com/wired/2x/price-tag-euro.png"
           />
@@ -167,27 +134,15 @@ class FormService extends Component {
             value={value.item ? value.item.note : null}
             icon="https://img.icons8.com/ios/2x/note.png"
           />
-          <View style={styles.containerChooseImage}>
-            <TouchableOpacity
-              style={[styles.iconImage]}
-              onPress={this.selectImage}>
-              <Icon name="ios-image" color="gray" size={40} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.iconImage]}
-              onPress={this.launchCamera}>
-              <Icon name="ios-camera" color="gray" size={40} />
-            </TouchableOpacity>
-          </View>
 
-          <View style={styles.containerChooseImage}>
+          <View style={styles.containerButton}>
             <TouchableOpacity
-              style={[styles.button, {backgroundColor: 'red'}]}
+              style={[styles.button, {backgroundColor: ERROR_COLOR}]}
               onPress={() => Navigation.dismissModal(this.props.componentId)}>
               <Text style={styles.textButton}>Hủy</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.button, {backgroundColor: '#44db5e'}]}
+              style={[styles.button, {backgroundColor: APP_COLOR}]}
               onPress={this.handleButton}>
               <Text style={styles.textButton}>
                 {value.item ? 'Cập nhật' : 'Thêm'}
@@ -203,10 +158,11 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: 'center',
   },
-  containerChooseImage: {
+  containerButton: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    margin: 20,
+    marginHorizontal: 30,
+    marginVertical: 40,
   },
   iconImage: {
     width: '50%',
@@ -232,7 +188,7 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = store => {
   return {
-    currentStation: store.AuthenticationReducers.stationInformation,
+    currentStation: store.StationReducers.station,
   };
 };
 const mapDispatchToProps = dispatch => {
@@ -240,8 +196,11 @@ const mapDispatchToProps = dispatch => {
     addService: (service, componentId) => {
       dispatch(serviceAction.addService(service, componentId));
     },
-    updateService: (service, componentId) => {
-      dispatch(serviceAction.updateService(service, componentId));
+    updateService: (service, serviceId, componentId) => {
+      dispatch(serviceAction.updateService(service, serviceId, componentId));
+    },
+    deleteService: (serviceId, componentId) => {
+      dispatch(serviceAction.deleteService(serviceId, componentId));
     },
   };
 };

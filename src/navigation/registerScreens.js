@@ -2,6 +2,7 @@ import {Navigation} from 'react-native-navigation';
 import React from 'react';
 import store from '../redux/store';
 import {Provider} from 'react-redux';
+import SplashScreen from '../screens/splashScreen';
 import homeFixer from '../screens/home/home';
 import serviceFixer from '../screens/services/services';
 import FormService from '../screens/services/formService';
@@ -10,11 +11,13 @@ import serviceSetting from '../screens/services/serviceSetting';
 import login from '../screens/authentication/login';
 import register from '../screens/authentication/register';
 import profileUser from '../screens/authentication/profileUser';
-import bookMain from '../screens/book/bookMain';
-import bookDetail from '../screens/book/bookDetail';
+import orderMain from '../screens/order/orderMain';
+import orderDetail from '../screens/order/orderDetail';
 import alertConfirm from '../components/alertConfirm';
-import notificationNewOrder from '../screens/book/notificationNewOrder';
+import notificationNewOrder from '../screens/order/notificationNewOrder';
 import sideBar from './sideBar';
+import RegisterStation from '../screens/authentication/registerStation';
+import notification from '../screens/notification/main';
 console.disableYellowBox = true;
 
 function ReduxProvider(Component) {
@@ -72,15 +75,15 @@ export function registerScreens() {
   );
 
   Navigation.registerComponent(
-    'bookMain',
-    () => ReduxProvider(bookMain),
-    () => bookMain,
+    'orderMain',
+    () => ReduxProvider(orderMain),
+    () => orderMain,
   );
 
   Navigation.registerComponent(
-    'bookDetail',
-    () => ReduxProvider(bookDetail),
-    () => bookDetail,
+    'orderDetail',
+    () => ReduxProvider(orderDetail),
+    () => orderDetail,
   );
   Navigation.registerComponent(
     'alertConfirm',
@@ -97,5 +100,27 @@ export function registerScreens() {
     'sideBar',
     () => ReduxProvider(sideBar),
     () => sideBar,
+  );
+
+  Navigation.registerComponent(
+    'registerStation',
+    () => ReduxProvider(RegisterStation),
+    () => RegisterStation,
+  );
+
+  Navigation.registerComponent(
+    'splashScreen',
+    () => ReduxProvider(SplashScreen),
+    () => SplashScreen,
+  );
+  Navigation.registerComponent(
+    'formService',
+    () => ReduxProvider(FormService),
+    () => FormService,
+  );
+  Navigation.registerComponent(
+    'notification',
+    () => ReduxProvider(notification),
+    () => notification,
   );
 }

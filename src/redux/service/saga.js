@@ -6,42 +6,21 @@ import store from '../store';
 import {showNotification} from '../../navigation/function';
 
 import {Navigation} from 'react-native-navigation';
-import firebase from 'react-native-firebase';
 import {eventChannel} from 'redux-saga';
-
+import {AsyncStorage} from 'react-native';
 import {
-  getDataByIdRequest,
-  addDataRequest,
-  deleteRequest,
-  updateRequest,
-} from '../../api/firebase/database';
-
-function* getAllService(actions) {
-  const channel = new eventChannel(data => {
-    let listener = getDataByIdRequest(
-      {collection: 'services/', child: 'stationId/'},
-      data,
-    );
-    // #2: Return the shutdown method;
-    return () => {
-      listener.off();
-    };
-  });
-  while (true) {
-    const {data} = yield take(channel);
-    let keys = Object.keys(data);
-    let listService = keys.map(function(k) {
-      return data[k];
-    });
-    // #4: Pause the task until the channel emits a signal and dispatch an action in the store;
-    yield put(serviceAction.getAllServiceSuccess([...listService]));
-  }
-}
+  addServiceApi,
+  deleteServiceApi,
+  updateServiceApi,
+} from '../../api/service';
 
 function* addService(actions) {
   try {
-    let response = yield call(addDataRequest, 'services/', actions.data);
-    yield put(serviceAction.addServiceSuccess());
+    const token = yield AsyncStorage.getItem('token');
+    let response = yield call(addServiceApi, actions.data, token);
+    let allService = yield store.getState().ServiceReducers.services;
+    yield allService.push(response.data);
+    yield put(serviceAction.addServiceSuccess(allService));
     yield showNotification(
       'showNotification',
       'Thêm dịch vụ thành công',
@@ -55,15 +34,21 @@ function* addService(actions) {
       'Thêm dịch vụ không thành công',
       'error',
     );
-
     yield put(serviceAction.addServiceFailed(error));
   }
 }
 
 function* deleteService(actions) {
   try {
-    let response = yield call(deleteRequest, 'services/', actions.data);
-    yield put(serviceAction.deleteServiceSuccess());
+    const token = yield AsyncStorage.getItem('token');
+    let response = yield call(deleteServiceApi, actions.serviceId, token);
+    let allService = yield store.getState().ServiceReducers.services;
+    allService = yield allService.filter(service => {
+      return service.id !== actions.serviceId;
+    });
+    yield put(serviceAction.deleteServiceSuccess(allService));
+    yield Navigation.dismissModal(actions.componentId);
+
     yield showNotification(
       'showNotification',
       'Xóa dịch vụ thành công',
@@ -83,8 +68,19 @@ function* deleteService(actions) {
 
 function* updateService(actions) {
   try {
-    let response = yield call(updateRequest, 'services/', actions.data);
-    yield put(serviceAction.updateServiceSuccess());
+    const token = yield AsyncStorage.getItem('token');
+    let response = yield call(
+      updateServiceApi,
+      actions.serviceId,
+      actions.data,
+      token,
+    );
+    let allService = yield store.getState().ServiceReducers.services;
+    allService = yield allService.filter(service => {
+      return service.id !== actions.serviceId;
+    });
+    yield allService.push(response.data);
+    yield put(serviceAction.updateServiceSuccess(allService));
     yield Navigation.dismissModal(actions.componentId);
     yield showNotification(
       'showNotification',
@@ -104,7 +100,6 @@ function* updateService(actions) {
 }
 
 const rootSagaService = () => [
-  takeLatest(typesAction.GET_ALL_SERVICE, getAllService),
   takeLatest(typesAction.ADD_SERVICE, addService),
   takeLatest(typesAction.DELETE_SERVICE, deleteService),
   takeLatest(typesAction.UPDATE_SERVICE, updateService),
