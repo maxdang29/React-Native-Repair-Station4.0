@@ -7,6 +7,7 @@ import {
   AsyncStorage,
   Image,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import InputText from '../../components/textInput';
 import {connect} from 'react-redux';
@@ -74,7 +75,7 @@ class Login extends Component {
   };
   render() {
     const {phoneError, passwordError, message} = this.state;
-    const {error} = this.props;
+    const {error, loading} = this.props;
     return (
       <ScrollView>
         <View style={styles.container}>
@@ -116,7 +117,11 @@ class Login extends Component {
             <TouchableOpacity
               style={[styles.button, {backgroundColor: '#00a7e7'}]}
               onPress={() => this.login()}>
-              <Text style={{color: 'white'}}>Đăng nhập</Text>
+              {loading ? (
+                <ActivityIndicator size="small" />
+              ) : (
+                <Text style={{color: 'white'}}>Đăng nhập</Text>
+              )}
             </TouchableOpacity>
           </View>
           <Text style={styles.text}>Quên mật khẩu?</Text>
@@ -184,7 +189,8 @@ const mapStateToProps = store => {
   return {
     onLogin: store.AuthenticationReducers.onLogin,
     allStation: store.AuthenticationReducers.allStation,
-    error: store.AuthenticationReducers.error,
+    error: store.AuthenticationReducers.errorLogin,
+    loading: store.AuthenticationReducers.loading,
   };
 };
 

@@ -16,14 +16,13 @@ import {
   changePowerApi,
 } from '../../api/station';
 import startApp from '../../navigation/bottomTab';
-
 function* registerStation(actions) {
   try {
     const token = yield AsyncStorage.getItem('token');
     const response = yield call(registerStationApi, actions.station, token);
     yield AsyncStorage.setItem('stationId', response.data.id);
     yield put(stationAction.registerStationSuccess());
-    startApp();
+    setRoot('splashScreen');
   } catch (error) {
     console.log('error saga', error);
     yield showNotification(
@@ -49,6 +48,9 @@ function* getMyStation() {
   try {
     const token = yield AsyncStorage.getItem('token');
     const response = yield call(getMyStationApi, token);
+    if (!response.data.length) {
+      setRoot('registerStation');
+    }
     yield put(stationAction.getMyStationSuccess(response.data));
   } catch (error) {
     console.log('error', error);
@@ -56,8 +58,9 @@ function* getMyStation() {
 }
 
 function* changePower(actions) {
-  const token = yield AsyncStorage.getItem('token');
   try {
+    const token = yield AsyncStorage.getItem('token');
+    console.log('stationsssssss', actions.stationId);
     const response = yield call(
       changePowerApi,
       actions.stationId,

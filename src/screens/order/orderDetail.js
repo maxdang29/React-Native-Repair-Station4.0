@@ -18,6 +18,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import {connect} from 'react-redux';
 import * as orderAction from '../../redux/order/actions/actions';
 import {format} from 'date-fns';
+import {alertConfirm} from '../../navigation/function';
 import {
   DONE,
   WAITING,
@@ -30,6 +31,7 @@ import {AsyncStorage} from 'react-native';
 
 import {Card, ListItem, Header, Button} from 'react-native-elements';
 import StepIndicator from 'react-native-step-indicator';
+import {DatePickerAndroid} from 'react-native';
 const deviceWidth = Dimensions.get('window').width;
 
 class OrderDetail extends Component {
@@ -48,16 +50,31 @@ class OrderDetail extends Component {
       Navigation.dismissModal(componentId);
     }
   }
+  componentDidMount = () => {
+    const {value} = this.props;
+    this.props.getOrderById(value.id);
+  };
 
   setModalVisible(visible) {
     this.setState({modalVisible: visible});
   }
   componentDidUpdate = async () => {
-    // const {loading} = this.props;
-    // if (loading) {
-    //   const stationId = await AsyncStorage.getItem('stationId');
-    //   this.props.getAllOrder(stationId);
-    // }
+    const {loading, value} = this.props;
+    if (loading) {
+      this.props.getOrderById(value.id);
+    }
+  };
+  cancelOrder = orderId => {
+    console.log('33333', this.props.loading);
+    alertConfirm(
+      'alertConfirm',
+      'Bạn chắc chắn muốn hủy cuốc?',
+      null,
+      'Xác nhận hủy',
+      {
+        onPress: () => this.props.onUpdateStatus(REJECTED, orderId),
+      },
+    );
   };
 
   onValueChange = valueCheckBox => {
@@ -77,7 +94,6 @@ class OrderDetail extends Component {
     } catch (error) {
       console.log('error', error);
     }
-
     this.setState({serviceSelected: serviceSelected});
   };
 
@@ -90,7 +106,15 @@ class OrderDetail extends Component {
 
   handleService = () => {
     const {serviceSelected} = this.state;
-    this.props.addServiceToOrder(serviceSelected, this.props.value.id);
+    let orderDetail = [];
+    serviceSelected.forEach(service => {
+      orderDetail.push({serviceId: service.id});
+    });
+    const data = {
+      status: this.props.value.status,
+      orderDetails: orderDetail,
+    };
+    this.props.addServiceToOrder(data, this.props.value.id);
     this.setModalVisible(!this.state.modalVisible);
   };
 
@@ -123,231 +147,261 @@ class OrderDetail extends Component {
     return dataOrders.find(order => order.id === value.id);
   };
 
+
   render() {
-    const {listService, value, loading} = this.props;
-    const order = this.filterOrderId();
+    const {listService, value, loading, orderCurrent} = this.props;
+    const order = orderCurrent ? orderCurrent : this.filterOrderId();
     const labels = [WAITING, ACCEPTED, DONE];
-    return (
-      <>
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={this.state.modalVisible}>
-          <View style={styles.modalContainer}>
-            <View
-              style={{
-                backgroundColor: 'white',
-                width: deviceWidth - 70,
-                paddingTop: 10,
-              }}>
-              <View>
-                <Text style={styles.textModal}>DỊCH VỤ</Text>
-                <View style={{maxHeight: 400}}>
-                  <ScrollView>
-                    <FlatList
-                      data={listService}
-                      renderItem={({item}) => (
-                        <CheckBoxItem
-                          onValueChange={valueCheckBox =>
-                            this.onValueChange(valueCheckBox)
-                          }
-                          setDefaultValueServices={value => {
-                            this.setDefaultValueServices(value);
-                          }}
-                          item={item}
-                          serviceSelected={order.services}
-                        />
-                      )}
-                      keyExtractor={item => item.id}
-                    />
-                  </ScrollView>
-                </View>
-              </View>
+    if (loading) {
+      return (
+        <View style={styles.loading}>
+          <ActivityIndicator size="large" />
+        </View>
+      );
+    } else
+      return (
+        <>
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={this.state.modalVisible}>
+            <View style={styles.modalContainer}>
               <View
-                style={[
-                  styles.row,
-                  {justifyContent: 'flex-end', marginRight: 10},
-                ]}>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() =>
-                    this.setModalVisible(!this.state.modalVisible)
-                  }>
-                  <Text>Hủy</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.button, {backgroundColor: APP_COLOR}]}
-                  onPress={() => this.handleService()}>
-                  <Text style={{color: 'white'}}>Hoàn tất</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </Modal>
-
-        {/* ORDER INFORMATION */}
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <Card title="THÔNG TIN CUỐC XE" titleStyle={styles.cardTitle}>
-            <ListItem
-              title="Họ và Tên:"
-              rightTitle={order?.customerName}
-              rightTitleStyle={{color: 'black'}}
-              containerStyle={{paddingVertical: 5}}
-              rightSubtitleStyle={{textAlign: 'left'}}
-            />
-            <ListItem
-              title="Số điện thoại:"
-              rightTitle={order?.customerPhone}
-              rightTitleStyle={{color: 'black'}}
-              containerStyle={{paddingVertical: 5}}
-              rightSubtitleStyle={{textAlign: 'left'}}
-            />
-            <ListItem
-              title="Vị trí:"
-              rightTitle={order?.address}
-              rightTitleStyle={{color: 'black'}}
-              containerStyle={{paddingVertical: 5}}
-              rightSubtitleStyle={{textAlign: 'left'}}
-            />
-            <ListItem
-              title="Khoảng cách:"
-              rightTitle={`${order?.distance / 1000} km`}
-              rightTitleStyle={{color: 'black'}}
-              containerStyle={{paddingVertical: 5}}
-              rightSubtitleStyle={{textAlign: 'left'}}
-            />
-            <ListItem
-              title="Tình trạng:"
-              rightTitle={order?.status}
-              rightTitleStyle={{color: 'black'}}
-              containerStyle={{paddingVertical: 5}}
-              rightSubtitleStyle={{textAlign: 'left'}}
-            />
-            <ListItem
-              title="Sử dụng lưu động:"
-              rightTitle={order?.useAmbulatory ? 'Có' : 'Không'}
-              rightTitleStyle={{color: 'black'}}
-              containerStyle={{paddingVertical: 5}}
-              rightSubtitleStyle={{textAlign: 'left'}}
-            />
-          </Card>
-          {/* SELECTED SERVICES */}
-          <Card
-            title="DỊCH VỤ ĐÃ CHỌN"
-            titleStyle={styles.cardTitle}
-            containerStyle={{
-              flex: 1,
-              margin: 5,
-            }}
-            dividerStyle={{height: 1}}>
-            <FlatList
-              data={order.services}
-              renderItem={({item}) => (
-                <View style={styles.between}>
-                  <Text style={styles.text}>{item.name}</Text>
-                  <Text style={styles.text}>
-                    {item.price
-                      .toString()
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' VNĐ'}
-                  </Text>
+                style={{
+                  backgroundColor: 'white',
+                  width: deviceWidth - 70,
+                  paddingTop: 10,
+                }}>
+                <View>
+                  <Text style={styles.textModal}>DỊCH VỤ</Text>
+                  <View style={{maxHeight: 400}}>
+                    <ScrollView>
+                      <FlatList
+                        data={listService}
+                        renderItem={({item}) => (
+                          <CheckBoxItem
+                            onValueChange={valueCheckBox =>
+                              this.onValueChange(valueCheckBox)
+                            }
+                            setDefaultValueServices={value => {
+                              this.setDefaultValueServices(value);
+                            }}
+                            item={item}
+                            serviceSelected={order.services}
+                          />
+                        )}
+                        keyExtractor={item => item.id}
+                      />
+                    </ScrollView>
+                  </View>
                 </View>
-              )}
-              keyExtractor={item => item.id}
-            />
-
-            <ListItem
-              title="Phí lưu động"
-              rightTitle={
-                order?.ambulatoryFee
-                  .toString()
-                  .replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' VNĐ'
-              }
-              rightTitleStyle={{color: 'black'}}
-            />
-            <View style={styles.between}>
-              <Text style={styles.text}>Tổng tiền: </Text>
-              <Text style={styles.text}>
-                {order?.totalPrice
-                  .toString()
-                  .replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' VNĐ'}
-              </Text>
-            </View>
-            <View style={styles.center}>
-              {order.status === ACCEPTED ? (
-                <TouchableOpacity
-                  onPress={() => {
-                    this.setModalVisible(!this.state.modalVisible);
-                  }}
+                <View
                   style={[
-                    {
-                      backgroundColor: 'red',
-                    },
-                    styles.bigButton,
+                    styles.row,
+                    {justifyContent: 'flex-end', marginRight: 10},
                   ]}>
-                  <Text style={[styles.textModal, {color: 'white'}]}>
-                    Thêm dịch vụ
-                  </Text>
-                </TouchableOpacity>
-              ) : null}
-            </View>
-          </Card>
-          {/* ORDER STATUS */}
-          <Card
-            title="TÌNH TRẠNG CUỐC XE"
-            titleStyle={styles.cardTitle}
-            containerStyle={{
-              flex: 1,
-              margin: 5,
-              marginBottom: 5,
-            }}>
-            <StepIndicator
-              customStyles={customStyles}
-              stepCount={labels.length}
-              currentPosition={labels.indexOf(order?.status)}
-              labels={labels}
-            />
-
-            <View style={styles.review}>
-              {order.status === DONE ? (
-                <Text style={{textAlign: 'center', margin: 10}}>
-                  Đánh giá của khách hàng
-                </Text>
-              ) : null}
-
-              <View style={[styles.row, {justifyContent: 'center'}]}>
-                {order.status === DONE
-                  ? this.countStars(
-                      order.star,
-                      styles.iconRankChecked,
-                      styles.iconRankUnchecked,
-                    )
-                  : null}
+                  <TouchableOpacity
+                    style={styles.button}
+                    onPress={() =>
+                      this.setModalVisible(!this.state.modalVisible)
+                    }>
+                    <Text>Hủy</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.button, {backgroundColor: APP_COLOR}]}
+                    onPress={() => this.handleService()}>
+                    <Text style={{color: 'white'}}>Hoàn tất</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-              <View style={[{justifyContent: 'center', alignItems: 'center'}]}>
+            </View>
+          </Modal>
+
+          {/* ORDER INFORMATION */}
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <Card title="THÔNG TIN CUỐC XE" titleStyle={styles.cardTitle}>
+              <ListItem
+                title="Họ và Tên:"
+                rightTitle={order?.customerName}
+                rightTitleStyle={{color: 'black'}}
+                containerStyle={{paddingVertical: 5}}
+                rightSubtitleStyle={{textAlign: 'left'}}
+              />
+              <ListItem
+                title="Số điện thoại:"
+                rightTitle={order?.customerPhone}
+                rightTitleStyle={{color: 'black'}}
+                containerStyle={{paddingVertical: 5}}
+                rightSubtitleStyle={{textAlign: 'left'}}
+              />
+              <ListItem
+                title="Vị trí:"
+                rightTitle={order?.address}
+                rightTitleStyle={{color: 'black'}}
+                containerStyle={{paddingVertical: 5}}
+                rightSubtitleStyle={{textAlign: 'left'}}
+              />
+              <ListItem
+                title="Khoảng cách:"
+                rightTitle={`${order?.distance / 1000} km`}
+                rightTitleStyle={{color: 'black'}}
+                containerStyle={{paddingVertical: 5}}
+                rightSubtitleStyle={{textAlign: 'left'}}
+              />
+              <ListItem
+                title="Tình trạng:"
+                rightTitle={order?.status}
+                rightTitleStyle={{color: 'black'}}
+                containerStyle={{paddingVertical: 5}}
+                rightSubtitleStyle={{textAlign: 'left'}}
+              />
+              <ListItem
+                title="Sử dụng lưu động:"
+                rightTitle={order?.useAmbulatory ? 'Có' : 'Không'}
+                rightTitleStyle={{color: 'black'}}
+                containerStyle={{paddingVertical: 5}}
+                rightSubtitleStyle={{textAlign: 'left'}}
+              />
+            </Card>
+            {/* SELECTED SERVICES */}
+            <Card
+              title="DỊCH VỤ ĐÃ CHỌN"
+              titleStyle={styles.cardTitle}
+              containerStyle={{
+                flex: 1,
+                margin: 5,
+              }}
+              dividerStyle={{height: 1}}>
+              <FlatList
+                data={order.services}
+                renderItem={({item}) => (
+                  <View style={styles.between}>
+                    <Text style={styles.text}>{item.name}</Text>
+                    <Text style={styles.text}>
+                      {item.price
+                        .toString()
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' VNĐ'}
+                    </Text>
+                  </View>
+                )}
+                keyExtractor={item => item.id}
+              />
+
+              <ListItem
+                title="Phí lưu động"
+                rightTitle={
+                  order?.ambulatoryFee
+                    .toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' VNĐ'
+                }
+                rightTitleStyle={{color: 'black'}}
+              />
+              <View style={styles.between}>
+                <Text style={styles.text}>Tổng tiền: </Text>
+                <Text style={styles.text}>
+                  {order?.totalPrice
+                    .toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' VNĐ'}
+                </Text>
+              </View>
+              <View style={styles.center}>
                 {order.status === ACCEPTED ? (
                   <TouchableOpacity
+                    onPress={() => {
+                      this.setModalVisible(!this.state.modalVisible);
+                    }}
                     style={[
                       {
-                        backgroundColor: APP_COLOR,
+                        backgroundColor: 'red',
                       },
                       styles.bigButton,
-                    ]}
-                    onPress={() => this.props.onUpdateStatus(DONE, order.id)}>
-                    {loading ? (
-                      <ActivityIndicator size="small" />
-                    ) : (
-                      <Text style={[styles.textModal, {color: 'white'}]}>
-                        Thanh toán
-                      </Text>
-                    )}
+                    ]}>
+                    <Text style={[styles.textModal, {color: 'white'}]}>
+                      Thêm dịch vụ
+                    </Text>
                   </TouchableOpacity>
                 ) : null}
               </View>
-            </View>
-          </Card>
-        </ScrollView>
-      </>
-    );
+            </Card>
+            {/* ORDER STATUS */}
+            <Card
+              title="TÌNH TRẠNG CUỐC XE"
+              titleStyle={styles.cardTitle}
+              containerStyle={{
+                flex: 1,
+                margin: 5,
+                marginBottom: 5,
+              }}>
+              <StepIndicator
+                customStyles={customStyles}
+                stepCount={labels.length}
+                currentPosition={labels.indexOf(order?.status)}
+                labels={labels}
+              />
+
+              <View style={styles.review}>
+                {order.status === DONE ? (
+                  <Text style={{textAlign: 'center', margin: 10}}>
+                    Đánh giá của khách hàng
+                  </Text>
+                ) : null}
+
+                <View style={[styles.row, {justifyContent: 'center'}]}>
+                  {order.status === DONE
+                    ? this.countStars(
+                        order.star,
+                        styles.iconRankChecked,
+                        styles.iconRankUnchecked,
+                      )
+                    : null}
+                </View>
+              </View>
+              <View>
+                {order.status === ACCEPTED ? (
+                  <View
+                    style={{
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      flexDirection: 'row',
+                    }}>
+                    <TouchableOpacity
+                      style={[
+                        {
+                          backgroundColor: '#F5F5F5',
+                          width: '20%',
+                          borderColor: 'gray',
+                          borderWidth: 0.3,
+                        },
+                        styles.bigButton,
+                      ]}
+                      onPress={() => this.cancelOrder(order.id)}>
+                      <Icon
+                        style={styles.icon}
+                        name="ios-close"
+                        color="red"
+                        size={26}
+                      />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[
+                        {
+                          backgroundColor: APP_COLOR,
+                          width: '80%',
+                        },
+                        styles.bigButton,
+                      ]}
+                      onPress={() => this.props.onUpdateStatus(DONE, order.id)}>
+                      <Text style={[styles.textModal, {color: 'white'}]}>
+                        Thanh toán
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : null}
+              </View>
+            </Card>
+          </ScrollView>
+        </>
+      );
   }
 }
 const customStyles = {
@@ -374,6 +428,11 @@ const customStyles = {
   currentStepLabelColor: APP_COLOR,
 };
 const styles = StyleSheet.create({
+  loading: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   container: {
     marginVertical: 15,
     height: '100%',
@@ -436,11 +495,10 @@ const styles = StyleSheet.create({
     margin: 10,
   },
   bigButton: {
-    width: '100%',
     padding: 12,
     alignItems: 'center',
     borderRadius: 3,
-    margin: 15,
+    height: 55,
   },
   center: {
     justifyContent: 'center',
@@ -460,6 +518,7 @@ const mapStateToProps = store => {
     listService: store.ServiceReducers.services,
     dataOrders: store.OrderReducers.dataOrder,
     loading: store.OrderReducers.loading,
+    orderCurrent: store.OrderReducers.order,
   };
 };
 const mapDispatchToProps = dispatch => {
@@ -472,6 +531,9 @@ const mapDispatchToProps = dispatch => {
     },
     getAllOrder: stationId => {
       dispatch(orderAction.getAllOrder(stationId));
+    },
+    getOrderById: orderId => {
+      dispatch(orderAction.getOrderById(orderId));
     },
   };
 };

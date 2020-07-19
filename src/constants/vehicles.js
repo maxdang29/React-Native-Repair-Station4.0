@@ -1,2 +1,2 @@
-export const MOTORBIKE = 'Motobike';
+export const MOTORBIKE = 'Motorbike';
 export const CAR = 'Car';

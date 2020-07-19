@@ -2,16 +2,19 @@ import * as typesAction from './actions/typesAction';
 const init = {
   allStation: [],
   error: '',
-  station: [],
+  station: null,
   changePower: false,
+  loading: false,
 };
 
 const StationReducers = (state = init, action) => {
   switch (action.type) {
+    case typesAction.REGISTER_STATION:
+      return {...state, loading: true};
     case typesAction.REGISTER_STATION_SUCCESS:
-      return {...state};
+      return {...state, loading: false};
     case typesAction.REGISTER_STATION_FAILED:
-      return {...state, error: action.error};
+      return {...state, error: action.error, loading: false};
     case typesAction.GET_STATION_BY_ID_SUCCESS:
       return {...state, station: action.data};
     case typesAction.GET_MY_STATION_SUCCESS:

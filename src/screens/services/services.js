@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderColor: 'gray',
     borderWidth: 0.5,
-    backgroundColor: APP_COLOR,
+    backgroundColor: 'white',
   },
   inputSearch: {
     width: '100%',

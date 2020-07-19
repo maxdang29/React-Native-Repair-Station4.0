@@ -57,7 +57,8 @@ function* register(actions) {
     yield showModalNavigation('registerStation');
     yield Navigation.dismissModal(actions.componentId);
   } catch (error) {
-    console.log('error', error);
+    console.log('error', JSON.stringify(error, null, 4));
+
     yield showNotification(
       'showNotification',
       'Đăng kí không thành công!',

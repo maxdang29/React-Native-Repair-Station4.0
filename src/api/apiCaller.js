@@ -1,11 +1,18 @@
 import axios from 'axios';
 
-const API_URL = 'https://suaxe-api.herokuapp.com/';
+const API_URL = 'https://api-vrs.herokuapp.com/';
 
-export default function callApi(endpoint, method = 'GET', body, Token) {
+export default function callApi(
+  endpoint,
+  method = 'GET',
+  body,
+  Token,
+  pageIndex = 1,
+  limit = 100,
+) {
   return axios({
     method: method,
-    url: `${API_URL}${endpoint}?limit=100`,
+    url: `${API_URL}${endpoint}?isDesc=true&limit=${limit}&offset=${pageIndex}`,
     data: body,
     headers: {
       Authorization: 'Bearer ' + Token,

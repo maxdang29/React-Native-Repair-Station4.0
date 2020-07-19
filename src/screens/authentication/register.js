@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import InputText from '../../components/textInput';
 import {connect} from 'react-redux';
@@ -12,6 +13,7 @@ import * as authenticationAction from '../../redux/authentication/actions/action
 import messaging from '@react-native-firebase/messaging';
 import {Navigation} from 'react-native-navigation';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {STATION} from '../../constants/roles';
 
 import startApp from '../../navigation/bottomTab';
 class Register extends Component {
@@ -33,7 +35,7 @@ class Register extends Component {
   componentDidUpdate() {
     const {onLogin} = this.props;
     if (onLogin) {
-      startApp();
+      // startApp();
     }
   }
 
@@ -74,7 +76,8 @@ class Register extends Component {
         name: userName,
         phoneNumber: phone,
         password: password,
-        role: 'Station',
+        role: STATION,
+        phoneNumberConfirmed: false,
       };
       this.props.register(user, this.props.componentId);
       this.setState({message: null});
@@ -107,7 +110,7 @@ class Register extends Component {
       confirmPasswordError,
       message,
     } = this.state;
-    const {error} = this.props;
+    const {error, loading} = this.props;
     return (
       <ScrollView>
         <View style={styles.container}>
@@ -173,7 +176,11 @@ class Register extends Component {
             <TouchableOpacity
               style={[styles.button, {backgroundColor: '#00a7e7'}]}
               onPress={() => this.register()}>
-              <Text style={{color: 'white'}}>Đăng kí</Text>
+              {loading ? (
+                <ActivityIndicator size="small" />
+              ) : (
+                <Text style={{color: 'white'}}>Đăng kí</Text>
+              )}
             </TouchableOpacity>
           </View>
           {typeof error === 'string' ? (
@@ -230,7 +237,8 @@ const mapStateToProps = store => {
   return {
     onLogin: store.AuthenticationReducers.onLogin,
     allStation: store.AuthenticationReducers.allStation,
-    error: store.AuthenticationReducers.error,
+    error: store.AuthenticationReducers.errorRegister,
+    loading: store.AuthenticationReducers.loading,
   };
 };
 

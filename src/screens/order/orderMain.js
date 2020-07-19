@@ -27,7 +27,6 @@ import {
 } from '../../constants/orderStatus';
 import {format} from 'date-fns';
 
-
 const initialLayout = {width: Dimensions.get('window').width};
 class Order extends Component {
   constructor(props) {
@@ -39,8 +38,10 @@ class Order extends Component {
         {key: 'done', title: 'Hoàn thành'},
         {key: 'cancel', title: 'Đã hủy'},
       ],
+      isFetching: false,
     };
   }
+
   _handleIndexChange = index => this.setState({index});
 
   _renderTabBar = props => {
@@ -82,40 +83,62 @@ class Order extends Component {
       }
     });
     let result = Object.keys(objOrder).map(key => objOrder[key]);
-    // console.log('ressult 2222', JSON.stringify(result, null, 4));
-    result.sort(function(a, b) {
-      return new Date(a.title) > new Date(b.title);
-    });
     return result;
   };
+  // fetchMore = async () => {
+  //   await this.setState({isFetching: true});
+  //   const stationId = await AsyncStorage.getItem('stationId');
+  //   const pageIndex = parseInt(this.props.pageIndex) + 1;
+  //   await this.props.getAllOrder(stationId, pageIndex);
+  //   this.setState({isFetching: false});
+  // };
   renderOrder = status => {
     const {dataOrders} = this.props;
+    // const {isFetching} = this.state;
+
     let resultData = dataOrders.filter(order => {
+      if (status === CANCELED) {
+        return order.status === status || order.status === REJECTED;
+      }
       return order.status === status;
     });
     const DATA = this.convertDataToSection(resultData);
-
-    return (
-      <View style={styles.container}>
-        <SectionList
-          sections={DATA}
-          keyExtractor={(item, index) => item + index}
-          renderItem={({item}) => <OrderItem item={item} />}
-          renderSectionHeader={({section: {title}}) => (
-            <Text
-              style={{
-                fontSize: 16,
-                fontWeight: 'bold',
-                marginHorizontal: 5,
-                marginTop: 10,
-              }}>
-              Ngày: {title}
-            </Text>
-          )}
-        />
-      </View>
-    );
+    if (DATA.length > 0)
+      return (
+        <View style={styles.container}>
+          <SectionList
+            style={{height: '100%'}}
+            sections={DATA}
+            keyExtractor={(item, index) => item + index}
+            renderItem={({item}) => <OrderItem item={item} />}
+            renderSectionHeader={({section: {title}}) => (
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: 'bold',
+                  marginHorizontal: 5,
+                  marginTop: 10,
+                }}>
+                Ngày: {title}
+              </Text>
+            )}
+          />
+        </View>
+      );
+    else {
+      return (
+        <View
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginVertical: 10,
+          }}>
+          <Text style={{fontSize: 16}}>Không có đơn hàng nào</Text>
+        </View>
+      );
+    }
   };
+
   _renderScene = SceneMap({
     accepted: () => {
       return this.renderOrder(ACCEPTED);
@@ -201,12 +224,13 @@ const mapStateToProps = store => {
   return {
     dataOrders: store.OrderReducers.dataOrder,
     loading: store.OrderReducers.loading,
+    pageIndex: store.OrderReducers.pageIndex,
   };
 };
 const mapDispatchToProps = dispatch => {
   return {
-    getAllOrder: stationId => {
-      dispatch(orderAction.getAllOrder(stationId));
+    getAllOrder: (stationId, pageIndex) => {
+      dispatch(orderAction.getAllOrder(stationId, pageIndex));
     },
   };
 };
