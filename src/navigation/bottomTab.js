@@ -45,13 +45,13 @@ export default function startApp() {
                     {
                       component: {
                         name: 'orderMain',
-                        id: 'order'
+                        id: 'order',
                       },
                     },
                   ],
                   options: {
                     topBar: {
-                       visible: false,
+                      visible: false,
                     },
                     bottomTab: {
                       text: 'Hoạt động',
@@ -91,7 +91,7 @@ export default function startApp() {
                   children: [
                     {
                       component: {
-                        name: 'homeFixer',
+                        name: 'notification',
                       },
                     },
                   ],

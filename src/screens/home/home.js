@@ -50,7 +50,6 @@ class HomeFixer extends Component {
     super(props);
   }
   changeToggleSwitch = async isOn => {
-    console.log('isons', isOn);
     await this.props.changePower(this.props.stationInformation.id, isOn);
   };
   async componentDidUpdate() {
@@ -106,10 +105,7 @@ class HomeFixer extends Component {
               marginVertical: 35,
             }}>
             <Image
-              source={{
-                uri:
-                  'https://d1nhio0ox7pgb.cloudfront.net/_img/v_collection_png/512x512/shadow/store.png',
-              }}
+              source={require('../../assets/image/store.png')}
               style={styles.imageAvatar}
             />
             <Text style={styles.nameRepair}>

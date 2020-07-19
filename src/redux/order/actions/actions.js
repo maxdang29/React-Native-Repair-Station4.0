@@ -1,15 +1,17 @@
 import * as typesAction from './typesAction';
 
-export const getAllOrder = stationId => {
+export const getAllOrder = (stationId, pageIndex) => {
   return {
     type: typesAction.GET_ALL_ORDER,
     stationId,
+    pageIndex,
   };
 };
-export const getAllOrderSuccess = data => {
+export const getAllOrderSuccess = (data, pageIndex) => {
   return {
     type: typesAction.GET_ALL_ORDER_SUCCESS,
     data,
+    pageIndex,
   };
 };
 
@@ -77,19 +79,43 @@ export const updateStatus = (status, orderId, componentId) => {
     type: typesAction.CHANGE_STATUS,
     orderId,
     status,
-    componentId
+    componentId,
   };
 };
-export const updateStatusSuccess = (data) => {
+export const updateStatusSuccess = (data, currentOrder) => {
   return {
     type: typesAction.CHANGE_STATUS_SUCCESS,
-    data
+    data,
+    currentOrder,
   };
 };
 
 export const updateStatusFailed = error => {
   return {
     type: typesAction.CHANGE_STATUS,
+    error,
+  };
+};
+
+// GET ORDER BY ID
+
+export const getOrderById = orderId => {
+  return {
+    type: typesAction.GET_ORDER_BY_ID,
+    orderId,
+  };
+};
+
+export const getOrderByIdSuccess = data => {
+  return {
+    type: typesAction.GET_ORDER_BY_ID_SUCCESS,
+    data,
+  };
+};
+
+export const getOrderByIdFailed = error => {
+  return {
+    type: typesAction.GET_ORDER_BY_ID_FAILED,
     error,
   };
 };

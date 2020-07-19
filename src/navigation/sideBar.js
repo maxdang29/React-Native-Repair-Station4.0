@@ -31,7 +31,7 @@ class SideBar extends Component {
       <View style={styles.container}>
         <Header
           centerComponent={{
-            text: user.name.toUpperCase() || '',
+            text: user?.name.toUpperCase() || '',
             style: {color: '#fff', fontSize: 18, marginHorizontal: -30},
           }}
           rightComponent={

@@ -17,6 +17,7 @@ import alertConfirm from '../components/alertConfirm';
 import notificationNewOrder from '../screens/order/notificationNewOrder';
 import sideBar from './sideBar';
 import RegisterStation from '../screens/authentication/registerStation';
+import notification from '../screens/notification/main';
 console.disableYellowBox = true;
 
 function ReduxProvider(Component) {
@@ -116,5 +117,10 @@ export function registerScreens() {
     'formService',
     () => ReduxProvider(FormService),
     () => FormService,
+  );
+  Navigation.registerComponent(
+    'notification',
+    () => ReduxProvider(notification),
+    () => notification,
   );
 }

@@ -7,6 +7,7 @@ import {
   ScrollView,
   Image,
   Picker,
+  ActivityIndicator,
 } from 'react-native';
 import InputText from '../../components/textInput';
 import {connect} from 'react-redux';
@@ -14,10 +15,11 @@ import * as stationAction from '../../redux/station/actions/actions';
 import {Navigation} from 'react-native-navigation';
 import Icon from 'react-native-vector-icons/Ionicons';
 import startApp from '../../navigation/bottomTab';
+import {CAR, MOTORBIKE} from '../../constants/vehicles';
 const vehicles = [
   {label: 'Chọn phương tiện', value: ''},
-  {label: 'Xe máy', value: 'motorbike'},
-  {label: 'Xe otô', value: 'car'},
+  {label: 'Xe máy', value: MOTORBIKE},
+  {label: 'Xe otô', value: CAR},
 ];
 class RegisterStation extends Component {
   constructor(props) {
@@ -25,7 +27,7 @@ class RegisterStation extends Component {
     this.state = {
       stationName: 'Nam Ita',
       address: '30 Nguyễn hữu thoại',
-      vehicle: 'Xe máy',
+      vehicle: MOTORBIKE,
       addressError: null,
       stationNameError: null,
       vehicleError: null,
@@ -57,8 +59,8 @@ class RegisterStation extends Component {
         name: stationName,
         address: address,
         vehicle: vehicle,
-        latitude: 16.043310,
-        longitude: 108.213320,
+        latitude: 16.04331,
+        longitude: 108.21332,
       };
       this.props.registerStation(station, this.props.componentId);
       this.setState({message: null});
@@ -73,7 +75,6 @@ class RegisterStation extends Component {
     }
   };
   filterError = (error, fieldName) => {
-    console.log('dddddddd', error);
     if (typeof error === 'object' && error.propertyName)
       return error.find(err => err.propertyName === fieldName).errorMessage;
   };
@@ -85,7 +86,7 @@ class RegisterStation extends Component {
       message,
       vehicle,
     } = this.state;
-    const {error} = this.props;
+    const {error, loading} = this.props;
     return (
       <ScrollView>
         <View style={styles.container}>
@@ -160,7 +161,11 @@ class RegisterStation extends Component {
             <TouchableOpacity
               style={[styles.button, {backgroundColor: '#00a7e7'}]}
               onPress={() => this.register()}>
-              <Text style={{color: 'white'}}>Đăng kí</Text>
+              {loading ? (
+                <ActivityIndicator size="small" />
+              ) : (
+                <Text style={{color: 'white'}}>Đăng kí</Text>
+              )}
             </TouchableOpacity>
           </View>
           {typeof error === 'string' ? (
@@ -231,6 +236,7 @@ const styles = StyleSheet.create({
 const mapStateToProps = store => {
   return {
     error: store.StationReducers.error,
+    loading: store.StationReducers.loading,
   };
 };
 
