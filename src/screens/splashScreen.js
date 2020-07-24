@@ -20,7 +20,6 @@ class SplashScreen extends Component {
   }
   async componentDidMount() {
     const {notificationPageIndex} = this.props;
-    console.log('all station', notificationPageIndex);
     await this.props.getMyAccount();
     await this.props.getMyStation();
     await this.props.getNotifications(notificationPageIndex);
@@ -44,7 +43,6 @@ class SplashScreen extends Component {
       await this.props.getStationById(firstStationId);
     }
     if (stationInformation) {
-      console.log('station33333333', stationInformation);
       startApp();
     }
   }

@@ -4,7 +4,7 @@ import * as notificationAction from './actions/actions';
 import store from '../store';
 import {showNotification, showModalNavigation} from '../../navigation/function';
 import {Navigation} from 'react-native-navigation';
-import {getAllNotificationApi} from '../../api/notification';
+import {getAllNotificationApi, getNotifyByIdApi} from '../../api/notification';
 import {AsyncStorage} from 'react-native';
 import {WAITING} from '../../constants/orderStatus';
 
@@ -25,8 +25,6 @@ function* getAllNotification(actions) {
       notifications = response.data.sources;
     }
 
-    console.log('data 111111111', JSON.stringify(notifications, null, 4));
-
     yield put(
       notificationAction.getAllNotificationSuccess(
         notifications,
@@ -34,11 +32,29 @@ function* getAllNotification(actions) {
       ),
     );
   } catch (error) {
-    console.log('errror notification', JSON.stringify(error, null, 4));
+    console.log('error notification', JSON.stringify(error, null, 4));
+  }
+}
+
+function* getNotifyById(actions) {
+  try {
+    const token = yield AsyncStorage.getItem('token');
+    const response = yield call(getNotifyByIdApi, actions.notifyId, token);
+
+    let allNotify = yield store.getState().NotificationReducers.notifications;
+    let index = yield allNotify.findIndex(notify => {
+      return notify.id === actions.notifyId;
+    });
+
+    allNotify[index].isSeen = response.data.isSeen;
+    yield put(notificationAction.seenNotifySuccess([...allNotify], response.data.order));
+  } catch (error) {
+    console.log('error notification', JSON.stringify(error, null, 4));
   }
 }
 
 const rootSagaNotification = () => [
   takeLatest(typesAction.GET_ALL_NOTIFICATION, getAllNotification),
+  takeLatest(typesAction.SEEN_NOTIFY, getNotifyById),
 ];
 export default rootSagaNotification();

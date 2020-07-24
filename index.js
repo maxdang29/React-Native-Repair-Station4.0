@@ -17,13 +17,6 @@ messaging().setBackgroundMessageHandler(async remoteMessage => {
 //   }
 // };
 Navigation.events().registerAppLaunchedListener(async () => {
- await messaging()
-    .getToken()
-    .then(fcmToken => {
-      if (fcmToken) {
-        console.log('device token', fcmToken);
-      }
-    });
   const token = await AsyncStorage.getItem('token');
   if (token) {
     setRoot('splashScreen');

@@ -52,7 +52,6 @@ function* getOrderById(actions) {
     const token = yield AsyncStorage.getItem('token');
     const response = yield call(getOrderByIdApi, actions.orderId, token);
     yield put(orderAction.getOrderByIdSuccess(response.data));
-    console.log('response 2222', JSON.stringify(response.data, null, 4));
   } catch (error) {
     console.log('get order error', error);
   }

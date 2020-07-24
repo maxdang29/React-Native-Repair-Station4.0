@@ -41,3 +41,25 @@ export const getNotificationByIdFailed = error => {
     error,
   };
 };
+
+export const seenNotify = notifyId => {
+  return {
+    type: typesAction.SEEN_NOTIFY,
+    notifyId,
+  };
+};
+
+export const seenNotifySuccess = (data, itemNotify) => {
+  return {
+    type: typesAction.SEEN_NOTIFY_SUCCESS,
+    data,
+    itemNotify
+  };
+};
+
+export const seenNotifyFailed = error => {
+  return {
+    type: typesAction.SEEN_NOTIFY_FAILEDTIFY,
+    error,
+  };
+};
