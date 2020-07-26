@@ -1,4 +1,5 @@
 import {Navigation} from 'react-native-navigation';
+import Icon from 'react-native-vector-icons/Feather';
 
 export const showModalNavigation = (
   modal_name,
@@ -6,33 +7,35 @@ export const showModalNavigation = (
   pageTitle,
   visible = false,
 ) => {
-  Navigation.showModal({
-    stack: {
-      children: [
-        {
-          component: {
-            name: modal_name,
-            passProps: {
-              value,
-            },
-            options: {
-              topBar: {
-                title: {
-                  text: pageTitle,
-                },
-                leftButtons: [
-                  {
-                    id: 'back',
-                    icon: require('../assets/image/icons-arrow-left.png'),
+  Promise.all([Icon.getImageSource('arrow-left', 30)]).then(([leftIcon]) => {
+    Navigation.showModal({
+      stack: {
+        children: [
+          {
+            component: {
+              name: modal_name,
+              passProps: {
+                value,
+              },
+              options: {
+                topBar: {
+                  title: {
+                    text: pageTitle,
                   },
-                ],
-                visible: visible,
+                  leftButtons: [
+                    {
+                      id: 'back',
+                      icon: leftIcon,
+                    },
+                  ],
+                  visible: visible,
+                },
               },
             },
           },
-        },
-      ],
-    },
+        ],
+      },
+    });
   });
 };
 

@@ -18,6 +18,8 @@ import ItemService from '../../components/services/itemService';
 import {showModalNavigation} from '../../navigation/function';
 import {Navigation} from 'react-native-navigation';
 import {APP_COLOR} from '../../utils/colors';
+import LinearGradient from 'react-native-linear-gradient';
+
 class Service extends Component {
   constructor(props) {
     super(props);
@@ -52,7 +54,7 @@ class Service extends Component {
     let data = suggestion ? suggestion : listService;
 
     return (
-      <>
+      <LinearGradient colors={['#c2d7ff', '#cde7f9', '#ffffff']}>
         <ScrollView style={styles.container}>
           <View style={styles.getRepair}>
             <View style={{flexDirection: 'row'}}>
@@ -86,7 +88,7 @@ class Service extends Component {
             <Text style={{color: 'white', fontSize: 20}}>+</Text>
           </TouchableOpacity>
         </View>
-      </>
+      </LinearGradient>
     );
   }
 }
@@ -98,21 +100,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: 30,
     paddingVertical: 10,
-    backgroundColor: 'white',
     alignItems: 'center',
     borderColor: 'gray',
     borderWidth: 0.5,
-    backgroundColor: 'white',
   },
   inputSearch: {
     width: '100%',
     height: 45,
     borderRadius: 50,
-
     borderColor: 'gray',
     borderWidth: 0.5,
     padding: 10,
-    backgroundColor: 'white',
+    backgroundColor: '#cde7f9',
   },
   buttonSearch: {
     borderColor: 'gray',

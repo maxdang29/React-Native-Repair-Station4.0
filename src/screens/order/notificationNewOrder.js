@@ -76,7 +76,7 @@ class NotificationNewOrder extends Component {
                 alignItems: 'center',
               }}>
               <Image
-                source={require('../../assets/image/max.jpg')}
+                source={require('../../assets/image/icon-avatar-profile.png')}
                 style={styles.imageUser}
               />
               <Text style={{marginTop: 5, fontSize: 20}}>

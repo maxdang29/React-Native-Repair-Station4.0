@@ -26,8 +26,9 @@ import {
   DONE,
 } from '../../constants/orderStatus';
 import {format} from 'date-fns';
+import LinearGradient from 'react-native-linear-gradient';
 
-const initialLayout = {width: Dimensions.get('window').width};
+const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 class Order extends Component {
   constructor(props) {
     super(props);
@@ -107,7 +108,7 @@ class Order extends Component {
       return (
         <View style={styles.container}>
           <SectionList
-            style={{height: '100%'}}
+            style={{height: '89%'}}
             sections={DATA}
             keyExtractor={(item, index) => item + index}
             renderItem={({item}) => <OrderItem item={item} />}
@@ -160,24 +161,32 @@ class Order extends Component {
     const {dataOrders, loading} = this.props;
     if (loading) {
       return (
-        <View style={styles.loading}>
+        <LinearGradient
+          colors={['#c2d7ff', '#cde7f9', '#ffffff']}
+          style={styles.loading}>
           <ActivityIndicator size="large" />
-        </View>
+        </LinearGradient>
       );
     } else
-    return (
-      <>
-        <Text style={styles.title}>Danh sách đơn hàng</Text>
-        <TabView
-          style={{flex: 3}}
-          navigationState={this.state}
-          renderScene={this._renderScene}
-          renderTabBar={this._renderTabBar}
-          onIndexChange={this._handleIndexChange}
-          swipeEnabled={true}
-        />
-      </>
-    );
+      return (
+        <>
+          <View style={{backgroundColor: '#c2d7ff'}}>
+            <Text style={styles.title}>Danh sách đơn hàng</Text>
+          </View>
+          <LinearGradient
+            colors={['#c2d7ff', '#cde7f9', '#ffffff']}
+            style={{backgroundColor: 'red', height: '100%'}}>
+            <TabView
+              style={{flex: 3}}
+              navigationState={this.state}
+              renderScene={this._renderScene}
+              renderTabBar={this._renderTabBar}
+              onIndexChange={this._handleIndexChange}
+              swipeEnabled={true}
+            />
+          </LinearGradient>
+        </>
+      );
   }
 }
 const styles = StyleSheet.create({
@@ -197,9 +206,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginHorizontal: 5,
-    borderBottomColor: '#EEEEEE',
+    borderBottomColor: '#e4e9ee',
     paddingBottom: 8,
-    borderBottomWidth: 3,
+    borderBottomWidth: 1,
   },
   buttonTab: {
     padding: 10,
