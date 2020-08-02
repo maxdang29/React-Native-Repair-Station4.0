@@ -28,6 +28,7 @@ import {Icon} from 'react-native-elements';
 import {ACCEPTED, DONE} from '../../constants/orderStatus';
 import {showModalNavigation} from '../../navigation/function';
 import {format} from 'date-fns';
+import {el} from 'date-fns/locale';
 class HomeFixer extends Component {
   constructor(props) {
     super(props);
@@ -75,32 +76,38 @@ class HomeFixer extends Component {
 
   getSevenOrderLast = () => {
     const doneOrder = this.filterStatusOrder(DONE);
-
-    let labels = [];
     let values = [];
+    let currentDate = new Date();
+    let labels = [format(new Date(currentDate), 'dd-MM')];
+    let countDate = 0;
+    while (countDate < 6) {
+      let newDate = currentDate.setDate(currentDate.getDate() - 1);
+      newDate = format(new Date(newDate), 'dd-MM');
+      labels.push(newDate);
+      countDate++;
+    }
 
     doneOrder.forEach(order => {
       let date = format(new Date(order.createdOn), 'dd-MM');
       let totalPrice = order.totalPrice;
 
-      if (labels.length < 7) {
-        let index = labels.findIndex(label => {
-          return label === date;
-        });
-
-        if (index === -1) {
-          labels.push(date);
-          values.push(totalPrice);
-        } else {
-          values[index] += totalPrice;
-        }
+      let index = labels.findIndex(label => {
+        return label === date;
+      });
+      if (index !== -1) {
+        values[index] = totalPrice;
       }
     });
-    return {labels: labels, value: values};
+    for (let index = 0; index < values.length; index++) {
+      const element = values[index];
+      if (element === undefined) {
+        values[index] = 0;
+      }
+    }
+    return {labels: labels.reverse(), values: values.reverse()};
   };
 
   showDataPointChart = (value, labels) => {
-    console.log('values', labels);
     Alert.alert(
       'Doanh thu',
       `Tổng doanh thu trong ngày ${
@@ -130,7 +137,7 @@ class HomeFixer extends Component {
     const revenueMonth = this.revenueOnMonth();
     const chartData = this.getSevenOrderLast();
     const labels = chartData.labels;
-    const value = chartData.value;
+    const value = chartData.values;
     const today = new Date();
     const date = today.getDate() + '/' + today.getMonth();
     return (
@@ -202,7 +209,6 @@ class HomeFixer extends Component {
               borderRadius: 16,
             }}
             onDataPointClick={value => {
-              console.log('error', JSON.stringify(labels, null, 4));
               this.showDataPointChart(value, labels);
             }}
           />

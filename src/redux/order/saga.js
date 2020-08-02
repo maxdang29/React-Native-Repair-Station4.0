@@ -13,6 +13,14 @@ import {
 import {AsyncStorage} from 'react-native';
 import {WAITING} from '../../constants/orderStatus';
 
+sortByDate = data => {
+  data.sort(function(a, b) {
+    let date1 = new Date(a.createdOn);
+    let date2 = new Date(b.createdOn);
+    return date1 < date2;
+  });
+};
+
 function* getAllOrder(actions) {
   try {
     const token = yield AsyncStorage.getItem('token');
@@ -22,6 +30,8 @@ function* getAllOrder(actions) {
       token,
       actions.pageIndex,
     );
+    sortByDate(response.data.sources);
+
     let orders = store.getState().OrderReducers.dataOrder;
     if (actions.pageIndex > 1) {
       orders = response.data.sources.concat(orders);
