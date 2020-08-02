@@ -87,6 +87,7 @@ class RegisterStation extends Component {
       vehicle,
     } = this.state;
     const {error, loading} = this.props;
+    console.log('weeeeee', error);
     return (
       <ScrollView>
         <View style={styles.container}>
@@ -154,11 +155,6 @@ class RegisterStation extends Component {
           ) : null}
           <View style={styles.row}>
             <TouchableOpacity
-              style={styles.button}
-              onPress={() => Navigation.dismissModal(this.props.componentId)}>
-              <Text style={styles.text}>Đăng nhập</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
               style={[styles.button, {backgroundColor: '#00a7e7'}]}
               onPress={() => this.register()}>
               {loading ? (
@@ -170,9 +166,13 @@ class RegisterStation extends Component {
           </View>
           {typeof error === 'string' ? (
             <View style={styles.containerError}>
-              <Text style={[styles.error]}> {this.props.error} </Text>
+              <Text style={[styles.error]}> {error} </Text>
             </View>
-          ) : null}
+          ) : (
+            <View style={styles.containerError}>
+              <Text style={[styles.error]}> {error[0].errorMessage} </Text>
+            </View>
+          )}
         </View>
       </ScrollView>
     );
@@ -196,10 +196,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   button: {
-    padding: 10,
+    padding: 15,
     borderColor: '#00a7e7',
     borderWidth: 1,
-    width: 130,
+    width: 230,
     justifyContent: 'center',
     alignItems: 'center',
     marginHorizontal: 20,

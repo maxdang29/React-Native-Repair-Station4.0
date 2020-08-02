@@ -195,8 +195,6 @@ dependencies {
     // Firebase dependencies
     implementation "com.google.firebase:firebase-messaging:20.1.2"
 
-    implementation project(':react-native-svg')
-    implementation project(':react-native-linear-gradient')
 
     if (enableHermes) {
         def hermesPath = "../../node_modules/hermes-engine/android/";

@@ -26,6 +26,7 @@ import {LineChart} from 'react-native-chart-kit';
 import LinearGradient from 'react-native-linear-gradient';
 import {Icon} from 'react-native-elements';
 import {ACCEPTED, DONE} from '../../constants/orderStatus';
+import {showModalNavigation} from '../../navigation/function';
 import {format} from 'date-fns';
 class HomeFixer extends Component {
   constructor(props) {
@@ -123,11 +124,15 @@ class HomeFixer extends Component {
     const totalAcceptedOrder = this.filterStatusOrder(ACCEPTED).length;
     const totalOrder = dataOrders.length;
     const rateSuccess =
-      (this.filterStatusOrder(DONE).length / totalOrder) * 100;
+      totalOrder !== 0
+        ? (this.filterStatusOrder(DONE).length / totalOrder) * 100
+        : 0;
     const revenueMonth = this.revenueOnMonth();
     const chartData = this.getSevenOrderLast();
     const labels = chartData.labels;
     const value = chartData.value;
+    const today = new Date();
+    const date = today.getDate() + '/' + today.getMonth();
     return (
       <View style={styles.container}>
         <LinearGradient
@@ -160,10 +165,10 @@ class HomeFixer extends Component {
 
           <LineChart
             data={{
-              labels: labels,
+              labels: labels.length > 0 ? labels : [date],
               datasets: [
                 {
-                  data: value,
+                  data: value.length > 0 ? value : [0],
                 },
               ],
             }}
@@ -261,7 +266,15 @@ class HomeFixer extends Component {
                   </Text>
                 </View>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.containerItem, styles.item]}>
+              <TouchableOpacity
+                style={[styles.containerItem, styles.item]}
+                onPress={() => {
+                  showModalNavigation(
+                    'revenueStatistics',
+                    null,
+                    'Thống kê doanh thu',
+                  );
+                }}>
                 <Image
                   source={require('../../assets/image/sales-performance.png')}
                   style={{width: 40, height: 40}}
