@@ -60,7 +60,6 @@ function* getMyStation() {
 function* changePower(actions) {
   try {
     const token = yield AsyncStorage.getItem('token');
-    console.log('stationsssssss', actions.stationId);
     const response = yield call(
       changePowerApi,
       actions.stationId,

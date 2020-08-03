@@ -18,6 +18,8 @@ import notificationNewOrder from '../screens/order/notificationNewOrder';
 import sideBar from './sideBar';
 import RegisterStation from '../screens/authentication/registerStation';
 import notification from '../screens/notification/main';
+import RevenueStatistics from '../screens/home/revenueStatistics';
+
 console.disableYellowBox = true;
 
 function ReduxProvider(Component) {
@@ -122,5 +124,11 @@ export function registerScreens() {
     'notification',
     () => ReduxProvider(notification),
     () => notification,
+  );
+
+  Navigation.registerComponent(
+    'revenueStatistics',
+    () => ReduxProvider(RevenueStatistics),
+    () => RevenueStatistics,
   );
 }

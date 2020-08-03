@@ -4,6 +4,8 @@ import android.app.Application;
 import android.content.Context;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
+import com.BV.LinearGradient.LinearGradientPackage;
+import com.horcrux.svg.SvgPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.swmansion.reanimated.ReanimatedPackage;
 import com.imagepicker.ImagePickerPackage;
@@ -30,6 +32,8 @@ import com.agontuk.RNFusedLocation.RNFusedLocationPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.swmansion.reanimated.ReanimatedPackage;
 
+import com.horcrux.svg.SvgPackage;
+import com.BV.LinearGradient.LinearGradientPackage;
 public class MainApplication extends NavigationApplication {
 
     @Override
@@ -59,7 +63,10 @@ public class MainApplication extends NavigationApplication {
             new ReactNativeFirebaseMessagingPackage(),
             new ReactNativePushNotificationPackage(),
             new ReanimatedPackage(),
-            new RNGestureHandlerPackage()
+            new RNGestureHandlerPackage(),
+            new SvgPackage(),
+            new LinearGradientPackage(),
+            new VectorIconsPackage()
         );
     }
 

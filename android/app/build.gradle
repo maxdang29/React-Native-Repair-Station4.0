@@ -181,6 +181,8 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-linear-gradient')
+    implementation project(':react-native-svg')
     implementation project(':react-native-gesture-handler')
     implementation project(':react-native-reanimated')
     implementation project(':react-native-image-picker')
@@ -192,6 +194,7 @@ dependencies {
     implementation project(':react-native-push-notification')
     // Firebase dependencies
     implementation "com.google.firebase:firebase-messaging:20.1.2"
+
 
     if (enableHermes) {
         def hermesPath = "../../node_modules/hermes-engine/android/";
@@ -213,7 +216,7 @@ apply from: file("../../node_modules/@react-native-community/cli-platform-androi
 apply plugin: 'com.android.application'
 
 project.ext.vectoricons = [
-        iconFontNames: ['Ionicons.ttf','MaterialIcons.ttf'] // Name of the font files you want to copy
+        iconFontNames: ['Ionicons.ttf','MaterialIcons.ttf', 'Feather.ttf'] // Name of the font files you want to copy
 ]
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
 apply plugin: 'com.google.gms.google-services'

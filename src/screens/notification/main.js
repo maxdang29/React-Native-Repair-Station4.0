@@ -37,16 +37,18 @@ class Notification extends Component {
     this.setState({isFetching: false});
   };
   handleNotificationPressed = itemNotify => {
-    if (notify.type === ORDER_TRACKING) {
-      try {
-        Navigator.showModal('OrderDetailModal', {order});
-      } catch (e) {
-        console.log(e?.response);
-      }
+    if (itemNotify.type === ORDER_TRACKING) {
+      this.props.seenNotify(itemNotify.id);
     } else {
-      console.log(notify);
+      console.log(itemNotify);
     }
   };
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.notify !== this.props.notify) {
+      showModalNavigation('orderDetail', nextProps.notify, 'Chi tiết', true);
+    }
+  }
   render() {
     const {notifications} = this.props;
     const {isFetching} = this.state;
@@ -56,7 +58,6 @@ class Notification extends Component {
           containerStyle={{
             flex: 1,
             margin: 0,
-            // marginBottom: 2,
             padding: 0,
           }}>
           <Text style={styles.title}>Thông báo</Text>
@@ -118,12 +119,16 @@ const mapStateToProps = store => {
     notifications: store.NotificationReducers.notifications,
     loading: store.NotificationReducers.loading,
     pageIndex: store.NotificationReducers.pageIndex,
+    notify: store.NotificationReducers.notify,
   };
 };
 const mapDispatchToProps = dispatch => {
   return {
     getNotifications: pageIndex => {
       dispatch(notificationAction.getAllNotification(pageIndex));
+    },
+    seenNotify: notifyId => {
+      dispatch(notificationAction.seenNotify(notifyId));
     },
   };
 };

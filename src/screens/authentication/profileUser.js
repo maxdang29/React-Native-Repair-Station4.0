@@ -3,7 +3,7 @@ import { Text, View, StyleSheet, Image, TouchableOpacity, ScrollView, TextInput 
 import { connect } from 'react-redux';
 import * as authenticationAction from '../../redux/authentication/actions/actions';
 import Icon from 'react-native-vector-icons/Ionicons';
-
+import {Navigation} from 'react-native-navigation';
 class ProfileUser extends Component {
   static getDerivedStateFromProps(nextProps, prevState) {
     if (nextProps.myInformation !== prevState.myInformation) {
@@ -30,7 +30,14 @@ class ProfileUser extends Component {
       addressError: null,
       myInformation: {}
     };
+    this.navigationEventListener = Navigation.events().bindComponent(this);
     this.props.getMyAccount();
+  }
+  navigationButtonPressed({buttonId}) {
+    const {componentId} = this.props;
+    if (buttonId === 'back') {
+      Navigation.dismissModal(componentId);
+    }
   }
 
   onchangeText = (key, value) => {

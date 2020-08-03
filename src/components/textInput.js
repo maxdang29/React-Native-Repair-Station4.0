@@ -38,7 +38,7 @@ export default class InputText extends Component {
             ref={ref => (this.inputRef = ref)}
             onSubmitEditing={this.props.onSubmitEditing}
             onChangeText={text => this.onChangeText(text)}
-            value={this.props.value || this.state.value}
+            defaultValue={this.props.value || this.state.value}
             keyboardType={type ? type : 'default'}
             secureTextEntry={isSecureTextEntry}
           />

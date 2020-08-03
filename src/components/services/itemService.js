@@ -29,7 +29,7 @@ export default class ItemService extends Component {
                 <Text>{item.price} VND</Text>
               </View>
               <View>
-                <Icon style={styles.icon} name="ios-bicycle" size={33} />
+                <Icon style={styles.icon} name="ios-car" size={33} />
               </View>
             </View>
           </TouchableOpacity>
@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
     margin: 10,
   },
   shadow: {
-    backgroundColor: 'white',
+    backgroundColor: '#eef4fc',
     paddingVertical: 10,
     width: '100%',
     borderRadius: 3,

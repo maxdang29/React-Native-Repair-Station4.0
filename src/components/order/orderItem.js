@@ -20,7 +20,7 @@ export default class ItemOrder extends Component {
   render() {
     const {item} = this.props;
     return (
-      <View style={([styles.bottom], {margin: 10})}>
+      <View style={([styles.bottom], {margin: 10, backgroundColor: '#eef4fc'})}>
         <View style={styles.bottom}>
           <View style={styles.row}>
             <View style={[styles.item, styles.row]}>
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   bottom: {
-    backgroundColor: 'white',
+    backgroundColor: '#eef4fc',
     width: '100%',
     borderRadius: 3,
     shadowOpacity: 0.3,

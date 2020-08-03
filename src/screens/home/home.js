@@ -8,8 +8,8 @@ import {
   Dimensions,
   FlatList,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
 import MapView, {Marker} from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
 import {Navigation} from 'react-native-navigation';
@@ -22,29 +22,12 @@ import {APP_COLOR} from '../../utils/colors';
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 import messaging from '@react-native-firebase/messaging';
 import {Alert} from 'react-native';
-const DATA = [
-  {
-    id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-    title: 'First Item',
-  },
-  {
-    id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-    title: 'Second Item',
-  },
-  {
-    id: '58694a0f-3da1-471f-bd96-145d571e29d72',
-    title: 'Third Item',
-  },
-  {
-    id: '58694a0f-3da1-471f-bd96-145571fe29d72',
-    title: 'Third Item',
-  },
-  {
-    id: '58694a0f-3da1-471f-bd96-145571ae29d72',
-    title: 'Third111 Item',
-  },
-];
-
+import {LineChart} from 'react-native-chart-kit';
+import LinearGradient from 'react-native-linear-gradient';
+import {Icon} from 'react-native-elements';
+import {ACCEPTED, DONE} from '../../constants/orderStatus';
+import {showModalNavigation} from '../../navigation/function';
+import {format} from 'date-fns';
 class HomeFixer extends Component {
   constructor(props) {
     super(props);
@@ -53,8 +36,8 @@ class HomeFixer extends Component {
     await this.props.changePower(this.props.stationInformation.id, isOn);
   };
   async componentDidUpdate() {
-    const {isAvailable} = this.props;
-    if (isAvailable) {
+    const {isChangePower} = this.props;
+    if (isChangePower) {
       const stationId = await AsyncStorage.getItem('stationId');
       this.props.getStationById(stationId);
     }
@@ -70,127 +53,307 @@ class HomeFixer extends Component {
     });
   };
 
+  filterStatusOrder = status => {
+    const {dataOrders} = this.props;
+    let result = dataOrders.filter(order => {
+      return order.status === status;
+    });
+    return result;
+  };
+
+  revenueOnMonth = () => {
+    const {dataOrders} = this.props;
+    let revenue = 0;
+    let orderDone = dataOrders.filter(order => {
+      return order.status === DONE;
+    });
+    orderDone.forEach(order => {
+      revenue += order.totalPrice;
+    });
+    return revenue;
+  };
+
+  getSevenOrderLast = () => {
+    const doneOrder = this.filterStatusOrder(DONE);
+
+    let labels = [];
+    let values = [];
+
+    doneOrder.forEach(order => {
+      let date = format(new Date(order.createdOn), 'dd-MM');
+      let totalPrice = order.totalPrice;
+
+      if (labels.length < 7) {
+        let index = labels.findIndex(label => {
+          return label === date;
+        });
+
+        if (index === -1) {
+          labels.push(date);
+          values.push(totalPrice);
+        } else {
+          values[index] += totalPrice;
+        }
+      }
+    });
+    return {labels: labels, value: values};
+  };
+
+  showDataPointChart = (value, labels) => {
+    console.log('values', labels);
+    Alert.alert(
+      'Doanh thu',
+      `Tổng doanh thu trong ngày ${
+        labels[value.index]
+      }: ${value.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') +
+        ' vnd'}`,
+      [{text: 'OK', onPress: () => console.log('OK Pressed')}],
+      {cancelable: false},
+    );
+  };
+  gotoOrderTab = () => {
+    Navigation.mergeOptions(this.props.componentId, {
+      bottomTabs: {
+        currentTabIndex: 1,
+      },
+    });
+  };
+
   render() {
-    const {stationInformation} = this.props;
+    const {stationInformation, isChangePower, dataOrders} = this.props;
+    const totalAcceptedOrder = this.filterStatusOrder(ACCEPTED).length;
+    const totalOrder = dataOrders.length;
+    const rateSuccess =
+      totalOrder !== 0
+        ? (this.filterStatusOrder(DONE).length / totalOrder) * 100
+        : 0;
+    const revenueMonth = this.revenueOnMonth();
+    const chartData = this.getSevenOrderLast();
+    const labels = chartData.labels;
+    const value = chartData.value;
+    const today = new Date();
+    const date = today.getDate() + '/' + today.getMonth();
     return (
       <View style={styles.container}>
-        <View
+        <LinearGradient
+          colors={['#c2d7ff', '#cde7f9', '#ffffff']}
           style={{
             backgroundColor: APP_COLOR,
             paddingVertical: 15,
             paddingHorizontal: 15,
-            height: 250,
+            height: SCREEN_HEIGHT,
           }}>
           <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
             <TouchableOpacity
               onPress={() => {
                 this.openSideBar();
               }}>
-              <Icon name="ios-menu" color={'white'} size={30} />
+              <Icon type="feather" name="align-left" size={30} />
             </TouchableOpacity>
-
-            <ToggleSwitch
-              isOn={stationInformation.isAvailable}
-              onColor="#4dc2ff"
-              offColor="red"
-              size="medium"
-              onToggle={isOn => this.changeToggleSwitch(isOn)}
-            />
+            {isChangePower ? (
+              <ActivityIndicator size="small" />
+            ) : (
+              <ToggleSwitch
+                isOn={stationInformation.isAvailable}
+                onColor="#4dc2ff"
+                offColor="red"
+                size="medium"
+                onToggle={isOn => this.changeToggleSwitch(isOn)}
+              />
+            )}
           </View>
 
-          <View
+          <LineChart
+            data={{
+              labels: labels.length > 0 ? labels : [date],
+              datasets: [
+                {
+                  data: value.length > 0 ? value : [0],
+                },
+              ],
+            }}
+            width={SCREEN_WIDTH - 30}
+            height={220}
+            yAxisLabel=""
+            yAxisSuffix=""
+            yAxisInterval={1}
+            chartConfig={{
+              backgroundColor: '#ffffff',
+              backgroundGradientFrom: '#c2d7ff',
+              backgroundGradientTo: '#cde7f9',
+              backgroundGradientFromOpacity: 1,
+              decimalPlaces: 0,
+              color: (opacity = 1) => `rgba(54, 72, 100, ${opacity})`,
+              labelColor: (opacity = 1) => `rgba(56, 75, 196, ${opacity})`,
+              style: {
+                borderRadius: 16,
+              },
+              propsForDots: {
+                r: '3',
+                strokeWidth: '2',
+              },
+              propsForBackgroundLines: {
+                strokeDasharray: 1,
+              },
+            }}
+            bezier
             style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginVertical: 35,
-            }}>
-            <Image
-              source={require('../../assets/image/store.png')}
-              style={styles.imageAvatar}
-            />
-            <Text style={styles.nameRepair}>
-              Tiệm xe {stationInformation.name}
-            </Text>
-          </View>
-        </View>
-
-        <View>
-          {/* <ScrollView> */}
-          <View style={{flexDirection: 'row'}}>
-            <View
-              style={[
-                {
-                  backgroundColor: '#4dc2ff',
-                },
-                styles.containerRating,
-              ]}>
-              <Text style={[styles.rating, styles.textAlign]}>100%</Text>
-              <Text style={[styles.textAlign]}>Hoàn thành hằng ngày</Text>
-            </View>
-            <View
-              style={[
-                {
-                  backgroundColor: '#ff7fe5',
-                },
-                styles.containerRating,
-              ]}>
-              <Text style={[styles.rating, styles.textAlign]}>100%</Text>
-              <Text style={[styles.textAlign]}>Hoàn thành hằng tháng</Text>
-            </View>
-            <View
+              marginVertical: 15,
+              borderRadius: 16,
+            }}
+            onDataPointClick={value => {
+              console.log('error', JSON.stringify(labels, null, 4));
+              this.showDataPointChart(value, labels);
+            }}
+          />
+          {totalAcceptedOrder > 0 ? (
+            <TouchableOpacity
               style={{
-                backgroundColor: 'white',
-                width: 90,
-                height: 90,
-                position: 'absolute',
-                left: Dimensions.get('window').width / 2 - 45,
-                top: -45,
-                borderRadius: 50,
-                justifyContent: 'center',
-                alignItems: 'center',
+                width: SCREEN_WIDTH - 30,
+                padding: 20,
+              }}
+              onPress={() => {
+                this.gotoOrderTab();
               }}>
-              <Text style={{textAlign: 'center', fontSize: 18}}>
-                {stationInformation.totalRating
-                  ? stationInformation.totalRating
-                  : 5}
-              </Text>
-              <Icon name="ios-star-outline" color="#00a7e7" size={30} />
-            </View>
-          </View>
-          <Text style={{margin: 15, fontSize: 20, color: 'gray'}}>HÔM NAY</Text>
-          <View style={{height: SCREEN_HEIGHT - 550}}>
-            {/* <ScrollView> */}
-            <FlatList
-              data={DATA}
-              renderItem={({item}) => (
+              <View
+                style={{
+                  height: 100,
+                  backgroundColor: '#d5a4f8',
+                  borderRadius: 30,
+                  padding: 15,
+                }}>
+                <Text
+                  style={{color: 'white', fontWeight: 'bold', fontSize: 17}}>
+                  Thông báo
+                </Text>
                 <View
                   style={{
                     flexDirection: 'row',
+                    marginLeft: 30,
+                    marginTop: 5,
                     alignItems: 'center',
-                    padding: 20,
                   }}>
+                  <Icon
+                    type="foundation"
+                    name="megaphone"
+                    size={25}
+                    color="#ffba1b"
+                  />
+                  <Text style={{color: 'white', marginLeft: 10}}>
+                    Bạn đang có {totalAcceptedOrder} cuốc xe đang sửa
+                  </Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          ) : null}
+
+          <View style={{marginTop: 10}}>
+            <View style={styles.containerItem}>
+              <TouchableOpacity
+                style={[styles.containerItem, styles.item]}
+                onPress={() => {
+                  this.gotoOrderTab();
+                }}>
+                <Image
+                  source={require('../../assets/image/good-pincode.png')}
+                  style={{width: 40, height: 40}}
+                />
+                <View style={{marginLeft: 10}}>
+                  <Text style={{color: '#4e5e77'}}>Tỉ lệ thành công</Text>
+                  <Text style={styles.textNumber}>
+                    {' '}
+                    {rateSuccess.toFixed(2)} %
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.containerItem, styles.item]}
+                onPress={() => {
+                  showModalNavigation(
+                    'revenueStatistics',
+                    null,
+                    'Thống kê doanh thu',
+                  );
+                }}>
+                <Image
+                  source={require('../../assets/image/sales-performance.png')}
+                  style={{width: 40, height: 40}}
+                />
+                <View style={{marginLeft: 10}}>
+                  <Text style={{color: '#4e5e77'}}>Doanh thu</Text>
+                  <Text style={styles.textNumber}>
+                    {' '}
+                    {revenueMonth
+                      .toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' vnd'}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.containerItem}>
+              <TouchableOpacity
+                style={[styles.containerItem, styles.item]}
+                onPress={() => {
+                  this.gotoOrderTab();
+                }}>
+                <Image
+                  source={require('../../assets/image/order.png')}
+                  style={{width: 40, height: 40}}
+                />
+                <View style={{marginLeft: 10}}>
+                  <Text style={{color: '#4e5e77'}}>Số đơn hàng</Text>
+                  <Text style={styles.textNumber}>{totalOrder}</Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.containerItem, styles.item]}>
+                <Image
+                  source={require('../../assets/image/icons8-star.png')}
+                  style={{width: 40, height: 40}}
+                />
+                <View style={{marginLeft: 10}}>
+                  <Text style={{color: '#4e5e77'}}>Đánh giá</Text>
                   <View
                     style={{
-                      width: 15,
-                      height: 15,
-                      backgroundColor: 'red',
-                      borderRadius: 50,
-                    }}
-                  />
-                  <Text style={styles.notificationName}>{item.title}</Text>
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={styles.textNumber}>5</Text>
+                    <Icon
+                      type="foundation"
+                      name="star"
+                      size={20}
+                      color="#ffba1b"
+                    />
+                  </View>
                 </View>
-              )}
-              keyExtractor={item => item.id}
-            />
-            {/* </ScrollView> */}
+              </TouchableOpacity>
+            </View>
           </View>
-          {/* </ScrollView> */}
-        </View>
+        </LinearGradient>
       </View>
     );
   }
 }
 const styles = StyleSheet.create({
+  containerItem: {
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  item: {
+    backgroundColor: '#eef4fc',
+    padding: 15,
+    borderRadius: 20,
+    width: 170,
+    margin: 10,
+  },
+  textNumber: {
+    textAlign: 'center',
+    fontWeight: 'bold',
+    fontSize: 17,
+    color: '#364864',
+  },
   containerRating: {
     width: '50%',
     paddingVertical: 40,
@@ -227,7 +390,8 @@ const mapStateToProps = store => {
   return {
     allStation: store.StationReducers.allStation,
     stationInformation: store.StationReducers.station,
-    isAvailable: store.StationReducers.changePower,
+    isChangePower: store.StationReducers.changePower,
+    dataOrders: store.OrderReducers.dataOrder,
   };
 };
 const mapDispatchToProps = dispatch => {

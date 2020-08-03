@@ -4,6 +4,7 @@ const init = {
   notifications: [],
   loading: false,
   pageIndex: 1,
+  notify: null,
 };
 
 const NotificationReducers = (state = init, action) => {
@@ -19,6 +20,8 @@ const NotificationReducers = (state = init, action) => {
       };
     case typesAction.GET_ALL_NOTIFICATION_FAILED:
       return {...state, loading: false};
+    case typesAction.SEEN_NOTIFY_SUCCESS:
+      return {...state, notifications: action.data, notify: action.itemNotify};
     default:
       return {...state};
   }

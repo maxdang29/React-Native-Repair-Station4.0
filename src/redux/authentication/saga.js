@@ -58,7 +58,6 @@ function* register(actions) {
     yield Navigation.dismissModal(actions.componentId);
   } catch (error) {
     console.log('error', JSON.stringify(error, null, 4));
-
     yield showNotification(
       'showNotification',
       'Đăng kí không thành công!',
@@ -72,7 +71,6 @@ function* getMyAccount(actions) {
   try {
     const token = yield AsyncStorage.getItem('token');
     let response = yield call(getMyAccountApi, token);
-    // console.log('response 2222', JSON.stringify(response.data, null, 4));
     yield put(authenticationAction.getMyAccountSuccess(response.data));
   } catch (error) {
     console.log('error', error);
