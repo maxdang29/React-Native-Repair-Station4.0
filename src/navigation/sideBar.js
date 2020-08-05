@@ -23,6 +23,10 @@ class SideBar extends Component {
     this.handleCloseSideMenu();
     showModalNavigation('profileUser', null, 'Trang cá nhân', true);
   };
+  handleOpenProfileStation = () => {
+    this.handleCloseSideMenu();
+    showModalNavigation('profileStation', null, 'Trang cửa hàng', true);
+  };
   render() {
     const {user} = this.props;
     // console.log('user', JSON.stringify(user, null, 4));
@@ -54,6 +58,12 @@ class SideBar extends Component {
             leftIcon={<Icon type="feather" name="user" />}
             title="Trang cá nhân"
             onPress={this.handleOpenProfile}
+            bottomDivider
+          />
+          <ListItem
+            leftIcon={<Icon type="feather" name="home" />}
+            title="Trang cửa hàng"
+            onPress={this.handleOpenProfileStation}
             bottomDivider
           />
           <ListItem

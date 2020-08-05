@@ -11,6 +11,7 @@ import serviceSetting from '../screens/services/serviceSetting';
 import login from '../screens/authentication/login';
 import register from '../screens/authentication/register';
 import profileUser from '../screens/authentication/profileUser';
+import profileStation from '../screens/authentication/profileStation';
 import orderMain from '../screens/order/orderMain';
 import orderDetail from '../screens/order/orderDetail';
 import alertConfirm from '../components/alertConfirm';
@@ -72,6 +73,11 @@ export function registerScreens() {
     'profileUser',
     () => ReduxProvider(profileUser),
     () => profileUser,
+  );
+  Navigation.registerComponent(
+    'profileStation',
+    () => ReduxProvider(profileStation),
+    () => profileStation,
   );
 
   Navigation.registerComponent(
