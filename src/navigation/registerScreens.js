@@ -1,7 +1,7 @@
-import {Navigation} from 'react-native-navigation';
+import { Navigation } from 'react-native-navigation';
 import React from 'react';
 import store from '../redux/store';
-import {Provider} from 'react-redux';
+import { Provider } from 'react-redux';
 import SplashScreen from '../screens/splashScreen';
 import homeFixer from '../screens/home/home';
 import serviceFixer from '../screens/services/services';
@@ -12,6 +12,7 @@ import login from '../screens/authentication/login';
 import register from '../screens/authentication/register';
 import profileUser from '../screens/authentication/profileUser';
 import profileStation from '../screens/authentication/profileStation';
+import searchStation from '../screens/authentication/searchStation';
 import orderMain from '../screens/order/orderMain';
 import orderDetail from '../screens/order/orderDetail';
 import alertConfirm from '../components/alertConfirm';
@@ -78,6 +79,11 @@ export function registerScreens() {
     'profileStation',
     () => ReduxProvider(profileStation),
     () => profileStation,
+  );
+  Navigation.registerComponent(
+    'searchStation',
+    () => ReduxProvider(searchStation),
+    () => searchStation,
   );
 
   Navigation.registerComponent(
