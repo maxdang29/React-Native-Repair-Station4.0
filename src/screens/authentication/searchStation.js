@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { StyleSheet, ScrollView, Dimensions, Image, Text } from 'react-native';
+import { StyleSheet, ScrollView, Dimensions, TextInput, Text, FlatList, TouchableOpacity, View } from 'react-native';
 import { connect } from 'react-redux';
+import Geocoder from 'react-native-geocoder';
 import MapView from 'react-native-maps';
-import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import { Icon, ListItem } from 'react-native-elements';
 
 const { width, height } = Dimensions.get('window');
 const ASPECT_RATIO = width / height;
@@ -226,30 +227,90 @@ const STYLE_MAP = [
 
 class SearchStation extends Component {
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {
       latitude: 0,
       longitude: 0,
-    };
+      searching: false,
+      searchStarted: false,
+      address: "",
+      positions: []
+    }
+    this._mapView = null;
+  }
+
+  handleChangeText = address => {
+    this.setState({ address }, () => this.handleSearchLocation())
+  }
+
+  handleSearchLocation = async () => {
+    try {
+      let { address, positions } = this.state
+      this.setState({ positions: [], searching: true, searchStarted: true })
+      if (address.length > 10) {
+        positions = await Geocoder.geocodeAddress(address)
+      }
+      this.setState({ positions, searching: false })
+    } catch (error) {
+      console.log("error: ", error)
+    }
+  }
+
+  handlePlaceSelected = place => {
+    const location = {
+      address: place.formattedAddress.replace('Unnamed Road, ', ''),
+      coords: place.position,
+
+    }
+    this._mapView.animateToCoordinate({
+      latitude: location.coords.lat,
+      longitude: location.coords.lng
+    }, 1000);
+    this.setState({
+      address: location.address,
+      latitude: location.coords.lat,
+      longitude: location.coords.lng,
+    });
   }
 
   render() {
+    const { searchStarted, searching, address, positions } = this.state;
     return (
       <ScrollView style={styles.container} showsHorizontalScrollIndicator={false} showsVerticalScrollIndicator={false}>
-        <GooglePlacesAutocomplete
-          style={{ position: 'absolute', top: 0, left: 0, right: 0 }}
-          placeholder='Search'
-          onPress={(data, details = null) => {
-            // 'details' is provided when fetchDetails = true
-            console.log(data, details);
-          }}
-          query={{
-            key: 'AIzaSyC5_5R7U9OrXn478uXviYcSRELdkeP3QMI',
-            language: 'en',
-          }}
-        />
+        <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 10 }}>
+          <TextInput
+            style={{ flex: 1, fontSize: 18, color: 'black' }}
+            onChangeText={address => this.handleChangeText(address)}
+            placeholder={'Search...'}
+            value={this.state.address}
+          />
+          <TouchableOpacity onPress={() => this.handleChangeText(address)}>
+            <Icon type="feather" name="search" />
+          </TouchableOpacity>
+        </View>
+        {
+          (!searching && searchStarted && address.length > 10 && positions.length < 1)
+            ?
+            <Text style={styles.notFoundMessage}>
+              Không tìm thấy kết quả
+            </Text>
+            :
+            <FlatList
+              data={positions}
+              renderItem={({ item }) =>
+                <ListItem
+                  title={item.formattedAddress.replace('Unnamed Road, ', '')}
+                  onPress={() => this.handlePlaceSelected(item)}
+                  bottomDivider
+                />}
+              keyExtractor={(item, index) => index}
+              showsHorizontalScrollIndicator={false}
+              showsVerticalScrollIndicator={false}
+            />
+        }
         <MapView
           provider={'google'}
+          ref={c => this._mapView = c}
           zoomEnabled={true}
           showsUserLocation={true}
           followUserLocation={true}

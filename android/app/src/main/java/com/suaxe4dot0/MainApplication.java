@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
+import com.devfd.RNGeocoder.RNGeocoderPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.swmansion.reanimated.ReanimatedPackage;
 import com.imagepicker.ImagePickerPackage;
@@ -59,7 +60,8 @@ public class MainApplication extends NavigationApplication {
             new ReactNativeFirebaseMessagingPackage(),
             new ReactNativePushNotificationPackage(),
             new ReanimatedPackage(),
-            new RNGestureHandlerPackage()
+            new RNGestureHandlerPackage(),
+            new RNGeocoderPackage()
         );
     }
 
