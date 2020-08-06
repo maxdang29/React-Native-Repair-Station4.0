@@ -28,6 +28,6 @@ Navigation.events().registerAppLaunchedListener(async () => {
   if (token) {
     setRoot('splashScreen');
   } else {
-    setRoot('searchStation');
+    setRoot('login');
   }
 });
