@@ -69,7 +69,7 @@ class Service extends Component {
             <FlatList
               data={data}
               renderItem={({item}) => <ItemService item={item} />}
-              numColumns={2}
+              numColumns={1}
               keyExtractor={item => item.id}
             />
           </View>

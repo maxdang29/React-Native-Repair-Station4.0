@@ -42,16 +42,17 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: 'center',
     flex: 1,
-    margin: 10,
+    marginHorizontal: 10,
+    marginVertical: 5,
   },
   shadow: {
     backgroundColor: '#eef4fc',
     paddingVertical: 10,
     width: '100%',
     borderRadius: 3,
-    shadowColor: 'black',
-    shadowOpacity: 0.9,
-    elevation: 3,
+    shadowColor: 'gray',
+    shadowOpacity: 0,
+    elevation: 0,
     padding: 10,
   },
   text: {

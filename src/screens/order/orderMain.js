@@ -27,6 +27,7 @@ import {
 } from '../../constants/orderStatus';
 import {format} from 'date-fns';
 import LinearGradient from 'react-native-linear-gradient';
+import MonthSelectorCalendar from 'react-native-month-selector';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 class Order extends Component {
@@ -170,6 +171,13 @@ class Order extends Component {
     } else
       return (
         <>
+          <MonthSelectorCalendar
+            selectedDate={this.state.month}
+            monthTapped={date => this.setState({month: date})}
+            localeLanguage="vi"
+            nextText=""
+            prevText="Trước"
+          />
           <View style={{backgroundColor: '#c2d7ff'}}>
             <Text style={styles.title}>Danh sách đơn hàng</Text>
           </View>
