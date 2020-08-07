@@ -5,6 +5,7 @@ import * as stationAction from '../../redux/station/actions/actions';
 import MapView from 'react-native-maps';
 import CheckBox from '@react-native-community/checkbox';
 import Icon from 'react-native-vector-icons/Ionicons';
+import Geocoder from 'react-native-geocoder';
 
 const { width, height } = Dimensions.get('window');
 const ASPECT_RATIO = width / height;
@@ -265,6 +266,7 @@ class ProfileStation extends Component {
       nameItem: null,
       priceItem: null,
     };
+    this._mapView = null;
   }
 
   async componentDidMount() {
@@ -319,16 +321,26 @@ class ProfileStation extends Component {
   }
 
   handleUpdateButton = async () => {
+    let lat = 16.04331, lng = 108.21332;
+    await Geocoder.geocodeAddress(this.state.address).then(res => {
+      // res is an Array of geocoding object (see below)
+      lat = res.position.lat;
+      lng = res.position.lng;
+    }).catch(err => console.log(err));
     let data = {
       id: this.state.stationInformation.id,
       address: this.state.address,
-      latitude: this.state.latitude,
-      longitude: this.state.longitude,
+      latitude: lat,
+      longitude: lng,
       hasAmbulatory: this.state.hasAmbulatory,
       owner: { name: this.state.owner.name, phoneNumber: this.state.phone },
       services: this.state.services,
     };
     await this.props.changeStationById(this.state.stationInformation.id, data);
+    this._mapView.animateToCoordinate({
+      latitude: lat,
+      longitude: lng
+    }, 1000);
   }
 
   handleEditItem = (item) => {
@@ -362,6 +374,7 @@ class ProfileStation extends Component {
       <ScrollView style={styles.container} showsHorizontalScrollIndicator={false} showsVerticalScrollIndicator={false}>
         <MapView
           provider={'google'}
+          ref={c => this._mapView = c}
           zoomEnabled={true}
           showsUserLocation={true}
           followUserLocation={true}

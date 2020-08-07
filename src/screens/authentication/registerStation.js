@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import {
   Text,
   View,
@@ -10,16 +10,17 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import InputText from '../../components/textInput';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 import * as stationAction from '../../redux/station/actions/actions';
-import {Navigation} from 'react-native-navigation';
+import { Navigation } from 'react-native-navigation';
 import Icon from 'react-native-vector-icons/Ionicons';
 import startApp from '../../navigation/bottomTab';
-import {CAR, MOTORBIKE} from '../../constants/vehicles';
+import { CAR, MOTORBIKE } from '../../constants/vehicles';
+import Geocoder from 'react-native-geocoder';
 const vehicles = [
-  {label: 'Chọn phương tiện', value: ''},
-  {label: 'Xe máy', value: MOTORBIKE},
-  {label: 'Xe otô', value: CAR},
+  { label: 'Chọn phương tiện', value: '' },
+  { label: 'Xe máy', value: MOTORBIKE },
+  { label: 'Xe otô', value: CAR },
 ];
 class RegisterStation extends Component {
   constructor(props) {
@@ -43,7 +44,7 @@ class RegisterStation extends Component {
   focusNextField(nextField) {
     this[nextField].focus();
   }
-  register = () => {
+  register = async () => {
     const {
       address,
       stationName,
@@ -52,18 +53,24 @@ class RegisterStation extends Component {
       stationNameError,
       vehicleError,
     } = this.state;
-    const {allStation} = this.props;
+    const { allStation } = this.props;
+    let lat = 16.04331, lng = 108.21332;
+    await Geocoder.geocodeAddress(address).then(res => {
+      // res is an Array of geocoding object (see below)
+      lat = res.position.lat;
+      lng = res.position.lng;
+    }).catch(err => console.log(err));
 
     if (stationName && stationName && vehicle) {
       const station = {
         name: stationName,
         address: address,
         vehicle: vehicle,
-        latitude: 16.04331,
-        longitude: 108.21332,
+        latitude: lat,
+        longitude: lng,
       };
       this.props.registerStation(station, this.props.componentId);
-      this.setState({message: null});
+      this.setState({ message: null });
     } else {
       if (!address) this.onchangeText('addressError', 'Nhập địa chỉ');
       else this.onchangeText('addressError', null);
@@ -86,7 +93,7 @@ class RegisterStation extends Component {
       message,
       vehicle,
     } = this.state;
-    const {error, loading} = this.props;
+    const { error, loading } = this.props;
     return (
       <ScrollView>
         <View style={styles.container}>
@@ -118,7 +125,7 @@ class RegisterStation extends Component {
             />
             <View style={styles.vehicleContainer}>
               <Image
-                source={{uri: 'https://img.icons8.com/wired/2x/automotive.png'}}
+                source={{ uri: 'https://img.icons8.com/wired/2x/automotive.png' }}
                 style={styles.image}
               />
               <Picker
@@ -138,7 +145,7 @@ class RegisterStation extends Component {
               </Picker>
             </View>
             {vehicleError ? (
-              <View style={[styles.containerError, {marginLeft: 50}]}>
+              <View style={[styles.containerError, { marginLeft: 50 }]}>
                 <Icon name="ios-alert" style={styles.error} />
                 <Text style={[styles.error, styles.textError]}>
                   {vehicleError}
@@ -159,13 +166,13 @@ class RegisterStation extends Component {
               <Text style={styles.text}>Đăng nhập</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.button, {backgroundColor: '#00a7e7'}]}
+              style={[styles.button, { backgroundColor: '#00a7e7' }]}
               onPress={() => this.register()}>
               {loading ? (
                 <ActivityIndicator size="small" />
               ) : (
-                <Text style={{color: 'white'}}>Đăng kí</Text>
-              )}
+                  <Text style={{ color: 'white' }}>Đăng kí</Text>
+                )}
             </TouchableOpacity>
           </View>
           {typeof error === 'string' ? (
