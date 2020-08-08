@@ -7,7 +7,7 @@ export default class NewOrder extends Component {
       <View style={styles.container}>
         <View style={styles.row}>
           <Image
-            source={require('../../assets/image/user.png')}
+            source={require('../../assets/image/background-avatar-profile.png')}
             style={styles.image}
             resizeMode="center"
           />

@@ -1,11 +1,11 @@
-import React, {component, Component} from 'react';
-import {Text, View, StyleSheet} from 'react-native';
-import {Icon, Header, ListItem} from 'react-native-elements';
-import {Navigation} from 'react-native-navigation';
-import {connect} from 'react-redux';
-import {APP_COLOR} from '../utils/colors';
+import React, { component, Component } from 'react';
+import { Text, View, StyleSheet } from 'react-native';
+import { Icon, Header, ListItem } from 'react-native-elements';
+import { Navigation } from 'react-native-navigation';
+import { connect } from 'react-redux';
+import { APP_COLOR } from '../utils/colors';
 import * as authenticationAction from '../redux/authentication/actions/actions';
-import {showModalNavigation} from '../navigation/function';
+import { showModalNavigation } from '../navigation/function';
 class SideBar extends Component {
   constructor(props) {
     super(props);
@@ -23,14 +23,24 @@ class SideBar extends Component {
     this.handleCloseSideMenu();
     showModalNavigation('profileUser', null, 'Trang cá nhân', true);
   };
+  handleOpenProfileStation = () => {
+    this.handleCloseSideMenu();
+    showModalNavigation('profileStation', null, 'Trang cửa hàng', true);
+  };
+  handleOpenSearchStation = () => {
+    this.handleCloseSideMenu();
+    showModalNavigation('searchStation', null, 'Tìm kiếm cửa hàng', true);
+  };
   render() {
-    const {user} = this.props;
+    const { user } = this.props;
+    // console.log('user', JSON.stringify(user, null, 4));
+
     return (
       <View style={styles.container}>
         <Header
           centerComponent={{
             text: user?.name.toUpperCase() || '',
-            style: {color: '#fff', fontSize: 18, marginHorizontal: -30},
+            style: { color: '#fff', fontSize: 18, marginHorizontal: -30 },
           }}
           rightComponent={
             <Icon
@@ -45,13 +55,25 @@ class SideBar extends Component {
             />
           }
           backgroundColor={APP_COLOR}
-          containerStyle={{paddingTop: 0, paddingHorizontal: 18, height: 60}}
+          containerStyle={{ paddingTop: 0, paddingHorizontal: 18, height: 60 }}
         />
         <View>
           <ListItem
             leftIcon={<Icon type="feather" name="user" />}
             title="Trang cá nhân"
             onPress={this.handleOpenProfile}
+            bottomDivider
+          />
+          <ListItem
+            leftIcon={<Icon type="feather" name="home" />}
+            title="Trang cửa hàng"
+            onPress={this.handleOpenProfileStation}
+            bottomDivider
+          />
+          <ListItem
+            leftIcon={<Icon type="feather" name="search" />}
+            title="Tìm kiếm cửa hàng"
+            onPress={this.handleOpenSearchStation}
             bottomDivider
           />
           <ListItem

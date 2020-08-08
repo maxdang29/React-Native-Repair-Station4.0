@@ -76,3 +76,25 @@ export const changePowerFailed = () => {
     type: typesAction.CHANGE_POWER_FAILED,
   };
 };
+
+//CHANGE POWER
+
+export const changeStationById = (stationId, data) => {
+  return {
+    type: typesAction.CHANGE_STATION_BY_ID,
+    stationId,
+    data,
+  };
+};
+
+export const changeStationByIdSuccess = () => {
+  return {
+    type: typesAction.CHANGE_STATION_BY_ID_SUCCESS,
+  };
+};
+
+export const changeStationByIdFailed = () => {
+  return {
+    type: typesAction.CHANGE_STATION_BY_ID_FAILED,
+  };
+};
