@@ -6,6 +6,7 @@ import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
 import com.BV.LinearGradient.LinearGradientPackage;
 import com.horcrux.svg.SvgPackage;
+import com.devfd.RNGeocoder.RNGeocoderPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.swmansion.reanimated.ReanimatedPackage;
 import com.imagepicker.ImagePickerPackage;
@@ -66,7 +67,9 @@ public class MainApplication extends NavigationApplication {
             new RNGestureHandlerPackage(),
             new SvgPackage(),
             new LinearGradientPackage(),
-            new VectorIconsPackage()
+            new VectorIconsPackage(),
+            new RNGeocoderPackage()
+
         );
     }
 

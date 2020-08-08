@@ -10,23 +10,29 @@ const init = {
 const StationReducers = (state = init, action) => {
   switch (action.type) {
     case typesAction.REGISTER_STATION:
-      return {...state, loading: true};
+      return { ...state, loading: true };
     case typesAction.REGISTER_STATION_SUCCESS:
-      return {...state, loading: false};
+      return { ...state, loading: false };
     case typesAction.REGISTER_STATION_FAILED:
-      return {...state, error: action.error, loading: false};
+      return { ...state, error: action.error, loading: false };
     case typesAction.GET_STATION_BY_ID_SUCCESS:
-      return {...state, station: action.data};
+      return { ...state, station: action.data };
     case typesAction.GET_MY_STATION_SUCCESS:
-      return {...state, allStation: action.data};
+      return { ...state, allStation: action.data };
     case typesAction.CHANGE_POWER:
-      return {...state, changePower: true};
+      return { ...state, changePower: true };
     case typesAction.CHANGE_POWER_SUCCESS:
-      return {...state, changePower: false};
+      return { ...state, changePower: false };
     case typesAction.CHANGE_POWER_FAILED:
-      return {...state, changePower: false};
+      return { ...state, changePower: false };
+    case typesAction.CHANGE_STATION_BY_ID:
+      return { ...state, changeStationById: true };
+    case typesAction.CHANGE_STATION_BY_ID_SUCCESS:
+      return { ...state, changeStationById: false };
+    case typesAction.CHANGE_STATION_BY_ID_FAILED:
+      return { ...state, changeStationById: false };
     default:
-      return {...state};
+      return { ...state };
   }
 };
 export default StationReducers;

@@ -52,6 +52,9 @@ target 'SuaXe4Dot0' do
 
   pod 'BVLinearGradient', :path => '../node_modules/react-native-linear-gradient'
 
+  pod 'react-native-geocoder', :path => '../node_modules/react-native-geocoder'
+
+
   target 'SuaXe4Dot0Tests' do
     inherit! :search_paths
     # Pods for testing
