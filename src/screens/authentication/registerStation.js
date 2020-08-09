@@ -57,8 +57,8 @@ class RegisterStation extends Component {
     let lat = 16.04331, lng = 108.21332;
     await Geocoder.geocodeAddress(address).then(res => {
       // res is an Array of geocoding object (see below)
-      lat = res.position.lat;
-      lng = res.position.lng;
+      lat = res[0].position.lat;
+      lng = res[0].position.lng;
     }).catch(err => console.log(err));
 
     if (stationName && stationName && vehicle) {
