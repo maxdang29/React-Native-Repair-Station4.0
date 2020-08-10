@@ -59,10 +59,10 @@ class OrderDetail extends Component {
     this.setState({modalVisible: visible});
   }
   componentDidUpdate = async () => {
-    const {loading, value} = this.props;
-    if (loading) {
-      this.props.getOrderById(value.id);
-    }
+    // const {loading, value} = this.props;
+    // if (loading) {
+    //   this.props.getOrderById(value.id);
+    // }
   };
   cancelOrder = orderId => {
     console.log('33333', this.props.loading);

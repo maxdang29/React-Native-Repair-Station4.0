@@ -1,11 +1,14 @@
 import callApi from './apiCaller';
-export const getAllOrderApi = (stationId, token, pageIndex) => {
+export const getAllOrderApi = (stationId, token, pageIndex, dateFrom, dateTo) => {
+  const rangeMonth = `&fromDate=${dateFrom}&toDate=${dateTo}`;
   return callApi(
     'api/orders/stations/' + stationId,
     'GET',
     null,
     token,
     pageIndex,
+    100,
+    rangeMonth
   );
 };
 

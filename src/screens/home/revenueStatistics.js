@@ -12,13 +12,10 @@ import {
   TextInput,
   Modal,
 } from 'react-native';
-import MapView, {Marker} from 'react-native-maps';
-import Geolocation from 'react-native-geolocation-service';
-import {Navigation} from 'react-native-navigation';
 import ToggleSwitch from 'toggle-switch-react-native';
 import {connect} from 'react-redux';
 import * as authenticationAction from '../../redux/authentication/actions/actions';
-import * as stationAction from '../../redux/station/actions/actions';
+import * as orderAction from '../../redux/order/actions/actions';
 import {AsyncStorage} from 'react-native';
 import {APP_COLOR} from '../../utils/colors';
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
@@ -29,22 +26,50 @@ import LinearGradient from 'react-native-linear-gradient';
 import {Icon} from 'react-native-elements';
 import {ACCEPTED, DONE} from '../../constants/orderStatus';
 import {format} from 'date-fns';
+import {Navigation} from 'react-native-navigation';
+
 class RevenueStatistics extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      modalVisible: false,
-    };
+  }
+  filterStatusOrder = status => {
+    const {orderRevenue} = this.props;
+    let result = orderRevenue.filter(order => {
+      return order.status === status;
+    });
+    return result;
+  };
+  filterRevenue = () =>{
+    const doneOrder = this.filterStatusOrder(DONE);
+    let labels = [];
+    let values = [];
+    let minMonth =  parseInt(format(new Date(doneOrder[0].createdOn), 'MM'));
+    for (let index = 1; index < 13; index++) {
+      index >= minMonth ? labels.push(index) : null;
+    }
+
+    doneOrder.forEach(order => {
+      let month = format(new Date(order.createdOn), 'MM');
+      let index = labels.findIndex(label=> label === parseInt(month))
+      if(index !== -1){
+        if(values[index] === undefined){
+          values[index] = 0;
+        }
+        values[index] += order.totalPrice;
+      }
+    })
+
+    for (let index = 1; index < labels.length; index++) {
+      values[index] =  values[index] === undefined ? 0 : values[index];
+      values[index] = `${values[index]}`
+    }
+    return {labels: labels, values: values}
   }
 
-  setModalVisible(visible) {
-    this.setState({modalVisible: visible});
-  }
-  handleSubmit=()=>{
-      
-  }
   render() {
-    const {stationInformation, isChangePower, dataOrders} = this.props;
+    const {orderRevenue} = this.props;
+    const dataChart = this.filterRevenue();
+    console.log("dataChart.values", dataChart.values)
     return (
       <View>
         <View
@@ -53,45 +78,10 @@ class RevenueStatistics extends Component {
             justifyContent: 'center',
             alignItems: 'center',
           }}>
-          <Modal
-            animationType="slide"
-            transparent={true}
-            visible={this.state.modalVisible}>
-            <View style={styles.modalContainer}>
-              <View
-                style={{
-                  backgroundColor: 'white',
-                  width: SCREEN_WIDTH - 70,
-                  paddingTop: 10,
-                }}>
-                <View>
-                  <Text style={styles.textModal}>DỊCH VỤ</Text>
-                </View>
-                <View
-                  style={[
-                    styles.row,
-                    {justifyContent: 'flex-end', marginRight: 10},
-                  ]}>
-                  <TouchableOpacity
-                    style={styles.button}
-                    onPress={() =>
-                      this.setModalVisible(!this.state.modalVisible)
-                    }>
-                    <Text>Hủy</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[styles.button, {backgroundColor: APP_COLOR}]}
-                    onPress={() => this.handleSubmit()}>
-                    <Text style={{color: 'white'}}>Hoàn tất</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </View>
-          </Modal>
         </View>
 
         <LinearGradient
-          colors={['#c2d7ff', '#cde7f9', '#ffffff']}
+          colors={['#f4f6f9', '#f4f6f9', '#f4f6f9']}
           style={{
             backgroundColor: APP_COLOR,
             paddingVertical: 15,
@@ -105,32 +95,14 @@ class RevenueStatistics extends Component {
               }}>
               <Icon type="feather" name="arrow-left" size={30} />
             </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                this.setModalVisible(!this.state.modalVisible);
-              }}>
-              <Icon type="feather" name="filter" size={30} />
-            </TouchableOpacity>
           </View>
 
           <LineChart
             data={{
-              labels: [
-                '2',
-                '3',
-                '4',
-                '5',
-                '6',
-                '7',
-                '8',
-                '9',
-                '10',
-                '11',
-                '12',
-              ],
+              labels: dataChart.labels,
               datasets: [
                 {
-                  data: [10, 20, 50, 30, 10, 20, 50, 30, 10, 20, 50, 12],
+                  data: dataChart.values,
                 },
               ],
             }}
@@ -140,37 +112,30 @@ class RevenueStatistics extends Component {
             yAxisSuffix=""
             yAxisInterval={1}
             chartConfig={{
-              backgroundColor: '#ffffff',
-              backgroundGradientFrom: '#c2d7ff',
-              backgroundGradientTo: '#cde7f9',
-              backgroundGradientFromOpacity: 1,
-              decimalPlaces: 0,
-              color: (opacity = 1) => `rgba(54, 72, 100, ${opacity})`,
+              backgroundColor: "#fff",
+              backgroundGradientFrom: '#fff',
+              backgroundGradientTo: '#fff',
+              decimalPlaces: 0, // optional, defaults to 2dp
+              color: (opacity = 1) => `rgba(0, 110, 199, ${opacity})`,
               labelColor: (opacity = 1) => `rgba(56, 75, 196, ${opacity})`,
               style: {
                 borderRadius: 16,
               },
               propsForDots: {
                 r: '3',
-                strokeWidth: '2',
+                strokeWidth: "",
               },
               propsForBackgroundLines: {
-                strokeDasharray: 1,
-              },
+                strokeWidth: 0.6,
+              }
             }}
             bezier
             style={{
               marginVertical: 15,
               borderRadius: 16,
             }}
-            onDataPointClick={value => {
-              //   console.log('error', JSON.stringify(labels, null, 4));
-              //   this.showDataPointChart(value, labels);
-            }}
           />
-          <Text style={{textAlign: 'center', fontSize: 20, fontWeight: 'bold'}}>
-            Doanh thu các tháng
-          </Text>
+         
         </LinearGradient>
       </View>
     );
@@ -182,7 +147,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#4a4c49',
+    backgroundColor: '#ffffff',
     opacity: 0.9,
   },
   nameRepair: {
@@ -214,26 +179,11 @@ const styles = StyleSheet.create({
 });
 const mapStateToProps = store => {
   return {
-    allStation: store.StationReducers.allStation,
-    stationInformation: store.StationReducers.station,
-    isChangePower: store.StationReducers.changePower,
-    dataOrders: store.OrderReducers.dataOrder,
+    orderRevenue: store.OrderReducers.orderRevenue,
   };
 };
 const mapDispatchToProps = dispatch => {
   return {
-    getMyAccount: () => {
-      dispatch(authenticationAction.getMyAccount());
-    },
-    changePower: (stationId, isOn) => {
-      dispatch(stationAction.changePower(stationId, isOn));
-    },
-    getMyStation: () => {
-      dispatch(stationAction.getMyStation());
-    },
-    getStationById: id => {
-      dispatch(stationAction.getStationById(id));
-    },
   };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(RevenueStatistics);
