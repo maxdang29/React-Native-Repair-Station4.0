@@ -22,6 +22,7 @@ sortByDate = data => {
 };
 
 function* getAllOrder(actions) {
+  console.log("111");
   try {
     const token = yield AsyncStorage.getItem('token');
     const response = yield call(
@@ -29,6 +30,8 @@ function* getAllOrder(actions) {
       actions.stationId,
       token,
       actions.pageIndex,
+      actions.dateFrom, 
+      actions.dateTo
     );
     sortByDate(response.data.sources);
 
@@ -62,6 +65,8 @@ function* getOrderById(actions) {
     const token = yield AsyncStorage.getItem('token');
     const response = yield call(getOrderByIdApi, actions.orderId, token);
     yield put(orderAction.getOrderByIdSuccess(response.data));
+    console.log('response ID 2222', JSON.stringify(response.data, null, 4));
+
   } catch (error) {
     console.log('get order error', error);
   }
@@ -98,7 +103,9 @@ function* addServiceToOrder(actions) {
       actions.data,
       token,
     );
-    yield put(orderAction.addServiceToOrderSuccess());
+    yield put(orderAction.addServiceToOrderSuccess(response.data));
+    console.log('response 2222', JSON.stringify(response.data, null, 4));
+
     yield showNotification(
       'showNotification',
       'Thêm dịch vụ thành công',
@@ -164,6 +171,24 @@ function* cancelConfirm(actions) {
   }
 }
 
+function* getAllOrderRevenue(actions) {
+  try {
+    const token = yield AsyncStorage.getItem('token');
+    const response = yield call(
+      getAllOrderApi,
+      actions.stationId,
+      token,
+      actions.pageIndex,
+      actions.dateFrom, 
+      actions.dateTo
+    );
+    // sortByDate(response.data.sources);
+    yield put(orderAction.getAllOrderRevenueSuccess(response.data.sources));
+  } catch (error) {
+    console.log('errror 2222', JSON.stringify(error, null, 4));
+  }
+}
+
 const rootSagaOrder = () => [
   takeLatest(typesAction.GET_ALL_ORDER, getAllOrder),
   takeLatest(typesAction.GET_ORDER_BY_ID, getOrderById),
@@ -171,5 +196,6 @@ const rootSagaOrder = () => [
   takeLatest(typesAction.CONFIRM_ORDER, confirmOrder),
   takeLatest(typesAction.CANCEL_CONFIRM, cancelConfirm),
   takeLatest(typesAction.CHANGE_STATUS, updateStatus),
+  takeLatest(typesAction.GET_REVENUE_YEAR, getAllOrderRevenue),
 ];
 export default rootSagaOrder();

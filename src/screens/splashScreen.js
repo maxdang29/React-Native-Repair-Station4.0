@@ -19,12 +19,19 @@ class SplashScreen extends Component {
     super(props);
   }
   async componentDidMount() {
+    const currentTime = new Date();
+    const dateFrom = `${ currentTime.getFullYear()}-${ currentTime.getMonth()+1}-01`;
+    const dateTo = `${ currentTime.getFullYear()}-${ currentTime.getMonth()+2}-01`;
     const {notificationPageIndex} = this.props;
     await this.props.getMyAccount();
     await this.props.getMyStation();
     await this.props.getNotifications(notificationPageIndex);
     const stationId = await AsyncStorage.getItem('stationId');
-    this.props.getAllOrder(stationId);
+    this.props.getAllOrder(stationId, 1, dateFrom, dateTo);
+
+    const yearFrom = `${ currentTime.getFullYear()}-1`;
+    const yearTo = `${ currentTime.getFullYear()}-12`;
+    this.props.getAllOrderRevenue(stationId, 1, yearFrom, yearTo);
     // Register FCM Service
     fcmService.register(
       this.onRegister,
@@ -66,11 +73,16 @@ class SplashScreen extends Component {
   };
 
   onOpenNotification = async data => {
+    const currentTime = new Date();
+    const dateFrom = `${ currentTime.getFullYear()}-${ currentTime.getMonth()+1}-01`;
+    const dateTo = `${ currentTime.getFullYear()}-${ currentTime.getMonth()+2}-01`;
+
     const notifyId = data?.id;
+    
     if (notifyId) {
       console.log('SplashScreen -> onOpenNotification -> notifyId', notifyId);
       const stationId = await AsyncStorage.getItem('stationId');
-      this.props.getAllOrder(stationId);
+      this.props.getAllOrder(stationId, 1, dateFrom, dateTo);
       this.props.getNotifications();
     }
   };
@@ -109,14 +121,17 @@ const mapDispatchToProps = dispatch => {
     getStationById: id => {
       dispatch(stationAction.getStationById(id));
     },
-    getAllOrder: stationId => {
-      dispatch(orderAction.getAllOrder(stationId));
+    getAllOrder: (stationId, pageIndex, dateFrom, dateTo) => {
+      dispatch(orderAction.getAllOrder(stationId, pageIndex, dateFrom, dateTo));
     },
     updateTokenDevice: tokenDevice => {
       dispatch(authenticationAction.updateMyAccount(tokenDevice));
     },
     getNotifications: pageIndex => {
       dispatch(notificationAction.getAllNotification(pageIndex));
+    },
+    getAllOrderRevenue: (stationId, pageIndex, dateFrom, dateTo) => {
+      dispatch(orderAction.getAllOrderRevenue(stationId, pageIndex, dateFrom, dateTo));
     },
   };
 };

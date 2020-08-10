@@ -1,10 +1,12 @@
 import * as typesAction from './typesAction';
 
-export const getAllOrder = (stationId, pageIndex) => {
+export const getAllOrder = (stationId, pageIndex, dateFrom, dateTo) => {
   return {
     type: typesAction.GET_ALL_ORDER,
     stationId,
     pageIndex,
+    dateFrom,
+    dateTo
   };
 };
 export const getAllOrderSuccess = (data, pageIndex) => {
@@ -23,9 +25,10 @@ export const addServiceToOrder = (data, orderId) => {
   };
 };
 
-export const addServiceToOrderSuccess = () => {
+export const addServiceToOrderSuccess = (data) => {
   return {
     type: typesAction.ADD_SERVICE_TO_ORDER_SUCCESS,
+    data
   };
 };
 export const addServiceToOrderFailed = () => {
@@ -116,5 +119,25 @@ export const getOrderByIdFailed = error => {
   return {
     type: typesAction.GET_ORDER_BY_ID_FAILED,
     error,
+  };
+};
+
+
+//revenue
+
+export const getAllOrderRevenue = (stationId, pageIndex, dateFrom, dateTo) => {
+  return {
+    type: typesAction.GET_REVENUE_YEAR,
+    stationId,
+    pageIndex,
+    dateFrom,
+    dateTo
+  };
+};
+
+export const getAllOrderRevenueSuccess = (data) => {
+  return {
+    type: typesAction.GET_REVENUE_YEAR_SUCCESS,
+    data,
   };
 };

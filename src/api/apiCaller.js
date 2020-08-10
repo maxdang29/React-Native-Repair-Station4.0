@@ -9,10 +9,11 @@ export default function callApi(
   Token,
   pageIndex = 1,
   limit = 100,
+  option
 ) {
   return axios({
     method: method,
-    url: `${API_URL}${endpoint}?isDesc=true&limit=${limit}&offset=${pageIndex}`,
+    url: `${API_URL}${endpoint}?isDesc=true&limit=${limit}&offset=${pageIndex}${option}`,
     data: body,
     headers: {
       Authorization: 'Bearer ' + Token,

@@ -5,6 +5,7 @@ const init = {
   loading: false,
   order: null,
   pageIndex: 1,
+  orderRevenue: null
 };
 
 const OrderReducers = (state = init, action) => {
@@ -29,7 +30,7 @@ const OrderReducers = (state = init, action) => {
     case typesAction.ADD_SERVICE_TO_ORDER:
       return {...state, loading: true};
     case typesAction.ADD_SERVICE_TO_ORDER_SUCCESS:
-      return {...state, loading: false};
+      return {...state, loading: false, order: action.data};
     case typesAction.ADD_SERVICE_TO_ORDER_FAILED:
       return {...state, loading: false};
     case typesAction.CHANGE_STATUS:
@@ -42,6 +43,8 @@ const OrderReducers = (state = init, action) => {
       };
     case typesAction.CHANGE_STATUS_FAILED:
       return {...state};
+    case typesAction.GET_REVENUE_YEAR_SUCCESS:
+      return {...state, orderRevenue: action.data};
     default:
       return {...state};
   }

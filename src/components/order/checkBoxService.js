@@ -5,8 +5,8 @@ import {
   StyleSheet,
   Image,
   TouchableOpacity,
-  CheckBox,
 } from 'react-native';
+import CheckBox from '@react-native-community/checkbox';
 import {showModalNavigation} from '../../navigation/function';
 export default class CheckBoxItem extends Component {
   constructor(props) {
@@ -64,10 +64,4 @@ export default class CheckBoxItem extends Component {
     );
   }
 }
-const styles = StyleSheet.create({
-  container: {
-    //  flex: 1,
-    // justifyContent: 'center',
-    //alignItems: 'center',
-  },
-});
+

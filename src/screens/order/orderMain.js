@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   Dimensions,
   SectionList,
+  Modal
 } from 'react-native';
 import OrderItem from '../../components/order/orderItem';
 import {connect} from 'react-redux';
@@ -28,8 +29,14 @@ import {
 import {format} from 'date-fns';
 import LinearGradient from 'react-native-linear-gradient';
 import MonthSelectorCalendar from 'react-native-month-selector';
+import {APP_COLOR} from '../../utils/colors';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
+
+import Moment from "moment";
+require("moment/locale/vi");
+Moment.locale("vi");
+
 class Order extends Component {
   constructor(props) {
     super(props);
@@ -41,6 +48,8 @@ class Order extends Component {
         {key: 'cancel', title: 'Đã hủy'},
       ],
       isFetching: false,
+      month: Moment(),
+      modalVisible: false
     };
   }
 
@@ -87,16 +96,9 @@ class Order extends Component {
     let result = Object.keys(objOrder).map(key => objOrder[key]);
     return result;
   };
-  // fetchMore = async () => {
-  //   await this.setState({isFetching: true});
-  //   const stationId = await AsyncStorage.getItem('stationId');
-  //   const pageIndex = parseInt(this.props.pageIndex) + 1;
-  //   await this.props.getAllOrder(stationId, pageIndex);
-  //   this.setState({isFetching: false});
-  // };
+
   renderOrder = status => {
     const {dataOrders} = this.props;
-    // const {isFetching} = this.state;
 
     let resultData = dataOrders.filter(order => {
       if (status === CANCELED) {
@@ -153,13 +155,25 @@ class Order extends Component {
     },
   });
 
-  componentDidMount = async () => {
-    const stationId = await AsyncStorage.getItem('stationId');
-    this.props.getAllOrder(stationId);
-  };
-
+ onchangeMonth = (date) =>{
+  this.setState({ month: date })
+ }
+ getOrders = async () =>{
+   const {modalVisible, month} = this.state;
+   let monthSelected = month.format('MMM');
+   let year = month.format('YYYY');
+   let dateFrom = `${year}-${parseInt(monthSelected)}-01`;
+   let dateTo = `${year}-${parseInt(monthSelected)+1}-01`;
+   const stationId = await AsyncStorage.getItem('stationId');
+   this.props.getAllOrder(stationId, 1, dateFrom, dateTo);
+   this.setState({modalVisible: !modalVisible});
+ }
+ setModalVisible(visible) {
+  this.setState({modalVisible: visible});
+}
   render() {
     const {dataOrders, loading} = this.props;
+    const {month} = this.state;
     if (loading) {
       return (
         <LinearGradient
@@ -171,15 +185,58 @@ class Order extends Component {
     } else
       return (
         <>
-          <MonthSelectorCalendar
-            selectedDate={this.state.month}
-            monthTapped={date => this.setState({month: date})}
-            localeLanguage="vi"
-            nextText=""
-            prevText="Trước"
-          />
-          <View style={{backgroundColor: '#c2d7ff'}}>
+        <Modal
+            animationType="slide"
+            transparent={true}
+            visible={this.state.modalVisible}>
+            <View style={styles.modalContainer}>
+              <View
+                style={{
+                  backgroundColor: 'white',
+                  width: SCREEN_WIDTH - 70,
+                  paddingTop: 10,
+                }}>
+                <View>
+                  <MonthSelectorCalendar
+                    selectedDate={month}
+                    localeLanguage="vi"
+                    nextText=""
+                    prevText=""
+                    yearTextStyle={{fontWeight: "bold", fontSize: 20}}
+                    onMonthTapped={(date)=> this.onchangeMonth(date)}
+                    monthTextStyle={{fontWeight: "bold"}}
+                  />
+                </View>
+                <View
+                  style={[
+                    {justifyContent: 'flex-end', marginRight: 10, flexDirection: "row"},
+                  ]}>
+                  <TouchableOpacity
+                    style={styles.button}
+                    onPress={() =>
+                      this.setModalVisible(!this.state.modalVisible)
+                    }>
+                    <Text>Hủy</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.button, {backgroundColor: APP_COLOR}]}
+                    onPress={() => this.getOrders()}>
+                    <Text style={{color: 'white'}}>Hoàn tất</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+          
+          <View style={{backgroundColor: '#c2d7ff', flexDirection: "row", justifyContent: "space-between", alignContent: 'space-between'}}>
             <Text style={styles.title}>Danh sách đơn hàng</Text>
+            <TouchableOpacity
+              onPress={() => {
+                this.setModalVisible(!this.state.modalVisible);
+              }}
+              style={{background:'red',justifyContent: "center", marginRight: 10}}>
+              <Icon type="feather" name="calendar" size={30} />
+            </TouchableOpacity>
           </View>
           <LinearGradient
             colors={['#c2d7ff', '#cde7f9', '#ffffff']}
@@ -236,6 +293,25 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: 'bold',
   },
+  modalContainer: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#4a4c49',
+    opacity: 0.9,
+  },
+  textModal: {
+    fontSize: 20,
+    textAlign: 'center',
+  },
+  button: {
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderColor: 'gray',
+    borderWidth: 0.5,
+    margin: 10,
+  }
 });
 const mapStateToProps = store => {
   return {
@@ -246,8 +322,8 @@ const mapStateToProps = store => {
 };
 const mapDispatchToProps = dispatch => {
   return {
-    getAllOrder: (stationId, pageIndex) => {
-      dispatch(orderAction.getAllOrder(stationId, pageIndex));
+    getAllOrder: (stationId, pageIndex, dateFrom, dateTo) => {
+      dispatch(orderAction.getAllOrder(stationId, pageIndex, dateFrom, dateTo));
     },
   };
 };
