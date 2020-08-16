@@ -5,7 +5,8 @@ const init = {
   loading: false,
   order: null,
   pageIndex: 1,
-  orderRevenue: null
+  orderRevenue: null,
+  ordersCurrentMonth: []
 };
 
 const OrderReducers = (state = init, action) => {
@@ -36,15 +37,13 @@ const OrderReducers = (state = init, action) => {
     case typesAction.CHANGE_STATUS:
       return {...state};
     case typesAction.CHANGE_STATUS_SUCCESS:
-      return {
-        ...state,
-        dataOrder: action.data,
-        order: action.currentOrder,
-      };
+      return {...state, dataOrder: action.data, order: action.currentOrder};
     case typesAction.CHANGE_STATUS_FAILED:
       return {...state};
     case typesAction.GET_REVENUE_YEAR_SUCCESS:
       return {...state, orderRevenue: action.data};
+    case typesAction.GET_ORDER_CURRENT_MONTH_SUCCESS:
+      return {...state, ordersCurrentMonth: action.data};
     default:
       return {...state};
   }

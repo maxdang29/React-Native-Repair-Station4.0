@@ -42,8 +42,14 @@ class RegisterStation extends Component {
       isShowListSearch: false,
       positions: [],
     };
+    this.navigationEventListener = Navigation.events().bindComponent(this);
   }
-
+  navigationButtonPressed({buttonId}) {
+    const {componentId} = this.props;
+    if (buttonId === 'back') {
+      Navigation.dismissModal(componentId);
+    }
+  }
   handleSearchLocation = async () => {
     try {
       let { address, positions } = this.state

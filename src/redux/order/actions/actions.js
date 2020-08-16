@@ -25,6 +25,23 @@ export const addServiceToOrder = (data, orderId) => {
   };
 };
 
+export const getOrdersCurrentMonth = (stationId, pageIndex, dateFrom, dateTo) => {
+  return {
+    type: typesAction.GET_ORDER_CURRENT_MONTH,
+    stationId,
+    pageIndex,
+    dateFrom,
+    dateTo
+  };
+};
+
+export const getOrdersCurrentMonthSuccess = (data) => {
+  return {
+    type: typesAction.GET_ORDER_CURRENT_MONTH_SUCCESS,
+    data
+  };
+};
+
 export const addServiceToOrderSuccess = (data) => {
   return {
     type: typesAction.ADD_SERVICE_TO_ORDER_SUCCESS,

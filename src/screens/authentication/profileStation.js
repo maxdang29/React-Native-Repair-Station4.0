@@ -288,6 +288,19 @@ class ProfileStation extends Component {
     this.props.getStationById(stationId);
   }
 
+  // TODO: Error with message "You must enable Billing on the Google Cloud Project"
+  convertAddressToLatLong = () => {
+    fetch('https://maps.googleapis.com/maps/api/geocode/json?address=' + this.state.address + '&key=AIzaSyC5_5R7U9OrXn478uXviYcSRELdkeP3QMI')
+      .then((response) => response.json())
+      .then((responseJson) => {
+        console.log('ADDRESS GEOCODE is BACK!! => ' + JSON.stringify(responseJson));
+        this.setState({
+          latitude: responseJson.results.geometry.location.lat,
+          longitude: responseJson.results.geometry.location.lng,
+        })
+      })
+  }
+
   handleSearchLocation = async () => {
     try {
       let { address, positions } = this.state

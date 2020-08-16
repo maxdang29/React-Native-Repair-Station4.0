@@ -28,7 +28,7 @@ class SplashScreen extends Component {
     await this.props.getNotifications(notificationPageIndex);
     const stationId = await AsyncStorage.getItem('stationId');
     this.props.getAllOrder(stationId, 1, dateFrom, dateTo);
-
+    this.props.getOrdersCurrentMonth(stationId, 1, dateFrom, dateTo);
     const yearFrom = `${ currentTime.getFullYear()}-1`;
     const yearTo = `${ currentTime.getFullYear()}-12`;
     this.props.getAllOrderRevenue(stationId, 1, yearFrom, yearTo);
@@ -83,6 +83,7 @@ class SplashScreen extends Component {
       console.log('SplashScreen -> onOpenNotification -> notifyId', notifyId);
       const stationId = await AsyncStorage.getItem('stationId');
       this.props.getAllOrder(stationId, 1, dateFrom, dateTo);
+      this.props.getOrdersCurrentMonth(stationId, 1, dateFrom, dateTo);
       this.props.getNotifications();
     }
   };
@@ -132,6 +133,9 @@ const mapDispatchToProps = dispatch => {
     },
     getAllOrderRevenue: (stationId, pageIndex, dateFrom, dateTo) => {
       dispatch(orderAction.getAllOrderRevenue(stationId, pageIndex, dateFrom, dateTo));
+    },
+    getOrdersCurrentMonth: (stationId, pageIndex, dateFrom, dateTo) => {
+      dispatch(orderAction.getOrdersCurrentMonth(stationId, pageIndex, dateFrom, dateTo));
     },
   };
 };
