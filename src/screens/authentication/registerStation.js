@@ -8,6 +8,7 @@ import {
   Image,
   Picker,
   ActivityIndicator,
+  FlatList,
 } from 'react-native';
 import InputText from '../../components/textInput';
 import { connect } from 'react-redux';
@@ -17,6 +18,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import startApp from '../../navigation/bottomTab';
 import { CAR, MOTORBIKE } from '../../constants/vehicles';
 import Geocoder from 'react-native-geocoder';
+import { ListItem } from 'react-native-elements';
 const vehicles = [
   { label: 'Chọn phương tiện', value: '' },
   { label: 'Xe máy', value: MOTORBIKE },
@@ -33,10 +35,51 @@ class RegisterStation extends Component {
       stationNameError: null,
       vehicleError: null,
       message: null,
+      latitude: 0,
+      longitude: 0,
+      searching: false,
+      searchStarted: false,
+      isShowListSearch: false,
+      positions: [],
     };
   }
 
+  handleSearchLocation = async () => {
+    try {
+      let { address, positions } = this.state
+      this.setState({ positions: [], searching: true, isShowListSearch: true, searchStarted: true })
+      if (address.length > 10) {
+        positions = await Geocoder.geocodeAddress(address)
+      }
+      this.setState({ positions, searching: false })
+    } catch (error) {
+      console.log("error: ", error)
+    }
+  }
+
+  handlePlaceSelected = place => {
+    const location = {
+      address: place.formattedAddress.replace('Unnamed Road, ', ''),
+      coords: place.position,
+    }
+    this.setState({
+      isShowListSearch: false,
+      address: location.address,
+      latitude: location.coords.lat,
+      longitude: location.coords.lng,
+    });
+  }
+
   onchangeText = (key, value) => {
+    if (value && value !== "") {
+      switch (key) {
+        case 'address':
+          this.handleSearchLocation();
+          break;
+        default:
+          break;
+      }
+    }
     this.setState({
       [key]: value,
     });
@@ -93,6 +136,7 @@ class RegisterStation extends Component {
       message,
       vehicle,
     } = this.state;
+    const { searchStarted, searching, address, positions, isShowListSearch } = this.state;
     const { error, loading } = this.props;
     return (
       <ScrollView>
@@ -122,7 +166,33 @@ class RegisterStation extends Component {
               title="Địa chỉ"
               error={addressError}
               icon="https://img.icons8.com/ios/2x/address.png"
+              value={address}
             />
+            {
+              !isShowListSearch ? null :
+                (!searching && searchStarted && address.length > 10 && positions.length < 1)
+                  ?
+                  <Text style={{
+                    textAlign: "center",
+                    fontSize: 16,
+                    paddingVertical: 5
+                  }}>
+                    Không tìm thấy kết quả
+                </Text>
+                  :
+                  <FlatList
+                    data={positions}
+                    renderItem={({ item }) =>
+                      <ListItem
+                        title={item.formattedAddress.replace('Unnamed Road, ', '')}
+                        onPress={() => this.handlePlaceSelected(item)}
+                        bottomDivider
+                      />}
+                    keyExtractor={(item, index) => index}
+                    showsHorizontalScrollIndicator={false}
+                    showsVerticalScrollIndicator={false}
+                  />
+            }
             <View style={styles.vehicleContainer}>
               <Image
                 source={{ uri: 'https://img.icons8.com/wired/2x/automotive.png' }}
@@ -161,7 +231,7 @@ class RegisterStation extends Component {
           ) : null}
           <View style={styles.row}>
             <TouchableOpacity
-              style={[styles.button, {backgroundColor: '#00a7e7'}]}
+              style={[styles.button, { backgroundColor: '#00a7e7' }]}
               onPress={() => this.register()}>
               {loading ? (
                 <ActivityIndicator size="small" />
@@ -175,10 +245,10 @@ class RegisterStation extends Component {
               <Text style={[styles.error]}> {error} </Text>
             </View>
           ) : (
-            <View style={styles.containerError}>
-              <Text style={[styles.error]}> {error[0].errorMessage} </Text>
-            </View>
-          )}
+              <View style={styles.containerError}>
+                <Text style={[styles.error]}> {error[0].errorMessage} </Text>
+              </View>
+            )}
         </View>
       </ScrollView>
     );

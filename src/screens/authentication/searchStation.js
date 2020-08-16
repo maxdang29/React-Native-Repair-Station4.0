@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import Geocoder from 'react-native-geocoder';
 import MapView from 'react-native-maps';
 import { Icon, ListItem } from 'react-native-elements';
+import { Navigation } from 'react-native-navigation';
 
 const { width, height } = Dimensions.get('window');
 const ASPECT_RATIO = width / height;
@@ -237,6 +238,14 @@ class SearchStation extends Component {
       positions: []
     }
     this._mapView = null;
+    this.navigationEventListener = Navigation.events().bindComponent(this);
+  }
+
+  navigationButtonPressed({ buttonId }) {
+    const { componentId } = this.props;
+    if (buttonId === 'back') {
+      Navigation.dismissModal(componentId);
+    }
   }
 
   handleChangeText = address => {
@@ -260,7 +269,6 @@ class SearchStation extends Component {
     const location = {
       address: place.formattedAddress.replace('Unnamed Road, ', ''),
       coords: place.position,
-
     }
     this._mapView.animateToCoordinate({
       latitude: location.coords.lat,
@@ -291,7 +299,11 @@ class SearchStation extends Component {
         {
           (!searching && searchStarted && address.length > 10 && positions.length < 1)
             ?
-            <Text style={styles.notFoundMessage}>
+            <Text style={{
+              textAlign: "center",
+              fontSize: 16,
+              paddingVertical: 5
+            }}>
               Không tìm thấy kết quả
             </Text>
             :

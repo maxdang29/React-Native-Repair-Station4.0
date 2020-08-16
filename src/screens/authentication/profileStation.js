@@ -6,6 +6,8 @@ import MapView from 'react-native-maps';
 import CheckBox from '@react-native-community/checkbox';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Geocoder from 'react-native-geocoder';
+import { Navigation } from 'react-native-navigation';
+import { ListItem } from 'react-native-elements';
 
 const { width, height } = Dimensions.get('window');
 const ASPECT_RATIO = width / height;
@@ -256,6 +258,10 @@ class ProfileStation extends Component {
       hasAmbulatory: false,
       latitude: 0,
       longitude: 0,
+      searching: false,
+      searchStarted: false,
+      isShowListSearch: false,
+      positions: [],
       name: "",
       owner: {},
       services: [],
@@ -267,6 +273,14 @@ class ProfileStation extends Component {
       priceItem: null,
     };
     this._mapView = null;
+    this.navigationEventListener = Navigation.events().bindComponent(this);
+  }
+
+  navigationButtonPressed({ buttonId }) {
+    const { componentId } = this.props;
+    if (buttonId === 'back') {
+      Navigation.dismissModal(componentId);
+    }
   }
 
   async componentDidMount() {
@@ -274,17 +288,17 @@ class ProfileStation extends Component {
     this.props.getStationById(stationId);
   }
 
-  // TODO: Error with message "You must enable Billing on the Google Cloud Project"
-  convertAddressToLatLong = () => {
-    fetch('https://maps.googleapis.com/maps/api/geocode/json?address=' + this.state.address + '&key=AIzaSyC5_5R7U9OrXn478uXviYcSRELdkeP3QMI')
-      .then((response) => response.json())
-      .then((responseJson) => {
-        console.log('ADDRESS GEOCODE is BACK!! => ' + JSON.stringify(responseJson));
-        this.setState({
-          latitude: responseJson.results.geometry.location.lat,
-          longitude: responseJson.results.geometry.location.lng,
-        })
-      })
+  handleSearchLocation = async () => {
+    try {
+      let { address, positions } = this.state
+      this.setState({ positions: [], searching: true, isShowListSearch: true, searchStarted: true })
+      if (address.length > 10) {
+        positions = await Geocoder.geocodeAddress(address)
+      }
+      this.setState({ positions, searching: false })
+    } catch (error) {
+      console.log("error: ", error)
+    }
   }
 
   onchangeText = (key, value) => {
@@ -295,6 +309,7 @@ class ProfileStation extends Component {
           break;
         case 'address':
           this.state.addressError = null;
+          this.handleSearchLocation();
           break;
         default:
           break;
@@ -347,33 +362,25 @@ class ProfileStation extends Component {
     });
   }
 
-  handleEditItem = (item) => {
-    const services = this.state.services;
-    const index = services.indexOf(item);
-    if (index > -1) {
-      if (this.state.nameItem) {
-        services[index].name = this.state.nameItem;
-      }
-      if (this.state.priceItem) {
-        services[index].price = this.state.priceItem;
-      }
+  handlePlaceSelected = place => {
+    const location = {
+      address: place.formattedAddress.replace('Unnamed Road, ', ''),
+      coords: place.position,
     }
+    this._mapView.animateToCoordinate({
+      latitude: location.coords.lat,
+      longitude: location.coords.lng
+    }, 1000);
     this.setState({
-      services: services,
-      indexItemEditing: -1
-    });
-  }
-
-  handleDeleteItem = (item) => {
-    const services = this.state.services;
-    const index = services.indexOf(item);
-    if (index > -1) { services.splice(index, 1) }
-    this.setState({
-      services: services
+      isShowListSearch: false,
+      address: location.address,
+      latitude: location.coords.lat,
+      longitude: location.coords.lng,
     });
   }
 
   render() {
+    const { searchStarted, searching, address, positions, isShowListSearch } = this.state;
     return (
       <ScrollView style={styles.container} showsHorizontalScrollIndicator={false} showsVerticalScrollIndicator={false}>
         <MapView
@@ -421,10 +428,36 @@ class ProfileStation extends Component {
                 editable={this.state.editMode}
                 style={{ flex: 1, fontSize: 18, color: 'black' }}
                 keyboardType={"default"}
+                placeholder={'Vui lòng nhập địa chỉ...'}
                 onChangeText={text => this.onchangeText('address', text)}
                 value={this.state.address}
               />
             </View>
+            {
+              !isShowListSearch ? null :
+                (!searching && searchStarted && address.length > 10 && positions.length < 1)
+                  ?
+                  <Text style={{
+                    textAlign: "center",
+                    fontSize: 16,
+                    paddingVertical: 5
+                  }}>
+                    Không tìm thấy kết quả
+                </Text>
+                  :
+                  <FlatList
+                    data={positions}
+                    renderItem={({ item }) =>
+                      <ListItem
+                        title={item.formattedAddress.replace('Unnamed Road, ', '')}
+                        onPress={() => this.handlePlaceSelected(item)}
+                        bottomDivider
+                      />}
+                    keyExtractor={(item, index) => index}
+                    showsHorizontalScrollIndicator={false}
+                    showsVerticalScrollIndicator={false}
+                  />
+            }
             {this.state.emailError ? (
               <View style={styles.errorContent}>
                 <Icon name="ios-alert" style={styles.iconError} />
