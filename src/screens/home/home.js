@@ -55,17 +55,17 @@ class HomeFixer extends Component {
   };
 
   filterStatusOrder = status => {
-    const {dataOrders} = this.props;
-    let result = dataOrders.filter(order => {
+    const {ordersCurrentMonth} = this.props;
+    let result = ordersCurrentMonth.filter(order => {
       return order.status === status;
     });
     return result;
   };
 
   revenueOnMonth = () => {
-    const {dataOrders} = this.props;
+    const {ordersCurrentMonth} = this.props;
     let revenue = 0;
-    let orderDone = dataOrders.filter(order => {
+    let orderDone = ordersCurrentMonth.filter(order => {
       return order.status === DONE;
     });
     orderDone.forEach(order => {
@@ -127,9 +127,9 @@ class HomeFixer extends Component {
   };
 
   render() {
-    const {stationInformation, isChangePower, dataOrders} = this.props;
+    const {stationInformation, isChangePower, ordersCurrentMonth} = this.props;
     const totalAcceptedOrder = this.filterStatusOrder(ACCEPTED).length;
-    const totalOrder = dataOrders.length;
+    const totalOrder = ordersCurrentMonth.length;
     const rateSuccess =
       totalOrder !== 0
         ? (this.filterStatusOrder(DONE).length / totalOrder) * 100
@@ -398,6 +398,7 @@ const mapStateToProps = store => {
     stationInformation: store.StationReducers.station,
     isChangePower: store.StationReducers.changePower,
     dataOrders: store.OrderReducers.dataOrder,
+    ordersCurrentMonth: store.OrderReducers.ordersCurrentMonth,
   };
 };
 const mapDispatchToProps = dispatch => {

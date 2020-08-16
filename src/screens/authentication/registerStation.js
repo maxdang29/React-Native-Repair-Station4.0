@@ -34,8 +34,15 @@ class RegisterStation extends Component {
       vehicleError: null,
       message: null,
     };
-  }
+    this.navigationEventListener = Navigation.events().bindComponent(this);
 
+  }
+  navigationButtonPressed({buttonId}) {
+    const {componentId} = this.props;
+    if (buttonId === 'back') {
+      Navigation.dismissModal(componentId);
+    }
+  }
   onchangeText = (key, value) => {
     this.setState({
       [key]: value,

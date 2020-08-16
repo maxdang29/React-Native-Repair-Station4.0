@@ -60,6 +60,28 @@ function* getAllOrder(actions) {
   }
 }
 
+function* getOrdersCurrentMonth(actions) {
+  console.log("getOrdersCurrentMonth redux");
+  try {
+    const token = yield AsyncStorage.getItem('token');
+    const response = yield call(
+      getAllOrderApi,
+      actions.stationId,
+      token,
+      actions.pageIndex,
+      actions.dateFrom, 
+      actions.dateTo
+    );
+    sortByDate(response.data.sources);
+    orders = response.data.sources;
+    console.log(' getOrdersCurrentMonth', JSON.stringify(orders, null, 4));
+    yield put(orderAction.getOrdersCurrentMonthSuccess(orders));
+  } catch (error) {
+    console.log('error getOrdersCurrentMonth', JSON.stringify(error, null, 4));
+  }
+}
+
+
 function* getOrderById(actions) {
   try {
     const token = yield AsyncStorage.getItem('token');
@@ -197,5 +219,6 @@ const rootSagaOrder = () => [
   takeLatest(typesAction.CANCEL_CONFIRM, cancelConfirm),
   takeLatest(typesAction.CHANGE_STATUS, updateStatus),
   takeLatest(typesAction.GET_REVENUE_YEAR, getAllOrderRevenue),
+  takeLatest(typesAction.GET_ORDER_CURRENT_MONTH, getOrdersCurrentMonth),
 ];
 export default rootSagaOrder();

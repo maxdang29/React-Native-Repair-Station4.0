@@ -70,12 +70,12 @@ class SideBar extends Component {
             onPress={this.handleOpenProfileStation}
             bottomDivider
           />
-          <ListItem
+          {/* <ListItem
             leftIcon={<Icon type="feather" name="search" />}
             title="Tìm kiếm cửa hàng"
             onPress={this.handleOpenSearchStation}
             bottomDivider
-          />
+          /> */}
           <ListItem
             leftIcon={<Icon type="feather" name="list" />}
             title="Lịch sử cuốc xe"

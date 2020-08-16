@@ -6,6 +6,7 @@ import MapView from 'react-native-maps';
 import CheckBox from '@react-native-community/checkbox';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Geocoder from 'react-native-geocoder';
+import {Navigation} from 'react-native-navigation';
 
 const { width, height } = Dimensions.get('window');
 const ASPECT_RATIO = width / height;
@@ -267,11 +268,19 @@ class ProfileStation extends Component {
       priceItem: null,
     };
     this._mapView = null;
+    this.navigationEventListener = Navigation.events().bindComponent(this);
   }
 
   async componentDidMount() {
     const stationId = await AsyncStorage.getItem('stationId');
     this.props.getStationById(stationId);
+  }
+
+  navigationButtonPressed({buttonId}) {
+    const {componentId} = this.props;
+    if (buttonId === 'back') {
+      Navigation.dismissModal(componentId);
+    }
   }
 
   // TODO: Error with message "You must enable Billing on the Google Cloud Project"
