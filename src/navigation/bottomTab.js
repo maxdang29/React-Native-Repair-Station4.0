@@ -1,8 +1,24 @@
 import {Navigation} from 'react-native-navigation';
 
-import Icon from 'react-native-vector-icons/Ionicons';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import {APP_COLOR} from '../utils/colors';
-export default function startApp() {
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
+async function prepareIcons() {
+  const icons = await Promise.all([
+      Icon.getImageSource('home', 25),
+      Ionicons.getImageSource('layers', 25),
+      Ionicons.getImageSource('ios-construct', 25),
+      Ionicons.getImageSource('notifications', 25),
+  ]);
+
+  const [ homeIcon, orderIcon, serviceIcon, notifyIcon ] = icons;
+  return { homeIcon, orderIcon, serviceIcon, notifyIcon};
+}
+
+
+export default async function startApp() {
+  const icons = await prepareIcons();
   Navigation.setRoot({
     root: {
       sideMenu: {
@@ -31,7 +47,7 @@ export default function startApp() {
                     },
                     bottomTab: {
                       text: 'Trang chủ',
-                      icon: require('../assets/image/icon-home.png'),
+                      icon: icons.homeIcon,
                       selectedIconColor: '#FFFFFF',
                       selectedTextColor: '#FFFFFF',
                       iconColor: '#FFFFFF',
@@ -55,7 +71,7 @@ export default function startApp() {
                     },
                     bottomTab: {
                       text: 'Hoạt động',
-                      icon: require('../assets/image/icons-purchase-order.png'),
+                      icon: icons.orderIcon,
                       selectedIconColor: '#FFFFFF',
                       selectedTextColor: '#FFFFFF',
                       iconColor: '#FFFFFF',
@@ -78,7 +94,7 @@ export default function startApp() {
                     },
                     bottomTab: {
                       text: 'Dịch vụ',
-                      icon: require('../assets/image/icons-car-service.png'),
+                      icon: icons.serviceIcon,
                       selectedIconColor: '#FFFFFF',
                       selectedTextColor: '#FFFFFF',
                       iconColor: '#FFFFFF',
@@ -101,7 +117,7 @@ export default function startApp() {
                     },
                     bottomTab: {
                       text: 'Thông báo',
-                      icon: require('../assets/image/icons8-notification-24.png'),
+                      icon: icons.notifyIcon,
                       selectedIconColor: '#FFFFFF',
                       selectedTextColor: '#FFFFFF',
                       iconColor: '#FFFFFF',
@@ -113,6 +129,7 @@ export default function startApp() {
             options: {
               bottomTabs: {
                 backgroundColor: APP_COLOR,
+                titleDisplayMode: 'alwaysShow',
               },
             },
           },

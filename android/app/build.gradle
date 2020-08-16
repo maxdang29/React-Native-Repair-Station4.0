@@ -128,7 +128,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.suaxe4dot0"
+        applicationId "com.station4dot0"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         missingDimensionStrategy "RNN.reactNativeVersion", "reactNative60"

@@ -10,12 +10,9 @@ registerScreens();
 
 messaging().setBackgroundMessageHandler(async remoteMessage => {
   console.log('BRM: ', remoteMessage);
+  setRoot('splashScreen');
 });
-// CheckNetwork = () => {
-//   if (Platform.OS === "android") {
-//     NetInfo.isConnected.fetch().then(isConnected => {return isConnected});
-//   }
-// };
+
 Navigation.events().registerAppLaunchedListener(async () => {
   const token = await AsyncStorage.getItem('token');
   if (token) {

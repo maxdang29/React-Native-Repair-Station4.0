@@ -13,7 +13,7 @@ export default function callApi(
 ) {
   return axios({
     method: method,
-    url: `${API_URL}${endpoint}?isDesc=true&limit=${limit}&offset=${pageIndex}${option}`,
+    url: `${API_URL}${endpoint}?&limit=${limit}&offset=${pageIndex}${option}`,
     data: body,
     headers: {
       Authorization: 'Bearer ' + Token,

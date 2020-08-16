@@ -17,6 +17,7 @@ import ToggleSwitch from 'toggle-switch-react-native';
 import {connect} from 'react-redux';
 import * as authenticationAction from '../../redux/authentication/actions/actions';
 import * as stationAction from '../../redux/station/actions/actions';
+import * as orderAction from '../../redux/order/actions/actions';
 import {AsyncStorage} from 'react-native';
 import {APP_COLOR} from '../../utils/colors';
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
@@ -37,10 +38,18 @@ class HomeFixer extends Component {
     await this.props.changePower(this.props.stationInformation.id, isOn);
   };
   async componentDidUpdate() {
-    const {isChangePower} = this.props;
+    const {isChangePower, changeStatusOrder} = this.props;
+    const stationId = await AsyncStorage.getItem('stationId');
+
     if (isChangePower) {
-      const stationId = await AsyncStorage.getItem('stationId');
       this.props.getStationById(stationId);
+    }
+    if(changeStatusOrder){
+      const currentTime = new Date();
+      const dateFrom = `${ currentTime.getFullYear()}-${ currentTime.getMonth()+1}-01`;
+      const dateTo = `${ currentTime.getFullYear()}-${ currentTime.getMonth()+2}-01`;
+      this.props.getAllOrder(stationId, 1, dateFrom, dateTo);
+      this.props.getOrdersCurrentMonth(stationId, 1, dateFrom, dateTo);
     }
   }
 
@@ -54,9 +63,9 @@ class HomeFixer extends Component {
     });
   };
 
-  filterStatusOrder = status => {
-    const {ordersCurrentMonth} = this.props;
-    let result = ordersCurrentMonth.filter(order => {
+  filterStatusOrder = (orderData, status) => {
+    // const {ordersCurrentMonth} = this.props;
+    let result = orderData.filter(order => {
       return order.status === status;
     });
     return result;
@@ -75,7 +84,8 @@ class HomeFixer extends Component {
   };
 
   getSevenOrderLast = () => {
-    const doneOrder = this.filterStatusOrder(DONE);
+    const {ordersCurrentMonth} = this.props;
+    const doneOrder = this.filterStatusOrder(ordersCurrentMonth, DONE);
     let values = [];
     let currentDate = new Date();
     let labels = [format(new Date(currentDate), 'dd-MM')];
@@ -98,7 +108,7 @@ class HomeFixer extends Component {
         values[index] = totalPrice;
       }
     });
-    for (let index = 0; index < values.length; index++) {
+    for (let index = 0; index < labels.length; index++) {
       const element = values[index];
       if (element === undefined) {
         values[index] = 0;
@@ -127,12 +137,12 @@ class HomeFixer extends Component {
   };
 
   render() {
-    const {stationInformation, isChangePower, ordersCurrentMonth} = this.props;
-    const totalAcceptedOrder = this.filterStatusOrder(ACCEPTED).length;
+    const {stationInformation, isChangePower, ordersCurrentMonth, dataOrders} = this.props;
+    const totalAcceptedOrder = this.filterStatusOrder(dataOrders, ACCEPTED).length;
     const totalOrder = ordersCurrentMonth.length;
     const rateSuccess =
       totalOrder !== 0
-        ? (this.filterStatusOrder(DONE).length / totalOrder) * 100
+        ? (this.filterStatusOrder(ordersCurrentMonth, DONE).length / totalOrder) * 100
         : 0;
     const revenueMonth = this.revenueOnMonth();
     const chartData = this.getSevenOrderLast();
@@ -278,7 +288,8 @@ class HomeFixer extends Component {
                   showModalNavigation(
                     'revenueStatistics',
                     null,
-                    'Thống kê doanh thu',
+                    'Thống kê doanh thu 1 năm',
+                    true
                   );
                 }}>
                 <Image
@@ -286,12 +297,12 @@ class HomeFixer extends Component {
                   style={{width: 40, height: 40}}
                 />
                 <View style={{marginLeft: 10}}>
-                  <Text style={{color: '#4e5e77'}}>Doanh thu</Text>
+                  <Text style={{color: '#4e5e77'}}>Doanh thu(vnd)</Text>
                   <Text style={styles.textNumber}>
                     {' '}
                     {revenueMonth
                       .toString()
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' vnd'}
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, '.')}
                   </Text>
                 </View>
               </TouchableOpacity>
@@ -399,6 +410,7 @@ const mapStateToProps = store => {
     isChangePower: store.StationReducers.changePower,
     dataOrders: store.OrderReducers.dataOrder,
     ordersCurrentMonth: store.OrderReducers.ordersCurrentMonth,
+    changeStatusOrder: store.OrderReducers.changeStatusOrder
   };
 };
 const mapDispatchToProps = dispatch => {
@@ -414,6 +426,9 @@ const mapDispatchToProps = dispatch => {
     },
     getStationById: id => {
       dispatch(stationAction.getStationById(id));
+    },
+    getAllOrder: (stationId, pageIndex, dateFrom, dateTo) => {
+      dispatch(orderAction.getAllOrder(stationId, pageIndex, dateFrom, dateTo));
     },
   };
 };

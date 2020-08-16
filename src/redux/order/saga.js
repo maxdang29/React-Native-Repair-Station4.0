@@ -22,7 +22,6 @@ sortByDate = data => {
 };
 
 function* getAllOrder(actions) {
-  console.log("111");
   try {
     const token = yield AsyncStorage.getItem('token');
     const response = yield call(
@@ -61,7 +60,6 @@ function* getAllOrder(actions) {
 }
 
 function* getOrdersCurrentMonth(actions) {
-  console.log("getOrdersCurrentMonth redux");
   try {
     const token = yield AsyncStorage.getItem('token');
     const response = yield call(
@@ -74,7 +72,6 @@ function* getOrdersCurrentMonth(actions) {
     );
     sortByDate(response.data.sources);
     orders = response.data.sources;
-    console.log(' getOrdersCurrentMonth', JSON.stringify(orders, null, 4));
     yield put(orderAction.getOrdersCurrentMonthSuccess(orders));
   } catch (error) {
     console.log('error getOrdersCurrentMonth', JSON.stringify(error, null, 4));
@@ -87,8 +84,6 @@ function* getOrderById(actions) {
     const token = yield AsyncStorage.getItem('token');
     const response = yield call(getOrderByIdApi, actions.orderId, token);
     yield put(orderAction.getOrderByIdSuccess(response.data));
-    console.log('response ID 2222', JSON.stringify(response.data, null, 4));
-
   } catch (error) {
     console.log('get order error', error);
   }
@@ -126,8 +121,6 @@ function* addServiceToOrder(actions) {
       token,
     );
     yield put(orderAction.addServiceToOrderSuccess(response.data));
-    console.log('response 2222', JSON.stringify(response.data, null, 4));
-
     yield showNotification(
       'showNotification',
       'Thêm dịch vụ thành công',
@@ -202,7 +195,7 @@ function* getAllOrderRevenue(actions) {
       token,
       actions.pageIndex,
       actions.dateFrom, 
-      actions.dateTo
+      actions.dateTo,
     );
     // sortByDate(response.data.sources);
     yield put(orderAction.getAllOrderRevenueSuccess(response.data.sources));

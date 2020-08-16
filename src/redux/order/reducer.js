@@ -6,7 +6,8 @@ const init = {
   order: null,
   pageIndex: 1,
   orderRevenue: null,
-  ordersCurrentMonth: []
+  ordersCurrentMonth: [],
+  changeStatusOrder: false,
 };
 
 const OrderReducers = (state = init, action) => {
@@ -14,12 +15,7 @@ const OrderReducers = (state = init, action) => {
     case typesAction.GET_ALL_ORDER:
       return {...state, loading: true};
     case typesAction.GET_ALL_ORDER_SUCCESS:
-      return {
-        ...state,
-        dataOrder: [...action.data],
-        loading: false,
-        pageIndex: action.pageIndex,
-      };
+      return {...state, dataOrder: [...action.data], loading: false, pageIndex: action.pageIndex,  changeStatusOrder: false};
     case typesAction.GET_ALL_ORDER_FAILED:
       return {...state, loading: false};
     case typesAction.GET_ORDER_BY_ID:
@@ -37,7 +33,7 @@ const OrderReducers = (state = init, action) => {
     case typesAction.CHANGE_STATUS:
       return {...state};
     case typesAction.CHANGE_STATUS_SUCCESS:
-      return {...state, dataOrder: action.data, order: action.currentOrder};
+      return {...state, dataOrder: action.data, order: action.currentOrder, changeStatusOrder: true};
     case typesAction.CHANGE_STATUS_FAILED:
       return {...state};
     case typesAction.GET_REVENUE_YEAR_SUCCESS:

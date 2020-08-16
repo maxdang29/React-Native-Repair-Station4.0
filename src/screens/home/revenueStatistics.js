@@ -31,6 +31,13 @@ import {Navigation} from 'react-native-navigation';
 class RevenueStatistics extends Component {
   constructor(props) {
     super(props);
+    this.navigationEventListener = Navigation.events().bindComponent(this);
+  }
+  navigationButtonPressed({buttonId}) {
+    const {componentId} = this.props;
+    if (buttonId === 'back') {
+      Navigation.dismissModal(componentId);
+    }
   }
   filterStatusOrder = status => {
     const {orderRevenue} = this.props;
@@ -39,10 +46,20 @@ class RevenueStatistics extends Component {
     });
     return result;
   };
+  sortByDate = data => {
+    data.sort(function(a, b) {
+      let date1 = new Date(a.createdOn);
+      let date2 = new Date(b.createdOn);
+      return date1 - date2;
+    });
+  };
   filterRevenue = () =>{
-    const doneOrder = this.filterStatusOrder(DONE);
+    let doneOrder = this.filterStatusOrder(DONE);
+    this.sortByDate(doneOrder)
+
     let labels = [];
     let values = [];
+    const currentTime = new Date();
     let minMonth =  parseInt(format(new Date(doneOrder[0].createdOn), 'MM'));
     for (let index = 1; index < 13; index++) {
       index >= minMonth ? labels.push(index) : null;
@@ -59,9 +76,10 @@ class RevenueStatistics extends Component {
       }
     })
 
-    for (let index = 1; index < labels.length; index++) {
+    for (let index = 0; index < labels.length; index++) {
       values[index] =  values[index] === undefined ? 0 : values[index];
-      values[index] = `${values[index]}`
+      values[index] = `${values[index]}`;
+      labels[index]+=  `/${currentTime.getFullYear()}`;
     }
     return {labels: labels, values: values}
   }
@@ -69,7 +87,6 @@ class RevenueStatistics extends Component {
   render() {
     const {orderRevenue} = this.props;
     const dataChart = this.filterRevenue();
-    console.log("dataChart.values", dataChart.values)
     return (
       <View>
         <View
@@ -88,14 +105,6 @@ class RevenueStatistics extends Component {
             paddingHorizontal: 15,
             height: SCREEN_HEIGHT,
           }}>
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <TouchableOpacity
-              onPress={() => {
-                Navigation.dismissModal(this.props.componentId);
-              }}>
-              <Icon type="feather" name="arrow-left" size={30} />
-            </TouchableOpacity>
-          </View>
 
           <LineChart
             data={{

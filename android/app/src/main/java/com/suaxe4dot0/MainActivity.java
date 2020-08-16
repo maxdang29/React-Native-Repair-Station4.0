@@ -1,4 +1,4 @@
-package com.suaxe4dot0;
+package com.station4dot0;
 
 import com.reactnativenavigation.NavigationActivity;
 
