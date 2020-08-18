@@ -65,7 +65,6 @@ class OrderDetail extends Component {
     // }
   };
   cancelOrder = orderId => {
-    console.log('33333', this.props.loading);
     alertConfirm(
       'alertConfirm',
       'Bạn chắc chắn muốn hủy cuốc?',

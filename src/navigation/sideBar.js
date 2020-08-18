@@ -66,7 +66,7 @@ class SideBar extends Component {
           />
           <ListItem
             leftIcon={<Icon type="feather" name="home" />}
-            title="Trang cửa hàng"
+            title="Xem cửa hàng"
             onPress={this.handleOpenProfileStation}
             bottomDivider
           />
@@ -76,18 +76,18 @@ class SideBar extends Component {
             onPress={this.handleOpenSearchStation}
             bottomDivider
           /> */}
-          <ListItem
+          {/* <ListItem
             leftIcon={<Icon type="feather" name="list" />}
             title="Lịch sử cuốc xe"
             onPress={this.handleOpenOrderHistory}
             bottomDivider
-          />
-          <ListItem
+          /> */}
+          {/* <ListItem
             leftIcon={<Icon type="feather" name="settings" />}
             title="Cài đặt"
             onPress={this.handleOpenSettings}
             bottomDivider
-          />
+          /> */}
           <ListItem
             leftIcon={<Icon type="feather" name="log-out" />}
             title="Đăng xuất"

@@ -18,6 +18,7 @@ class SplashScreen extends Component {
   constructor(props) {
     super(props);
   }
+  
   async componentDidMount() {
     const currentTime = new Date();
     const dateFrom = `${ currentTime.getFullYear()}-${ currentTime.getMonth()+1}-01`;
@@ -26,12 +27,6 @@ class SplashScreen extends Component {
     await this.props.getMyAccount();
     await this.props.getMyStation();
     await this.props.getNotifications(notificationPageIndex);
-    const stationId = await AsyncStorage.getItem('stationId');
-    this.props.getAllOrder(stationId, 1, dateFrom, dateTo);
-    this.props.getOrdersCurrentMonth(stationId, 1, dateFrom, dateTo);
-    const yearFrom = `${ currentTime.getFullYear()}-1`;
-    const yearTo = `${ currentTime.getFullYear()}-12`;
-    this.props.getAllOrderRevenue(stationId, 1, yearFrom, yearTo);
     // Register FCM Service
     fcmService.register(
       this.onRegister,
@@ -43,11 +38,21 @@ class SplashScreen extends Component {
   }
 
   async componentDidUpdate() {
-    const {allStation, stationInformation, notificationPageIndex} = this.props;
+    const {allStation, stationInformation} = this.props;
     if (allStation.length) {
+      const currentTime = new Date();
+      const dateFrom = `${ currentTime.getFullYear()}-${ currentTime.getMonth()+1}-01`;
+      const dateTo = `${ currentTime.getFullYear()}-${ currentTime.getMonth()+2}-01`;
       let firstStationId = allStation[0].id;
       await AsyncStorage.setItem('stationId', firstStationId);
       await this.props.getStationById(firstStationId);
+
+      this.props.getAllOrder(firstStationId, 1, dateFrom, dateTo);
+      this.props.getOrdersCurrentMonth(firstStationId, 1, dateFrom, dateTo);
+
+      const yearFrom = `${ currentTime.getFullYear()}-1`;
+      const yearTo = `${ currentTime.getFullYear()}-12`;
+      this.props.getAllOrderRevenue(firstStationId, 1, yearFrom, yearTo);
     }
     if (stationInformation) {
       startApp();
