@@ -20,10 +20,10 @@ class Register extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      userName: 'Phương Nam',
-      password: 'Abc123456#',
-      confirmPassword: 'Abc123456#',
-      phone: '0368947845',
+      userName: null,
+      password: null,
+      confirmPassword: null,
+      phone: null,
       passwordError: null,
       userNameError: null,
       confirmPasswordError: null,
@@ -71,6 +71,19 @@ class Register extends Component {
     } = this.state;
     const {allStation} = this.props;
 
+    if (!password) this.onchangeText('passwordError', 'Nhập mật khẩu');
+    else this.onchangeText('passwordError', null);
+    if (!userName) this.onchangeText('userNameError', 'Nhập tên');
+    else this.onchangeText('userNameError', null);
+    if (!phone) this.onchangeText('phoneError', 'Nhập số điện thoại');
+    else this.onchangeText('phoneError', null);
+    if (confirmPassword !== password)
+      this.onchangeText(
+        'confirmPasswordError',
+        'Mật khẩu đó không khớp, hãy thử lại',
+      );
+    else this.onchangeText('confirmPasswordError', null);
+
     if (password && userName && phone && confirmPassword === password) {
       const user = {
         name: userName,
@@ -81,27 +94,18 @@ class Register extends Component {
       };
       this.props.register(user, this.props.componentId);
       this.setState({message: null});
-    } else {
-      if (!password) this.onchangeText('passwordError', 'Nhập mật khẩu');
-      else this.onchangeText('passwordError', null);
-      if (!userName) this.onchangeText('userNameError', 'Nhập tên');
-      else this.onchangeText('userNameError', null);
-      if (!phone) this.onchangeText('phoneError', 'Nhập số điện thoại');
-      else this.onchangeText('phoneError', null);
-      if (confirmPassword !== password)
-        this.onchangeText(
-          'confirmPasswordError',
-          'Mật khẩu đó không khớp, hãy thử lại',
-        );
-      else this.onchangeText('confirmPasswordError', null);
     }
   };
 
-  filterError = (error, fieldName) => {
+  filterError = (key, error, fieldName) => {
+    let result;
+    let errorField = this.state[key];
+    if (errorField) return errorField;
     if (typeof error === 'object')
-      return error.filter(err => err.propertyName === fieldName)[0]
-        .errorMessage;
+      result = error.find(err => err.propertyName === fieldName);
+    return result ? result.errorMessage : null;
   };
+
   render() {
     const {
       passwordError,
@@ -134,9 +138,7 @@ class Register extends Component {
               type="numeric"
               onchangeText={value => this.onchangeText('phone', value)}
               title="Số điện thoại *"
-              error={
-                phoneError ? phoneError : this.filterError(error, 'PhoneNumber')
-              }
+              error={this.filterError('phoneError', error, 'PhoneNumber')}
               icon="https://img.icons8.com/ios/2x/phone.png"
             />
             <InputText
@@ -146,7 +148,7 @@ class Register extends Component {
               }}
               onchangeText={value => this.onchangeText('password', value)}
               title="Mật khẩu *"
-              error={passwordError}
+              error={this.filterError('passwordError', error, 'Password')}
               icon="https://img.icons8.com/ios/2x/password.png"
               isSecureTextEntry={true}
             />

@@ -27,11 +27,19 @@ export default class InputText extends Component {
     this.props.onchangeText(text);
   };
   render() {
-    const {title, value, icon, type, error, isSecureTextEntry} = this.props;
+    const {
+      title,
+      value,
+      icon,
+      type,
+      error,
+      isSecureTextEntry,
+      editable = true,
+    } = this.props;
     return (
       <>
         <View style={styles.container}>
-          <Image source={{uri: icon}} style={styles.image} /> 
+          <Image source={{uri: icon}} style={styles.image} />
           <TextInput
             style={styles.InputText}
             placeholder={title}
@@ -41,6 +49,7 @@ export default class InputText extends Component {
             defaultValue={this.props.value || this.state.value}
             keyboardType={type ? type : 'default'}
             secureTextEntry={isSecureTextEntry}
+            editable={editable}
           />
         </View>
         {error ? (
@@ -52,7 +61,7 @@ export default class InputText extends Component {
       </>
     );
   }
-} 
+}
 const styles = StyleSheet.create({
   container: {
     marginHorizontal: 30,
@@ -78,12 +87,13 @@ const styles = StyleSheet.create({
     marginLeft: 50,
     marginTop: -5,
     alignContent: 'center',
+    paddingRight: 5,
   },
   error: {
     color: 'red',
     fontSize: 12,
   },
   textError: {
-    marginLeft: 10,
+    marginLeft: 0,
   },
 });

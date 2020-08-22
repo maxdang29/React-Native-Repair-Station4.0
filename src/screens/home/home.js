@@ -35,7 +35,7 @@ class HomeFixer extends Component {
     super(props);
   }
   changeToggleSwitch = async isOn => {
-    await this.props.changePower(this.props.stationInformation.id, isOn);
+    await this.props.changePower(this.props.stationInformation.id, isOn, this.props.stationInformation.hasAmbulatory);
   };
   async componentDidUpdate() {
     const {isChangePower, changeStatusOrder} = this.props;
@@ -418,8 +418,8 @@ const mapDispatchToProps = dispatch => {
     getMyAccount: () => {
       dispatch(authenticationAction.getMyAccount());
     },
-    changePower: (stationId, isOn) => {
-      dispatch(stationAction.changePower(stationId, isOn));
+    changePower: (stationId, isOn, hasAmbulatory) => {
+      dispatch(stationAction.changePower(stationId, isOn, hasAmbulatory));
     },
     getMyStation: () => {
       dispatch(stationAction.getMyStation());

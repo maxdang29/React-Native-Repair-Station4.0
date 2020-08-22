@@ -100,7 +100,6 @@ class Order extends Component {
 
   renderOrder = status => {
     const {dataOrders} = this.props;
-    console.log("dataOrders", dataOrders)
 
     let resultData = dataOrders.filter(order => {
       if (status === CANCELED) {

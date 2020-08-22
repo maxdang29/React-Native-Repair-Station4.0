@@ -1,232 +1,243 @@
-import React, { Component } from 'react';
-import { Text, View, StyleSheet, ScrollView, Dimensions, Image, FlatList, TouchableOpacity, TextInput, AsyncStorage } from 'react-native';
-import { connect } from 'react-redux';
+import React, {Component} from 'react';
+import {
+  Text,
+  View,
+  StyleSheet,
+  ScrollView,
+  Dimensions,
+  Image,
+  FlatList,
+  TouchableOpacity,
+  TextInput,
+  AsyncStorage,
+} from 'react-native';
+import {connect} from 'react-redux';
 import * as stationAction from '../../redux/station/actions/actions';
 import MapView from 'react-native-maps';
 import CheckBox from '@react-native-community/checkbox';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Geocoder from 'react-native-geocoder';
-import { Navigation } from 'react-native-navigation';
-import { ListItem } from 'react-native-elements';
+import {Navigation} from 'react-native-navigation';
+import {ListItem} from 'react-native-elements';
 
-const { width, height } = Dimensions.get('window');
+const {width, height} = Dimensions.get('window');
 const ASPECT_RATIO = width / height;
 const LATITUDE_DELTA = 0.004922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 const STYLE_MAP = [
   {
-    "elementType": "geometry",
-    "stylers": [
+    elementType: 'geometry',
+    stylers: [
       {
-        "color": "#ebe3cd"
-      }
-    ]
+        color: '#ebe3cd',
+      },
+    ],
   },
   {
-    "elementType": "labels.text.fill",
-    "stylers": [
+    elementType: 'labels.text.fill',
+    stylers: [
       {
-        "color": "#523735"
-      }
-    ]
+        color: '#523735',
+      },
+    ],
   },
   {
-    "elementType": "labels.text.stroke",
-    "stylers": [
+    elementType: 'labels.text.stroke',
+    stylers: [
       {
-        "color": "#f5f1e6"
-      }
-    ]
+        color: '#f5f1e6',
+      },
+    ],
   },
   {
-    "featureType": "administrative",
-    "elementType": "geometry.stroke",
-    "stylers": [
+    featureType: 'administrative',
+    elementType: 'geometry.stroke',
+    stylers: [
       {
-        "color": "#c9b2a6"
-      }
-    ]
+        color: '#c9b2a6',
+      },
+    ],
   },
   {
-    "featureType": "administrative.land_parcel",
-    "elementType": "geometry.stroke",
-    "stylers": [
+    featureType: 'administrative.land_parcel',
+    elementType: 'geometry.stroke',
+    stylers: [
       {
-        "color": "#dcd2be"
-      }
-    ]
+        color: '#dcd2be',
+      },
+    ],
   },
   {
-    "featureType": "administrative.land_parcel",
-    "elementType": "labels.text.fill",
-    "stylers": [
+    featureType: 'administrative.land_parcel',
+    elementType: 'labels.text.fill',
+    stylers: [
       {
-        "color": "#ae9e90"
-      }
-    ]
+        color: '#ae9e90',
+      },
+    ],
   },
   {
-    "featureType": "landscape.natural",
-    "elementType": "geometry",
-    "stylers": [
+    featureType: 'landscape.natural',
+    elementType: 'geometry',
+    stylers: [
       {
-        "color": "#dfd2ae"
-      }
-    ]
+        color: '#dfd2ae',
+      },
+    ],
   },
   {
-    "featureType": "poi",
-    "elementType": "geometry",
-    "stylers": [
+    featureType: 'poi',
+    elementType: 'geometry',
+    stylers: [
       {
-        "color": "#dfd2ae"
-      }
-    ]
+        color: '#dfd2ae',
+      },
+    ],
   },
   {
-    "featureType": "poi",
-    "elementType": "labels.text.fill",
-    "stylers": [
+    featureType: 'poi',
+    elementType: 'labels.text.fill',
+    stylers: [
       {
-        "color": "#93817c"
-      }
-    ]
+        color: '#93817c',
+      },
+    ],
   },
   {
-    "featureType": "poi.park",
-    "elementType": "geometry.fill",
-    "stylers": [
+    featureType: 'poi.park',
+    elementType: 'geometry.fill',
+    stylers: [
       {
-        "color": "#a5b076"
-      }
-    ]
+        color: '#a5b076',
+      },
+    ],
   },
   {
-    "featureType": "poi.park",
-    "elementType": "labels.text.fill",
-    "stylers": [
+    featureType: 'poi.park',
+    elementType: 'labels.text.fill',
+    stylers: [
       {
-        "color": "#447530"
-      }
-    ]
+        color: '#447530',
+      },
+    ],
   },
   {
-    "featureType": "road",
-    "elementType": "geometry",
-    "stylers": [
+    featureType: 'road',
+    elementType: 'geometry',
+    stylers: [
       {
-        "color": "#f5f1e6"
-      }
-    ]
+        color: '#f5f1e6',
+      },
+    ],
   },
   {
-    "featureType": "road.arterial",
-    "elementType": "geometry",
-    "stylers": [
+    featureType: 'road.arterial',
+    elementType: 'geometry',
+    stylers: [
       {
-        "color": "#fdfcf8"
-      }
-    ]
+        color: '#fdfcf8',
+      },
+    ],
   },
   {
-    "featureType": "road.highway",
-    "elementType": "geometry",
-    "stylers": [
+    featureType: 'road.highway',
+    elementType: 'geometry',
+    stylers: [
       {
-        "color": "#f8c967"
-      }
-    ]
+        color: '#f8c967',
+      },
+    ],
   },
   {
-    "featureType": "road.highway",
-    "elementType": "geometry.stroke",
-    "stylers": [
+    featureType: 'road.highway',
+    elementType: 'geometry.stroke',
+    stylers: [
       {
-        "color": "#e9bc62"
-      }
-    ]
+        color: '#e9bc62',
+      },
+    ],
   },
   {
-    "featureType": "road.highway.controlled_access",
-    "elementType": "geometry",
-    "stylers": [
+    featureType: 'road.highway.controlled_access',
+    elementType: 'geometry',
+    stylers: [
       {
-        "color": "#e98d58"
-      }
-    ]
+        color: '#e98d58',
+      },
+    ],
   },
   {
-    "featureType": "road.highway.controlled_access",
-    "elementType": "geometry.stroke",
-    "stylers": [
+    featureType: 'road.highway.controlled_access',
+    elementType: 'geometry.stroke',
+    stylers: [
       {
-        "color": "#db8555"
-      }
-    ]
+        color: '#db8555',
+      },
+    ],
   },
   {
-    "featureType": "road.local",
-    "elementType": "labels.text.fill",
-    "stylers": [
+    featureType: 'road.local',
+    elementType: 'labels.text.fill',
+    stylers: [
       {
-        "color": "#806b63"
-      }
-    ]
+        color: '#806b63',
+      },
+    ],
   },
   {
-    "featureType": "transit.line",
-    "elementType": "geometry",
-    "stylers": [
+    featureType: 'transit.line',
+    elementType: 'geometry',
+    stylers: [
       {
-        "color": "#dfd2ae"
-      }
-    ]
+        color: '#dfd2ae',
+      },
+    ],
   },
   {
-    "featureType": "transit.line",
-    "elementType": "labels.text.fill",
-    "stylers": [
+    featureType: 'transit.line',
+    elementType: 'labels.text.fill',
+    stylers: [
       {
-        "color": "#8f7d77"
-      }
-    ]
+        color: '#8f7d77',
+      },
+    ],
   },
   {
-    "featureType": "transit.line",
-    "elementType": "labels.text.stroke",
-    "stylers": [
+    featureType: 'transit.line',
+    elementType: 'labels.text.stroke',
+    stylers: [
       {
-        "color": "#ebe3cd"
-      }
-    ]
+        color: '#ebe3cd',
+      },
+    ],
   },
   {
-    "featureType": "transit.station",
-    "elementType": "geometry",
-    "stylers": [
+    featureType: 'transit.station',
+    elementType: 'geometry',
+    stylers: [
       {
-        "color": "#dfd2ae"
-      }
-    ]
+        color: '#dfd2ae',
+      },
+    ],
   },
   {
-    "featureType": "water",
-    "elementType": "geometry.fill",
-    "stylers": [
+    featureType: 'water',
+    elementType: 'geometry.fill',
+    stylers: [
       {
-        "color": "#b9d3c2"
-      }
-    ]
+        color: '#b9d3c2',
+      },
+    ],
   },
   {
-    "featureType": "water",
-    "elementType": "labels.text.fill",
-    "stylers": [
+    featureType: 'water',
+    elementType: 'labels.text.fill',
+    stylers: [
       {
-        "color": "#92998d"
-      }
-    ]
-  }
+        color: '#92998d',
+      },
+    ],
+  },
 ];
 
 class ProfileStation extends Component {
@@ -239,21 +250,22 @@ class ProfileStation extends Component {
         longitude: nextProps.stationInformation.longitude,
         name: nextProps.stationInformation.name,
         owner: nextProps.stationInformation.owner,
-        phone: nextProps.stationInformation.owner ? nextProps.stationInformation.owner.phoneNumber : "",
+        phone: nextProps.stationInformation.owner
+          ? nextProps.stationInformation.owner.phoneNumber
+          : '',
         services: nextProps.stationInformation.services,
         vehicle: nextProps.stationInformation.vehicle,
-        stationInformation: nextProps.stationInformation
+        stationInformation: nextProps.stationInformation,
       };
-    }
-    else return null;
+    } else return null;
   }
 
   constructor(props) {
     super(props);
     this.state = {
-      address: "",
+      address: '',
       emailError: null,
-      phone: "",
+      phone: '',
       phoneError: null,
       hasAmbulatory: false,
       latitude: 0,
@@ -262,10 +274,10 @@ class ProfileStation extends Component {
       searchStarted: false,
       isShowListSearch: false,
       positions: [],
-      name: "",
+      name: '',
       owner: {},
       services: [],
-      vehicle: "",
+      vehicle: '',
       editMode: false,
       stationInformation: {},
       indexItemEditing: -1,
@@ -276,8 +288,8 @@ class ProfileStation extends Component {
     this.navigationEventListener = Navigation.events().bindComponent(this);
   }
 
-  navigationButtonPressed({ buttonId }) {
-    const { componentId } = this.props;
+  navigationButtonPressed({buttonId}) {
+    const {componentId} = this.props;
     if (buttonId === 'back') {
       Navigation.dismissModal(componentId);
     }
@@ -290,32 +302,43 @@ class ProfileStation extends Component {
 
   // TODO: Error with message "You must enable Billing on the Google Cloud Project"
   convertAddressToLatLong = () => {
-    fetch('https://maps.googleapis.com/maps/api/geocode/json?address=' + this.state.address + '&key=AIzaSyC5_5R7U9OrXn478uXviYcSRELdkeP3QMI')
-      .then((response) => response.json())
-      .then((responseJson) => {
-        console.log('ADDRESS GEOCODE is BACK!! => ' + JSON.stringify(responseJson));
+    fetch(
+      'https://maps.googleapis.com/maps/api/geocode/json?address=' +
+        this.state.address +
+        '&key=AIzaSyC5_5R7U9OrXn478uXviYcSRELdkeP3QMI',
+    )
+      .then(response => response.json())
+      .then(responseJson => {
+        console.log(
+          'ADDRESS GEOCODE is BACK!! => ' + JSON.stringify(responseJson),
+        );
         this.setState({
           latitude: responseJson.results.geometry.location.lat,
           longitude: responseJson.results.geometry.location.lng,
-        })
-      })
-  }
+        });
+      });
+  };
 
   handleSearchLocation = async () => {
     try {
-      let { address, positions } = this.state
-      this.setState({ positions: [], searching: true, isShowListSearch: true, searchStarted: true })
+      let {address, positions} = this.state;
+      this.setState({
+        positions: [],
+        searching: true,
+        isShowListSearch: true,
+        searchStarted: true,
+      });
       if (address.length > 10) {
-        positions = await Geocoder.geocodeAddress(address)
+        positions = await Geocoder.geocodeAddress(address);
       }
-      this.setState({ positions, searching: false })
+      this.setState({positions, searching: false});
     } catch (error) {
-      console.log("error: ", error)
+      console.log('error: ', error);
     }
-  }
+  };
 
   onchangeText = (key, value) => {
-    if (value && value !== "") {
+    if (value && value !== '') {
       switch (key) {
         case 'phone':
           this.state.phoneError = null;
@@ -349,56 +372,76 @@ class ProfileStation extends Component {
   }
 
   handleUpdateButton = async () => {
-    let lat = 16.04331, lng = 108.21332;
-    await Geocoder.geocodeAddress(this.state.address).then(res => {
-      // res is an Array of geocoding object (see below)
-      lat = res[0].position.lat;
-      lng = res[0].position.lng;
-    }).catch(err => console.log(err));
+    let lat = 16.04331,
+      lng = 108.21332;
+    await Geocoder.geocodeAddress(this.state.address)
+      .then(res => {
+        // res is an Array of geocoding object (see below)
+        lat = res[0].position.lat;
+        lng = res[0].position.lng;
+      })
+      .catch(err => console.log(err));
+    console.log('stationInformation', this.state.stationInformation);
     let data = {
       id: this.state.stationInformation.id,
       address: this.state.address,
       latitude: lat,
       longitude: lng,
       hasAmbulatory: this.state.hasAmbulatory,
-      owner: { name: this.state.owner.name, phoneNumber: this.state.phone },
+      owner: {name: this.state.owner.name, phoneNumber: this.state.phone},
       services: this.state.services,
+      isAvailable: this.state.stationInformation.isAvailable
     };
     await this.props.changeStationById(this.state.stationInformation.id, data);
-    this._mapView.animateToCoordinate({
-      latitude: lat,
-      longitude: lng
-    }, 1000);
+    this._mapView.animateToCoordinate(
+      {
+        latitude: lat,
+        longitude: lng,
+      },
+      1000,
+    );
     this.setState({
       latitude: lat,
-      longitude: lng
+      longitude: lng,
     });
-  }
+  };
 
   handlePlaceSelected = place => {
     const location = {
       address: place.formattedAddress.replace('Unnamed Road, ', ''),
       coords: place.position,
-    }
-    this._mapView.animateToCoordinate({
-      latitude: location.coords.lat,
-      longitude: location.coords.lng
-    }, 1000);
+    };
+    this._mapView.animateToCoordinate(
+      {
+        latitude: location.coords.lat,
+        longitude: location.coords.lng,
+      },
+      1000,
+    );
     this.setState({
       isShowListSearch: false,
       address: location.address,
       latitude: location.coords.lat,
       longitude: location.coords.lng,
     });
-  }
+  };
 
   render() {
-    const { searchStarted, searching, address, positions, isShowListSearch } = this.state;
+    const {
+      searchStarted,
+      searching,
+      address,
+      positions,
+      isShowListSearch,
+    } = this.state;
     return (
-      <ScrollView style={styles.container} showsHorizontalScrollIndicator={false} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.container}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}>
         <MapView
           provider={'google'}
-          ref={c => this._mapView = c}
+          ref={c => (this._mapView = c)}
           zoomEnabled={true}
           showsUserLocation={true}
           followUserLocation={true}
@@ -409,11 +452,10 @@ class ProfileStation extends Component {
             latitudeDelta: LATITUDE_DELTA,
             longitudeDelta: LONGITUDE_DELTA,
           }}
-          style={{ width: width, height: height }}
-          customMapStyle={STYLE_MAP}
-        >
+          style={{width: width, height: height}}
+          customMapStyle={STYLE_MAP}>
           <MapView.Marker
-            anchor={{ x: 0.5, y: 0.5 }}
+            anchor={{x: 0.5, y: 0.5}}
             flat={true}
             draggable
             coordinate={{
@@ -423,66 +465,104 @@ class ProfileStation extends Component {
           />
         </MapView>
 
-        <View style={{ position: 'absolute', top: 10, left: 10, right: 10, justifyContent: 'center', borderRadius: 10, paddingVertical: 10, backgroundColor: 'white' }}>
-          <View style={{ flexDirection: 'row' }}>
-            <Text numberOfLines={1} style={{ flex: 1, fontSize: 20, fontWeight: 'bold', textAlign: 'center' }}>Tiệm Xe {this.state.name}</Text>
-            <TouchableOpacity onPress={() => this.setState({ editMode: !this.state.editMode }, () => !this.state.editMode ? this.handleUpdateButton() : {})}>
+        <View
+          style={{
+            position: 'absolute',
+            top: 10,
+            left: 10,
+            right: 10,
+            justifyContent: 'center',
+            borderRadius: 10,
+            paddingVertical: 10,
+            backgroundColor: 'white',
+          }}>
+          <View style={{flexDirection: 'row'}}>
+            <Text
+              numberOfLines={1}
+              style={{
+                flex: 1,
+                fontSize: 20,
+                fontWeight: 'bold',
+                textAlign: 'center',
+              }}>
+              Tiệm Xe {this.state.name}
+            </Text>
+            <TouchableOpacity
+              onPress={() =>
+                this.setState({editMode: !this.state.editMode}, () =>
+                  !this.state.editMode ? this.handleUpdateButton() : {},
+                )
+              }>
               <Image
-                style={[styles.edit, { marginRight: 10 }]}
-                source={this.state.editMode ? require("../../assets/image/icon-done.png") : require("../../assets/image/icon-edit.png")}
+                style={[styles.edit, {marginRight: 10}]}
+                source={
+                  this.state.editMode
+                    ? require('../../assets/image/icon-done.png')
+                    : require('../../assets/image/icon-edit.png')
+                }
                 resizeMode={'contain'}
               />
             </TouchableOpacity>
           </View>
           <View>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Text numberOfLines={1} style={{ fontSize: 18, textAlign: 'left', marginLeft: 10 }}>- Địa chỉ: </Text>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <Text
+                numberOfLines={1}
+                style={{fontSize: 18, textAlign: 'left', marginLeft: 10}}>
+                - Địa chỉ:{' '}
+              </Text>
               <TextInput
                 editable={this.state.editMode}
-                style={{ flex: 1, fontSize: 18, color: 'black' }}
-                keyboardType={"default"}
+                style={{flex: 1, fontSize: 18, color: 'black'}}
+                keyboardType={'default'}
                 placeholder={'Vui lòng nhập địa chỉ...'}
                 onChangeText={text => this.onchangeText('address', text)}
                 value={this.state.address}
               />
             </View>
-            {
-              !isShowListSearch ? null :
-                (!searching && searchStarted && address.length > 10 && positions.length < 1)
-                  ?
-                  <Text style={{
-                    textAlign: "center",
-                    fontSize: 16,
-                    paddingVertical: 5
-                  }}>
-                    Không tìm thấy kết quả
-                </Text>
-                  :
-                  <FlatList
-                    data={positions}
-                    renderItem={({ item }) =>
-                      <ListItem
-                        title={item.formattedAddress.replace('Unnamed Road, ', '')}
-                        onPress={() => this.handlePlaceSelected(item)}
-                        bottomDivider
-                      />}
-                    keyExtractor={(item, index) => index}
-                    showsHorizontalScrollIndicator={false}
-                    showsVerticalScrollIndicator={false}
+            {!isShowListSearch ? null : !searching &&
+              searchStarted &&
+              address.length > 10 &&
+              positions.length < 1 ? (
+              <Text
+                style={{
+                  textAlign: 'center',
+                  fontSize: 16,
+                  paddingVertical: 5,
+                }}>
+                Không tìm thấy kết quả
+              </Text>
+            ) : (
+              <FlatList
+                data={positions}
+                renderItem={({item}) => (
+                  <ListItem
+                    title={item.formattedAddress.replace('Unnamed Road, ', '')}
+                    onPress={() => this.handlePlaceSelected(item)}
+                    bottomDivider
                   />
-            }
+                )}
+                keyExtractor={(item, index) => index}
+                showsHorizontalScrollIndicator={false}
+                showsVerticalScrollIndicator={false}
+              />
+            )}
             {this.state.emailError ? (
               <View style={styles.errorContent}>
                 <Icon name="ios-alert" style={styles.iconError} />
                 <Text style={styles.textError}>{this.state.emailError}</Text>
               </View>
             ) : null}
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Text numberOfLines={1} style={{ fontSize: 18, textAlign: 'left', marginLeft: 10 }}>- Số điện thoại: </Text>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <Text
+                numberOfLines={1}
+                style={{fontSize: 18, textAlign: 'left', marginLeft: 10}}>
+                - Số điện thoại:{' '}
+              </Text>
               <TextInput
                 editable={this.state.editMode}
-                style={{ flex: 1, fontSize: 18, color: 'black' }}
-                keyboardType={"numeric"}
+                style={{flex: 1, fontSize: 18, color: 'black'}}
+                keyboardType={'numeric'}
                 onChangeText={text => this.onchangeText('phone', text)}
                 value={this.state.phone}
               />
@@ -493,27 +573,52 @@ class ProfileStation extends Component {
                 <Text style={styles.textError}>{this.state.phoneError}</Text>
               </View>
             ) : null}
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Text numberOfLines={1} style={{ fontSize: 18, textAlign: 'left', marginLeft: 10 }}>- Cứu hộ xe: </Text>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <Text
+                numberOfLines={1}
+                style={{fontSize: 18, textAlign: 'left', marginLeft: 10}}>
+                - Cứu hộ xe:{' '}
+              </Text>
               <CheckBox
                 disabled={!this.state.editMode}
                 value={this.state.hasAmbulatory}
-                onValueChange={(newValue) => this.setState({ hasAmbulatory: newValue })}
+                onValueChange={newValue =>
+                  this.setState({hasAmbulatory: newValue})
+                }
               />
             </View>
           </View>
         </View>
 
-        <View style={{ position: 'absolute', bottom: 10, left: 10, right: 10, justifyContent: 'center', borderRadius: 10, paddingVertical: 10, backgroundColor: 'white' }}>
-          <Text numberOfLines={1} style={{ fontSize: 18, textAlign: 'left', marginLeft: 10, marginTop: 5 }}>Bảng giá dịch vụ: </Text>
+        <View
+          style={{
+            position: 'absolute',
+            bottom: 10,
+            left: 10,
+            right: 10,
+            justifyContent: 'center',
+            borderRadius: 10,
+            paddingVertical: 10,
+            backgroundColor: 'white',
+          }}>
+          <Text
+            numberOfLines={1}
+            style={{
+              fontSize: 18,
+              textAlign: 'left',
+              marginLeft: 10,
+              marginTop: 5,
+            }}>
+            Bảng giá dịch vụ:{' '}
+          </Text>
           <FlatList
             scrollEnabled={true}
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={false}
             nestedScrollEnabled={true}
-            style={{ height: 200 }}
+            style={{height: 200}}
             data={this.state.services}
-            renderItem={({ item, index }) => (
+            renderItem={({item, index}) => (
               <View
                 style={{
                   flexDirection: 'row',
@@ -534,27 +639,28 @@ class ProfileStation extends Component {
                     flexDirection: 'row',
                     marginHorizontal: 5,
                   }}>
-                  <View style={{
-                    flex: 1,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                  }}>
+                  <View
+                    style={{
+                      flex: 1,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                    }}>
                     <TextInput
                       editable={false}
-                      style={{ fontSize: 16, fontWeight: 'bold', color: 'black', }}
-                      keyboardType={"default"}
+                      style={{fontSize: 16, fontWeight: 'bold', color: 'black'}}
+                      keyboardType={'default'}
                       value={`${item.name}`}
                     />
-                    <Text style={{ fontSize: 16, color: 'black' }}>: </Text>
+                    <Text style={{fontSize: 16, color: 'black'}}>: </Text>
                     <TextInput
                       editable={false}
-                      style={{ fontSize: 16, color: 'black' }}
-                      keyboardType={"numeric"}
+                      style={{fontSize: 16, color: 'black'}}
+                      keyboardType={'numeric'}
                       value={`${item.price}`}
                     />
                     <TextInput
                       editable={false}
-                      style={{ fontSize: 12, color: 'black' }}
+                      style={{fontSize: 12, color: 'black'}}
                       value={` (VNĐ)`}
                     />
                   </View>
@@ -573,7 +679,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  edit: { width: 20, height: 20 },
+  edit: {width: 20, height: 20},
   errorContent: {
     flexDirection: 'row',
     alignItems: 'center',

@@ -1,4 +1,4 @@
-import { put, takeLatest, call, all, take } from 'redux-saga/effects';
+import {put, takeLatest, call, all, take} from 'redux-saga/effects';
 import * as typesAction from './actions/typesAction';
 import * as stationAction from './actions/actions';
 import {
@@ -7,8 +7,8 @@ import {
   showModalNavigation,
 } from '../../navigation/function';
 
-import { Navigation } from 'react-native-navigation';
-import { AsyncStorage } from 'react-native';
+import {Navigation} from 'react-native-navigation';
+import {AsyncStorage} from 'react-native';
 import {
   registerStationApi,
   getStationByIdApi,
@@ -66,6 +66,7 @@ function* changePower(actions) {
       actions.stationId,
       {
         isAvailable: actions.isOn,
+        hasAmbulatory: actions.hasAmbulatory
       },
       token,
     );
@@ -88,8 +89,9 @@ function* changeStationById(actions) {
         latitude: actions.data.latitude,
         longitude: actions.data.longitude,
         hasAmbulatory: actions.data.hasAmbulatory,
-        owner: { name: actions.data.owner.name, phoneNumber: actions.data.phone },
+        owner: {name: actions.data.owner.name, phoneNumber: actions.data.phone},
         services: actions.data.services,
+        isAvailable: actions.data.isAvailable,
       },
       token,
     );
