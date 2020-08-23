@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View, StyleSheet, Dimensions, ActivityIndicator} from 'react-native';
+import {View, StyleSheet, Dimensions, ActivityIndicator, PermissionsAndroid} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {Navigation} from 'react-native-navigation';
 import {connect} from 'react-redux';
@@ -17,6 +17,19 @@ const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 class SplashScreen extends Component {
   constructor(props) {
     super(props);
+    this.checkLocationPermission();
+  }
+
+  checkLocationPermission = async () => {
+    let locationPermission = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION)
+    if (!locationPermission) {
+      locationPermission = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION)
+      if (locationPermission !== 'granted') {
+        Navigator.showOverlay({ message: 'Để ứng dụng biết được vị trí chính xác, vui lòng cho phép ứng dụng truy cập vị trí của bạn' })
+        return false
+      }
+    }
+    return true
   }
   
   async componentDidMount() {

@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import {
   Text,
   View,
-  PermissionsAndroid,
   StyleSheet,
   TouchableOpacity,
   AsyncStorage,
@@ -52,17 +51,6 @@ class Login extends Component {
   focusNextField(nextField) {
     this[nextField].focus();
   }
-  checkLocationPermission = async () => {
-    let locationPermission = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION)
-    if (!locationPermission) {
-      locationPermission = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION)
-      if (locationPermission !== 'granted') {
-        Navigator.showOverlay({ message: 'Để ứng dụng biết được vị trí chính xác, vui lòng cho phép ứng dụng truy cập vị trí của bạn' })
-        return false
-      }
-    }
-    return true
-  }
   login = async () => {
     const {
       phone,
@@ -78,7 +66,6 @@ class Login extends Component {
         password: password,
       };
       this.props.login(user, tokenDevice);
-      this.checkLocationPermission();
     } else {
       if (!phone) this.onchangeText('phoneError', 'Nhập số điện thoại');
       else this.onchangeText('phoneError', '');
