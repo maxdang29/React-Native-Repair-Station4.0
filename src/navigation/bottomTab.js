@@ -6,16 +6,15 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 async function prepareIcons() {
   const icons = await Promise.all([
-      Icon.getImageSource('home', 25),
-      Ionicons.getImageSource('layers', 25),
-      Ionicons.getImageSource('ios-construct', 25),
-      Ionicons.getImageSource('notifications', 25),
+    Icon.getImageSource('home', 25),
+    Ionicons.getImageSource('layers', 25),
+    Ionicons.getImageSource('ios-construct', 25),
+    Ionicons.getImageSource('notifications', 25),
   ]);
 
-  const [ homeIcon, orderIcon, serviceIcon, notifyIcon ] = icons;
-  return { homeIcon, orderIcon, serviceIcon, notifyIcon};
+  const [homeIcon, orderIcon, serviceIcon, notifyIcon] = icons;
+  return {homeIcon, orderIcon, serviceIcon, notifyIcon};
 }
-
 
 export default async function startApp() {
   const icons = await prepareIcons();
@@ -51,6 +50,7 @@ export default async function startApp() {
                       selectedIconColor: '#FFFFFF',
                       selectedTextColor: '#FFFFFF',
                       iconColor: '#FFFFFF',
+                      textColor: '#FFFFFF',
                     },
                   },
                 },
@@ -75,6 +75,7 @@ export default async function startApp() {
                       selectedIconColor: '#FFFFFF',
                       selectedTextColor: '#FFFFFF',
                       iconColor: '#FFFFFF',
+                      textColor: '#FFFFFF',
                     },
                   },
                 },
@@ -98,6 +99,7 @@ export default async function startApp() {
                       selectedIconColor: '#FFFFFF',
                       selectedTextColor: '#FFFFFF',
                       iconColor: '#FFFFFF',
+                      textColor: '#FFFFFF',
                     },
                   },
                 },
@@ -121,6 +123,7 @@ export default async function startApp() {
                       selectedIconColor: '#FFFFFF',
                       selectedTextColor: '#FFFFFF',
                       iconColor: '#FFFFFF',
+                      textColor: '#FFFFFF',
                     },
                   },
                 },

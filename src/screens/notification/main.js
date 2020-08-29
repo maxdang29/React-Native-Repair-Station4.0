@@ -18,7 +18,9 @@ import {ORDER_TRACKING} from '../../constants/typesNotify';
 import {format} from 'date-fns';
 import {el} from 'date-fns/locale';
 import * as notificationAction from '../../redux/notification/actions/actions';
-const initialLayout = {width: Dimensions.get('window').width};
+import LinearGradient from 'react-native-linear-gradient';
+const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
+import {APP_COLOR} from '../../utils/colors';
 class Notification extends Component {
   constructor(props) {
     super(props);
@@ -53,7 +55,12 @@ class Notification extends Component {
     const {notifications} = this.props;
     const {isFetching} = this.state;
     return (
-      <>
+      <LinearGradient
+        colors={['#c2d7ff', '#cde7f9', '#ffffff']}
+        style={{
+          backgroundColor: APP_COLOR,
+          height: SCREEN_HEIGHT,
+        }}>
         <Card
           containerStyle={{
             flex: 1,
@@ -67,6 +74,7 @@ class Notification extends Component {
               style={{height: '90%'}}
               renderItem={({item}) => (
                 <ListItem
+                  style={styles.listItem}
                   title={item.title}
                   subtitle={`${item.body}\n\n${format(
                     new Date(item.createdOn),
@@ -97,7 +105,7 @@ class Notification extends Component {
             </View>
           )}
         </Card>
-      </>
+      </LinearGradient>
     );
   }
 }
@@ -112,6 +120,10 @@ const styles = StyleSheet.create({
     marginVertical: 15,
     fontSize: 25,
     fontWeight: 'bold',
+  },
+  listItem: {
+    marginVertical: 5,
+    backgroundColor: 'transparent',
   },
 });
 const mapStateToProps = store => {

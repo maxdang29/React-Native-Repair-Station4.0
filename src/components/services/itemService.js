@@ -29,7 +29,10 @@ export default class ItemService extends Component {
                 <Text>{item.price} VND</Text>
               </View>
               <View>
-                <Icon style={styles.icon} name="ios-car" size={33} />
+                <Image
+                  source={require('../../assets/image/icon-motor.png')}
+                  style={{width: 35, height: 35}}
+                />
               </View>
             </View>
           </TouchableOpacity>

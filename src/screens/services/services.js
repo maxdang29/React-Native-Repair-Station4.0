@@ -66,6 +66,7 @@ class Service extends Component {
             </View>
           </View>
           <View style={styles.content}>
+            <Text style={styles.title}>Dịch vụ</Text>
             <FlatList
               data={data}
               renderItem={({item}) => <ItemService item={item} />}
@@ -120,9 +121,6 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 50,
     padding: 3,
   },
-  content: {
-    marginTop: 20,
-  },
   containerButton: {
     position: 'absolute',
     justifyContent: 'center',
@@ -142,6 +140,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  title: {
+    marginHorizontal: 15,
+    marginVertical: 10,
+    fontSize: 25,
+    fontWeight: 'bold',
   },
 });
 const mapStateToProps = store => {

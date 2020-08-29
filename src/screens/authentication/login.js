@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import {
   Text,
   View,
@@ -10,10 +10,10 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import InputText from '../../components/textInput';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 import Icon from 'react-native-vector-icons/Ionicons';
 import * as authenticationAction from '../../redux/authentication/actions/actions';
-import {showModalNavigation, setRoot} from '../../navigation/function';
+import { showModalNavigation, setRoot } from '../../navigation/function';
 import messaging from '@react-native-firebase/messaging';
 class Login extends Component {
   constructor(props) {
@@ -38,7 +38,7 @@ class Login extends Component {
   }
 
   componentDidUpdate() {
-    const {onLogin} = this.props;
+    const { onLogin } = this.props;
     if (onLogin) {
       setRoot('splashScreen');
     }
@@ -59,7 +59,7 @@ class Login extends Component {
       passwordError,
       tokenDevice,
     } = this.state;
-    const {allStation} = this.props;
+    const { allStation } = this.props;
     if (phone && password) {
       const user = {
         phoneNumber: phone,
@@ -74,8 +74,8 @@ class Login extends Component {
     }
   };
   render() {
-    const {phoneError, passwordError, message} = this.state;
-    const {error, loading} = this.props;
+    const { phoneError, passwordError, message } = this.state;
+    const { error, loading } = this.props;
     return (
       <ScrollView>
         <View style={styles.container}>
@@ -115,13 +115,13 @@ class Login extends Component {
               <Text style={styles.text}>Đăng Kí</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.button, {backgroundColor: '#00a7e7'}]}
+              style={[styles.button, { backgroundColor: '#00a7e7' }]}
               onPress={() => this.login()}>
               {loading ? (
                 <ActivityIndicator size="small" />
               ) : (
-                <Text style={{color: 'white'}}>Đăng nhập</Text>
-              )}
+                  <Text style={{ color: 'white' }}>Đăng nhập</Text>
+                )}
             </TouchableOpacity>
           </View>
           <Text style={styles.text}>Quên mật khẩu?</Text>

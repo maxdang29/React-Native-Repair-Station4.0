@@ -5,6 +5,8 @@ import {
   Dimensions,
   ActivityIndicator,
   Text,
+  PermissionsAndroid,
+  Image,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {Navigation} from 'react-native-navigation';
@@ -24,7 +26,27 @@ const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 class SplashScreen extends Component {
   constructor(props) {
     super(props);
+    this.checkLocationPermission();
   }
+
+  checkLocationPermission = async () => {
+    let locationPermission = await PermissionsAndroid.check(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+    );
+    if (!locationPermission) {
+      locationPermission = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      );
+      if (locationPermission !== 'granted') {
+        Navigator.showOverlay({
+          message:
+            'Để ứng dụng biết được vị trí chính xác, vui lòng cho phép ứng dụng truy cập vị trí của bạn',
+        });
+        return false;
+      }
+    }
+    return true;
+  };
 
   async componentDidMount() {
     const currentTime = new Date();
@@ -115,7 +137,10 @@ class SplashScreen extends Component {
       <LinearGradient
         colors={['#c2d7ff', '#cde7f9', '#ffffff']}
         style={styles.container}>
-        <ActivityIndicator size="large" />
+        <Image
+          source={require('../assets/image/logo.png')}
+          style={[{width: 120, height: 120}]}
+        />
         <Text style={{textAlign: 'center', marginTop: 10}}>
           Đang tải thông tin ...
         </Text>
@@ -128,6 +153,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignContent: 'center',
+    alignItems: 'center',
   },
 });
 const mapStateToProps = store => {
