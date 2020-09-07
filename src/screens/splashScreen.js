@@ -1,5 +1,13 @@
 import React, {Component} from 'react';
-import {View, StyleSheet, Dimensions, ActivityIndicator, PermissionsAndroid} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Dimensions,
+  ActivityIndicator,
+  Text,
+  PermissionsAndroid,
+  Image,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {Navigation} from 'react-native-navigation';
 import {connect} from 'react-redux';
@@ -12,6 +20,7 @@ import {localNotificationService} from '../config/notification/LocalNotification
 import * as orderAction from '../redux/order/actions/actions';
 import * as notificationAction from '../redux/notification/actions/actions';
 import {setRoot} from '../navigation/function';
+import LinearGradient from 'react-native-linear-gradient';
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 
 class SplashScreen extends Component {
@@ -21,21 +30,30 @@ class SplashScreen extends Component {
   }
 
   checkLocationPermission = async () => {
-    let locationPermission = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION)
+    let locationPermission = await PermissionsAndroid.check(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+    );
     if (!locationPermission) {
-      locationPermission = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION)
+      locationPermission = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      );
       if (locationPermission !== 'granted') {
-        Navigator.showOverlay({ message: 'Để ứng dụng biết được vị trí chính xác, vui lòng cho phép ứng dụng truy cập vị trí của bạn' })
-        return false
+        Navigator.showOverlay({
+          message:
+            'Để ứng dụng biết được vị trí chính xác, vui lòng cho phép ứng dụng truy cập vị trí của bạn',
+        });
+        return false;
       }
     }
-    return true
-  }
-  
+    return true;
+  };
+
   async componentDidMount() {
     const currentTime = new Date();
-    const dateFrom = `${ currentTime.getFullYear()}-${ currentTime.getMonth()+1}-01`;
-    const dateTo = `${ currentTime.getFullYear()}-${ currentTime.getMonth()+2}-01`;
+    const dateFrom = `${currentTime.getFullYear()}-${currentTime.getMonth() +
+      1}-01`;
+    const dateTo = `${currentTime.getFullYear()}-${currentTime.getMonth() +
+      2}-01`;
     const {notificationPageIndex} = this.props;
     await this.props.getMyAccount();
     await this.props.getMyStation();
@@ -54,8 +72,10 @@ class SplashScreen extends Component {
     const {allStation, stationInformation} = this.props;
     if (allStation.length) {
       const currentTime = new Date();
-      const dateFrom = `${ currentTime.getFullYear()}-${ currentTime.getMonth()+1}-01`;
-      const dateTo = `${ currentTime.getFullYear()}-${ currentTime.getMonth()+2}-01`;
+      const dateFrom = `${currentTime.getFullYear()}-${currentTime.getMonth() +
+        1}-01`;
+      const dateTo = `${currentTime.getFullYear()}-${currentTime.getMonth() +
+        2}-01`;
       let firstStationId = allStation[0].id;
       await AsyncStorage.setItem('stationId', firstStationId);
       await this.props.getStationById(firstStationId);
@@ -63,8 +83,8 @@ class SplashScreen extends Component {
       this.props.getAllOrder(firstStationId, 1, dateFrom, dateTo);
       this.props.getOrdersCurrentMonth(firstStationId, 1, dateFrom, dateTo);
 
-      const yearFrom = `${ currentTime.getFullYear()}-1`;
-      const yearTo = `${ currentTime.getFullYear()}-12`;
+      const yearFrom = `${currentTime.getFullYear()}-1`;
+      const yearTo = `${currentTime.getFullYear()}-12`;
       this.props.getAllOrderRevenue(firstStationId, 1, yearFrom, yearTo);
     }
     if (stationInformation) {
@@ -92,25 +112,39 @@ class SplashScreen extends Component {
 
   onOpenNotification = async data => {
     const currentTime = new Date();
-    const dateFrom = `${ currentTime.getFullYear()}-${ currentTime.getMonth()+1}-01`;
-    const dateTo = `${ currentTime.getFullYear()}-${ currentTime.getMonth()+2}-01`;
+    const dateFrom = `${currentTime.getFullYear()}-${currentTime.getMonth() +
+      1}-01`;
+    const dateTo = `${currentTime.getFullYear()}-${currentTime.getMonth() +
+      2}-01`;
 
     const notifyId = data?.id;
-    
+
     if (notifyId) {
       console.log('SplashScreen -> onOpenNotification -> notifyId', notifyId);
       const stationId = await AsyncStorage.getItem('stationId');
       this.props.getAllOrder(stationId, 1, dateFrom, dateTo);
       this.props.getOrdersCurrentMonth(stationId, 1, dateFrom, dateTo);
       this.props.getNotifications();
+
+      const yearFrom = `${currentTime.getFullYear()}-1`;
+      const yearTo = `${currentTime.getFullYear()}-12`;
+      this.props.getAllOrderRevenue(stationId, 1, yearFrom, yearTo);
     }
   };
   // END NOTIFICATION SETUP
   render() {
     return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" />
-      </View>
+      <LinearGradient
+        colors={['#c2d7ff', '#cde7f9', '#ffffff']}
+        style={styles.container}>
+        <Image
+          source={require('../assets/image/logo.png')}
+          style={[{width: 120, height: 120}]}
+        />
+        <Text style={{textAlign: 'center', marginTop: 10}}>
+          Đang tải thông tin ...
+        </Text>
+      </LinearGradient>
     );
   }
 }
@@ -119,6 +153,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignContent: 'center',
+    alignItems: 'center',
   },
 });
 const mapStateToProps = store => {
@@ -150,10 +185,19 @@ const mapDispatchToProps = dispatch => {
       dispatch(notificationAction.getAllNotification(pageIndex));
     },
     getAllOrderRevenue: (stationId, pageIndex, dateFrom, dateTo) => {
-      dispatch(orderAction.getAllOrderRevenue(stationId, pageIndex, dateFrom, dateTo));
+      dispatch(
+        orderAction.getAllOrderRevenue(stationId, pageIndex, dateFrom, dateTo),
+      );
     },
     getOrdersCurrentMonth: (stationId, pageIndex, dateFrom, dateTo) => {
-      dispatch(orderAction.getOrdersCurrentMonth(stationId, pageIndex, dateFrom, dateTo));
+      dispatch(
+        orderAction.getOrdersCurrentMonth(
+          stationId,
+          pageIndex,
+          dateFrom,
+          dateTo,
+        ),
+      );
     },
   };
 };

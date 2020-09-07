@@ -35,7 +35,11 @@ class HomeFixer extends Component {
     super(props);
   }
   changeToggleSwitch = async isOn => {
-    await this.props.changePower(this.props.stationInformation.id, isOn);
+    await this.props.changePower(
+      this.props.stationInformation.id,
+      isOn,
+      this.props.stationInformation.hasAmbulatory,
+    );
   };
   async componentDidUpdate() {
     const {isChangePower, changeStatusOrder} = this.props;
@@ -44,10 +48,12 @@ class HomeFixer extends Component {
     if (isChangePower) {
       this.props.getStationById(stationId);
     }
-    if(changeStatusOrder){
+    if (changeStatusOrder) {
       const currentTime = new Date();
-      const dateFrom = `${ currentTime.getFullYear()}-${ currentTime.getMonth()+1}-01`;
-      const dateTo = `${ currentTime.getFullYear()}-${ currentTime.getMonth()+2}-01`;
+      const dateFrom = `${currentTime.getFullYear()}-${currentTime.getMonth() +
+        1}-01`;
+      const dateTo = `${currentTime.getFullYear()}-${currentTime.getMonth() +
+        2}-01`;
       this.props.getAllOrder(stationId, 1, dateFrom, dateTo);
       this.props.getOrdersCurrentMonth(stationId, 1, dateFrom, dateTo);
     }
@@ -137,12 +143,20 @@ class HomeFixer extends Component {
   };
 
   render() {
-    const {stationInformation, isChangePower, ordersCurrentMonth, dataOrders} = this.props;
-    const totalAcceptedOrder = this.filterStatusOrder(dataOrders, ACCEPTED).length;
+    const {
+      stationInformation,
+      isChangePower,
+      ordersCurrentMonth,
+      dataOrders,
+    } = this.props;
+    const totalAcceptedOrder = this.filterStatusOrder(dataOrders, ACCEPTED)
+      .length;
     const totalOrder = ordersCurrentMonth.length;
     const rateSuccess =
       totalOrder !== 0
-        ? (this.filterStatusOrder(ordersCurrentMonth, DONE).length / totalOrder) * 100
+        ? (this.filterStatusOrder(ordersCurrentMonth, DONE).length /
+            totalOrder) *
+          100
         : 0;
     const revenueMonth = this.revenueOnMonth();
     const chartData = this.getSevenOrderLast();
@@ -289,7 +303,7 @@ class HomeFixer extends Component {
                     'revenueStatistics',
                     null,
                     'Thống kê doanh thu 1 năm',
-                    true
+                    true,
                   );
                 }}>
                 <Image
@@ -363,7 +377,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 20,
     width: 170,
-    margin: 10,
+    marginVertical: 10,
   },
   textNumber: {
     textAlign: 'center',
@@ -410,7 +424,7 @@ const mapStateToProps = store => {
     isChangePower: store.StationReducers.changePower,
     dataOrders: store.OrderReducers.dataOrder,
     ordersCurrentMonth: store.OrderReducers.ordersCurrentMonth,
-    changeStatusOrder: store.OrderReducers.changeStatusOrder
+    changeStatusOrder: store.OrderReducers.changeStatusOrder,
   };
 };
 const mapDispatchToProps = dispatch => {
@@ -418,8 +432,8 @@ const mapDispatchToProps = dispatch => {
     getMyAccount: () => {
       dispatch(authenticationAction.getMyAccount());
     },
-    changePower: (stationId, isOn) => {
-      dispatch(stationAction.changePower(stationId, isOn));
+    changePower: (stationId, isOn, hasAmbulatory) => {
+      dispatch(stationAction.changePower(stationId, isOn, hasAmbulatory));
     },
     getMyStation: () => {
       dispatch(stationAction.getMyStation());

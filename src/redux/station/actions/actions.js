@@ -57,11 +57,12 @@ export const getMyStationFailed = () => {
 };
 //CHANGE POWER
 
-export const changePower = (stationId, isOn) => {
+export const changePower = (stationId, isOn, hasAmbulatory) => {
   return {
     type: typesAction.CHANGE_POWER,
     stationId,
     isOn,
+    hasAmbulatory
   };
 };
 
