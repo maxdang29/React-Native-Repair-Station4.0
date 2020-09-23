@@ -29,8 +29,8 @@ function* getAllOrder(actions) {
       actions.stationId,
       token,
       actions.pageIndex,
-      actions.dateFrom, 
-      actions.dateTo
+      actions.dateFrom,
+      actions.dateTo,
     );
     sortByDate(response.data.sources);
 
@@ -67,8 +67,8 @@ function* getOrdersCurrentMonth(actions) {
       actions.stationId,
       token,
       actions.pageIndex,
-      actions.dateFrom, 
-      actions.dateTo
+      actions.dateFrom,
+      actions.dateTo,
     );
     sortByDate(response.data.sources);
     orders = response.data.sources;
@@ -77,7 +77,6 @@ function* getOrdersCurrentMonth(actions) {
     console.log('error getOrdersCurrentMonth', JSON.stringify(error, null, 4));
   }
 }
-
 
 function* getOrderById(actions) {
   try {
@@ -194,7 +193,7 @@ function* getAllOrderRevenue(actions) {
       actions.stationId,
       token,
       actions.pageIndex,
-      actions.dateFrom, 
+      actions.dateFrom,
       actions.dateTo,
     );
     // sortByDate(response.data.sources);

@@ -10,6 +10,7 @@ import {
   ScrollView,
   Dimensions,
   ActivityIndicator,
+  Linking,
 } from 'react-native';
 import {Navigation} from 'react-native-navigation';
 
@@ -59,10 +60,37 @@ class OrderDetail extends Component {
     this.setState({modalVisible: visible});
   }
   componentDidUpdate = async () => {
-    // const {loading, value} = this.props;
-    // if (loading) {
-    //   this.props.getOrderById(value.id);
-    // }
+    const {orderCurrent} = this.props;
+
+    if (orderCurrent.useAmbulatory) {
+      this.updateRightButton();
+    }
+  };
+  navigationButtonPressed({buttonId}) {
+    const {orderCurrent, componentId} = this.props;
+    if (buttonId === 'btnDirection') {
+      Linking.openURL(
+        `google.navigation:q=${orderCurrent?.latitude},${orderCurrent?.longitude}`,
+      );
+    }
+    if (buttonId === 'back') {
+      Navigation.dismissModal(componentId);
+    }
+  }
+
+  updateRightButton = () => {
+    const options = {
+      topBar: {
+        rightButtons: [
+          {
+            id: 'btnDirection',
+            icon: require('../../assets/image/direction.jpg'),
+            color: ERROR_COLOR,
+          },
+        ],
+      },
+    };
+    Navigation.mergeOptions(this.props.componentId, options);
   };
   cancelOrder = orderId => {
     alertConfirm(
@@ -145,7 +173,6 @@ class OrderDetail extends Component {
     const {value, dataOrders} = this.props;
     return dataOrders.find(order => order.id === value.id);
   };
-
 
   render() {
     const {listService, value, loading, orderCurrent} = this.props;

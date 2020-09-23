@@ -1,11 +1,5 @@
 import React, {Component} from 'react';
-import {
-  Text,
-  View,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-} from 'react-native';
+import {Text, View, StyleSheet, Image, TouchableOpacity} from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
 import {showModalNavigation} from '../../navigation/function';
 export default class CheckBoxItem extends Component {
@@ -48,15 +42,17 @@ export default class CheckBoxItem extends Component {
               borderBottomColor: 'gray',
               marginVertical: 10,
             }}>
-            <Text style={{marginTop: 5, width: '50%'}}>
-              {item.name}
+            <Text style={{marginTop: 5, width: '50%'}}>{item.name}</Text>
+            <Text style={{marginTop: 5, width: '30%'}}>
+              {' '}
+              {item.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') +
+                ' vnd'}
             </Text>
-            <Text style={{marginTop: 5, width: '30%'}}> {item.price} vnd</Text>
 
             <CheckBox
               value={this.state.checked}
               onValueChange={() => this.onValueChange(item)}
-              style={{ width: '10%'}}
+              style={{width: '10%'}}
             />
           </View>
         </TouchableOpacity>
@@ -64,4 +60,3 @@ export default class CheckBoxItem extends Component {
     );
   }
 }
-

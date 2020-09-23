@@ -86,6 +86,18 @@ class RevenueStatistics extends Component {
     }
     return {labels: labels, values: values};
   };
+  showDataPointChart = (value, labels) => {
+    console.log('ddddd', value.index);
+    Alert.alert(
+      'Doanh thu',
+      `Tổng doanh thu trong tháng ${
+        labels[value.index]
+      }: ${value.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') +
+        ' vnd'}`,
+      [{text: 'OK', onPress: () => console.log('OK Pressed')}],
+      {cancelable: false},
+    );
+  };
 
   render() {
     const {orderRevenue} = this.props;
@@ -144,6 +156,9 @@ class RevenueStatistics extends Component {
               style={{
                 marginVertical: 15,
                 borderRadius: 16,
+              }}
+              onDataPointClick={value => {
+                this.showDataPointChart(value, dataChart.labels);
               }}
             />
           </LinearGradient>

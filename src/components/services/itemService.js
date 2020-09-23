@@ -26,7 +26,10 @@ export default class ItemService extends Component {
               }}>
               <View>
                 <Text style={styles.text}>{item.name}</Text>
-                <Text>{item.price} VND</Text>
+                <Text>
+                  {item.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') +
+                    ' vnd'}
+                </Text>
               </View>
               <View>
                 <Image

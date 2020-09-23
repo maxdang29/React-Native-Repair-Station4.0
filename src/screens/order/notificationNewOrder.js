@@ -146,8 +146,7 @@ class NotificationNewOrder extends Component {
                   <Text style={styles.highlight}>Thời gian</Text>
                 </View>
                 <Text style={{paddingLeft: 30}}>
-                  {' '}
-                  {format(new Date(value[0].createdOn), 'dd-MM-yyyy H:mma')}
+                  {format(new Date(value[0].createdOn), 'dd-MM-yyyy H:mm')}
                 </Text>
               </View>
 
@@ -170,7 +169,11 @@ class NotificationNewOrder extends Component {
                             {justifyContent: 'space-between'},
                           ]}>
                           <Text style={{paddingLeft: 30}}>{element.name}</Text>
-                          <Text>{element.price} vnd</Text>
+                          <Text>
+                            {element.price
+                              .toString()
+                              .replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' vnd'}
+                          </Text>
                         </View>
                       );
                     })
@@ -181,7 +184,9 @@ class NotificationNewOrder extends Component {
                     marginVertical: 10,
                     color: ERROR_COLOR,
                   }}>
-                  {value[0].totalPrice} vnd
+                  {value[0].totalPrice
+                    .toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' vnd'}
                 </Text>
               </View>
 

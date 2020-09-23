@@ -102,7 +102,6 @@ class HomeFixer extends Component {
       labels.push(newDate);
       countDate++;
     }
-
     doneOrder.forEach(order => {
       let date = format(new Date(order.createdOn), 'dd-MM');
       let totalPrice = order.totalPrice;
@@ -111,13 +110,21 @@ class HomeFixer extends Component {
         return label === date;
       });
       if (index !== -1) {
-        values[index] = totalPrice;
+        if (typeof values[index] === 'number') {
+          values[index] += totalPrice;
+        } else {
+          values[index] = totalPrice;
+        }
       }
     });
     for (let index = 0; index < labels.length; index++) {
       const element = values[index];
       if (element === undefined) {
         values[index] = 0;
+      } else {
+        values[index] = values[index]
+          .toString()
+          .replace(/\B(?=(\d{3})+(?!\d))/g, '.');
       }
     }
     return {labels: labels.reverse(), values: values.reverse()};
@@ -165,204 +172,206 @@ class HomeFixer extends Component {
     const today = new Date();
     const date = today.getDate() + '/' + today.getMonth();
     return (
-      <View style={styles.container}>
-        <LinearGradient
-          colors={['#c2d7ff', '#cde7f9', '#ffffff']}
-          style={{
-            backgroundColor: APP_COLOR,
-            paddingVertical: 15,
-            paddingHorizontal: 15,
-            height: SCREEN_HEIGHT,
-          }}>
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <TouchableOpacity
-              onPress={() => {
-                this.openSideBar();
-              }}>
-              <Icon type="feather" name="align-left" size={30} />
-            </TouchableOpacity>
-            {isChangePower ? (
-              <ActivityIndicator size="small" />
-            ) : (
-              <ToggleSwitch
-                isOn={stationInformation.isAvailable}
-                onColor="#4dc2ff"
-                offColor="red"
-                size="medium"
-                onToggle={isOn => this.changeToggleSwitch(isOn)}
-              />
-            )}
-          </View>
-
-          <LineChart
-            data={{
-              labels: labels.length > 0 ? labels : [date],
-              datasets: [
-                {
-                  data: value.length > 0 ? value : [0],
-                },
-              ],
-            }}
-            width={SCREEN_WIDTH - 30}
-            height={220}
-            yAxisLabel=""
-            yAxisSuffix=""
-            yAxisInterval={1}
-            chartConfig={{
-              backgroundColor: '#ffffff',
-              backgroundGradientFrom: '#c2d7ff',
-              backgroundGradientTo: '#cde7f9',
-              backgroundGradientFromOpacity: 1,
-              decimalPlaces: 0,
-              color: (opacity = 1) => `rgba(54, 72, 100, ${opacity})`,
-              labelColor: (opacity = 1) => `rgba(56, 75, 196, ${opacity})`,
-              style: {
-                borderRadius: 16,
-              },
-              propsForDots: {
-                r: '3',
-                strokeWidth: '2',
-              },
-              propsForBackgroundLines: {
-                strokeDasharray: 1,
-              },
-            }}
-            bezier
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={[styles.container]}>
+          <LinearGradient
+            colors={['#c2d7ff', '#cde7f9', '#ffffff']}
             style={{
-              marginVertical: 15,
-              borderRadius: 16,
-            }}
-            onDataPointClick={value => {
-              this.showDataPointChart(value, labels);
-            }}
-          />
-          {totalAcceptedOrder > 0 ? (
-            <TouchableOpacity
-              style={{
-                width: SCREEN_WIDTH - 30,
-                padding: 20,
-              }}
-              onPress={() => {
-                this.gotoOrderTab();
-              }}>
-              <View
-                style={{
-                  height: 100,
-                  backgroundColor: '#d5a4f8',
-                  borderRadius: 30,
-                  padding: 15,
+              backgroundColor: APP_COLOR,
+              paddingVertical: 15,
+              paddingHorizontal: 15,
+            }}>
+            <View
+              style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              <TouchableOpacity
+                onPress={() => {
+                  this.openSideBar();
                 }}>
-                <Text
-                  style={{color: 'white', fontWeight: 'bold', fontSize: 17}}>
-                  Thông báo
-                </Text>
+                <Icon type="feather" name="align-left" size={30} />
+              </TouchableOpacity>
+              {isChangePower ? (
+                <ActivityIndicator size="small" />
+              ) : (
+                <ToggleSwitch
+                  isOn={stationInformation.isAvailable}
+                  onColor="#4dc2ff"
+                  offColor="red"
+                  size="medium"
+                  onToggle={isOn => this.changeToggleSwitch(isOn)}
+                />
+              )}
+            </View>
+
+            <LineChart
+              data={{
+                labels: labels.length > 0 ? labels : [date],
+                datasets: [
+                  {
+                    data: value.length > 0 ? value : [0],
+                  },
+                ],
+              }}
+              width={SCREEN_WIDTH - 30}
+              height={220}
+              yAxisLabel=""
+              yAxisSuffix=""
+              yAxisInterval={1}
+              chartConfig={{
+                backgroundColor: '#ffffff',
+                backgroundGradientFrom: '#c2d7ff',
+                backgroundGradientTo: '#cde7f9',
+                backgroundGradientFromOpacity: 1,
+                // decimalPlaces: 0,
+                color: (opacity = 1) => `rgba(54, 72, 100, ${opacity})`,
+                labelColor: (opacity = 1) => `rgba(56, 75, 196, ${opacity})`,
+                style: {
+                  borderRadius: 16,
+                },
+                propsForDots: {
+                  r: '3',
+                  strokeWidth: '2',
+                },
+                propsForBackgroundLines: {
+                  strokeDasharray: 1,
+                },
+              }}
+              bezier
+              style={{
+                marginVertical: 15,
+                borderRadius: 16,
+              }}
+              onDataPointClick={value => {
+                this.showDataPointChart(value, labels);
+              }}
+            />
+            {totalAcceptedOrder > 0 ? (
+              <TouchableOpacity
+                style={{
+                  width: SCREEN_WIDTH - 30,
+                  padding: 20,
+                }}
+                onPress={() => {
+                  this.gotoOrderTab();
+                }}>
                 <View
                   style={{
-                    flexDirection: 'row',
-                    marginLeft: 30,
-                    marginTop: 5,
-                    alignItems: 'center',
+                    height: 100,
+                    backgroundColor: '#d5a4f8',
+                    borderRadius: 30,
+                    padding: 15,
                   }}>
-                  <Icon
-                    type="foundation"
-                    name="megaphone"
-                    size={25}
-                    color="#ffba1b"
-                  />
-                  <Text style={{color: 'white', marginLeft: 10}}>
-                    Bạn đang có {totalAcceptedOrder} cuốc xe đang sửa
+                  <Text
+                    style={{color: 'white', fontWeight: 'bold', fontSize: 17}}>
+                    Thông báo
                   </Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-          ) : null}
-
-          <View style={{marginTop: 10}}>
-            <View style={styles.containerItem}>
-              <TouchableOpacity
-                style={[styles.containerItem, styles.item]}
-                onPress={() => {
-                  this.gotoOrderTab();
-                }}>
-                <Image
-                  source={require('../../assets/image/good-pincode.png')}
-                  style={{width: 40, height: 40}}
-                />
-                <View style={{marginLeft: 10}}>
-                  <Text style={{color: '#4e5e77'}}>Tỉ lệ thành công</Text>
-                  <Text style={styles.textNumber}>
-                    {' '}
-                    {rateSuccess.toFixed(2)} %
-                  </Text>
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.containerItem, styles.item]}
-                onPress={() => {
-                  showModalNavigation(
-                    'revenueStatistics',
-                    null,
-                    'Thống kê doanh thu 1 năm',
-                    true,
-                  );
-                }}>
-                <Image
-                  source={require('../../assets/image/sales-performance.png')}
-                  style={{width: 40, height: 40}}
-                />
-                <View style={{marginLeft: 10}}>
-                  <Text style={{color: '#4e5e77'}}>Doanh thu(vnd)</Text>
-                  <Text style={styles.textNumber}>
-                    {' '}
-                    {revenueMonth
-                      .toString()
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, '.')}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.containerItem}>
-              <TouchableOpacity
-                style={[styles.containerItem, styles.item]}
-                onPress={() => {
-                  this.gotoOrderTab();
-                }}>
-                <Image
-                  source={require('../../assets/image/order.png')}
-                  style={{width: 40, height: 40}}
-                />
-                <View style={{marginLeft: 10}}>
-                  <Text style={{color: '#4e5e77'}}>Số đơn hàng</Text>
-                  <Text style={styles.textNumber}>{totalOrder}</Text>
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity style={[styles.containerItem, styles.item]}>
-                <Image
-                  source={require('../../assets/image/icons8-star.png')}
-                  style={{width: 40, height: 40}}
-                />
-                <View style={{marginLeft: 10}}>
-                  <Text style={{color: '#4e5e77'}}>Đánh giá</Text>
                   <View
                     style={{
                       flexDirection: 'row',
-                      justifyContent: 'center',
+                      marginLeft: 30,
+                      marginTop: 5,
                       alignItems: 'center',
                     }}>
-                    <Text style={styles.textNumber}>5</Text>
                     <Icon
                       type="foundation"
-                      name="star"
-                      size={20}
+                      name="megaphone"
+                      size={25}
                       color="#ffba1b"
                     />
+                    <Text style={{color: 'white', marginLeft: 10}}>
+                      Bạn đang có {totalAcceptedOrder} cuốc xe đang sửa
+                    </Text>
                   </View>
                 </View>
               </TouchableOpacity>
+            ) : null}
+
+            <View style={{marginTop: 10}}>
+              <View style={styles.containerItem}>
+                <TouchableOpacity
+                  style={[styles.containerItem, styles.item]}
+                  onPress={() => {
+                    this.gotoOrderTab();
+                  }}>
+                  <Image
+                    source={require('../../assets/image/good-pincode.png')}
+                    style={{width: 40, height: 40}}
+                  />
+                  <View style={{marginLeft: 10}}>
+                    <Text style={{color: '#4e5e77'}}>Tỉ lệ thành công</Text>
+                    <Text style={styles.textNumber}>
+                      {' '}
+                      {rateSuccess.toFixed(2)} %
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.containerItem, styles.item]}
+                  onPress={() => {
+                    showModalNavigation(
+                      'revenueStatistics',
+                      null,
+                      'Thống kê doanh thu trong năm',
+                      true,
+                    );
+                  }}>
+                  <Image
+                    source={require('../../assets/image/sales-performance.png')}
+                    style={{width: 40, height: 40}}
+                  />
+                  <View style={{marginLeft: 10}}>
+                    <Text style={{color: '#4e5e77'}}>Doanh thu(vnd)</Text>
+                    <Text style={styles.textNumber}>
+                      {' '}
+                      {revenueMonth
+                        .toString()
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, '.')}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.containerItem}>
+                <TouchableOpacity
+                  style={[styles.containerItem, styles.item]}
+                  onPress={() => {
+                    this.gotoOrderTab();
+                  }}>
+                  <Image
+                    source={require('../../assets/image/order.png')}
+                    style={{width: 40, height: 40}}
+                  />
+                  <View style={{marginLeft: 10}}>
+                    <Text style={{color: '#4e5e77'}}>Số đơn hàng</Text>
+                    <Text style={styles.textNumber}>{totalOrder}</Text>
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.containerItem, styles.item]}>
+                  <Image
+                    source={require('../../assets/image/icons8-star.png')}
+                    style={{width: 40, height: 40}}
+                  />
+                  <View style={{marginLeft: 10}}>
+                    <Text style={{color: '#4e5e77'}}>Đánh giá</Text>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}>
+                      <Text style={styles.textNumber}>5</Text>
+                      <Icon
+                        type="foundation"
+                        name="star"
+                        size={20}
+                        color="#ffba1b"
+                      />
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-        </LinearGradient>
-      </View>
+          </LinearGradient>
+        </View>
+      </ScrollView>
     );
   }
 }

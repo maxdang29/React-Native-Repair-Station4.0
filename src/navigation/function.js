@@ -7,36 +7,40 @@ export const showModalNavigation = (
   pageTitle,
   visible = false,
 ) => {
-  Promise.all([Icon.getImageSource('arrow-left', 30)]).then(([leftIcon]) => {
-    Navigation.showModal({
-      stack: {
-        children: [
-          {
-            component: {
-              name: modal_name,
-              passProps: {
-                value,
-              },
-              options: {
-                topBar: {
-                  title: {
-                    text: pageTitle,
-                  },
-                  leftButtons: [
-                    {
-                      id: 'back',
-                      icon: leftIcon,
+  try {
+    Promise.all([Icon.getImageSource('arrow-left', 30)]).then(([leftIcon]) => {
+      Navigation.showModal({
+        stack: {
+          children: [
+            {
+              component: {
+                name: modal_name,
+                passProps: {
+                  value,
+                },
+                options: {
+                  topBar: {
+                    title: {
+                      text: pageTitle,
                     },
-                  ],
-                  visible: visible,
+                    leftButtons: [
+                      {
+                        id: 'back',
+                        icon: leftIcon,
+                      },
+                    ],
+                    visible: visible,
+                  },
                 },
               },
             },
-          },
-        ],
-      },
+          ],
+        },
+      });
     });
-  });
+  } catch (error) {
+    console.log('modal error', error);
+  }
 };
 
 showOverlay = (componentName, title, type, data, event) => {

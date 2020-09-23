@@ -53,7 +53,9 @@ export default class ItemOrder extends Component {
             <View style={[styles.row]}>
               <Text style={[styles.text, {color: '#5a5e68'}]}>Tổng tiền:</Text>
               <Text style={[styles.text, {fontWeight: 'bold'}]}>
-                {item.totalPrice} vnd
+                {item.totalPrice
+                  .toString()
+                  .replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' vnd'}
               </Text>
             </View>
           </View>
