@@ -309,7 +309,7 @@ class HomeFixer extends Component {
                   onPress={() => {
                     showModalNavigation(
                       'revenueStatistics',
-                      null,
+                      totalOrder,
                       'Thống kê doanh thu trong năm',
                       true,
                     );
